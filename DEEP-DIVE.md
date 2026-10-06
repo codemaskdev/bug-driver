@@ -896,6 +896,161 @@ export function countExamLap(record, lap) {
 
 ---
 
+## 8. Make your own track
+
+**The one idea:** a track is just a list of points. Everything else is the same rules on every track: the road width, the start line, the checkpoints and the physics. So anyone can draw a new one, it can be checked automatically, and it fits in a link.
+
+**Analogy:** a toy train set. You choose the layout; the rails, the train and the rules of the track are the same on every layout.
+
+**Key figure**
+
+![Paperclip: the gen 80 champion's two laps](docs/img/08-paperclip.svg)
+
+*Paperclip, a track drawn in the editor and opened from its share link, with the seed 3, generation 80 champion alone on it. Cyan: lap 1 (14.17 s), a crawl through the right-hand hairpin. Pink: lap 2, which ends in reverse against the wall.*
+
+### The editor
+Press T, then "Edit / new track". It opens on a copy of the current track (the built-in tracks themselves stay frozen), or empty after "Clear". Exam never opens in the editor.
+- **Click** to add a point at the end of the loop, **drag** a point to move it, **right-click** a point to delete it, **Backspace** to undo the last one.
+- The loop always closes: the last point joins the first.
+- **The start line is at the first point**, and you drive towards the second.
+- The road is always 90 px wide, the car and its physics are the frozen ones (PHYSICS_VERSION 3), and the checkpoints are made exactly as on every track: one every 48 px along the middle of the road (`buildTrack()`, unchanged).
+- At most 60 points. Coordinates are whole pixels on the 1280 × 720 screen.
+- Every valid track is kept in the browser as "My track". "Drive it" and "Let the AI train on it" only work while the track is valid.
+
+### The track check
+Every change is checked at once (`checkTrack()` in `src/sim/track-check.js`). Each problem comes with a plain message and the spot where it is, which the editor circles in pink.
+
+![The track check](docs/img/08-track-check.svg)
+
+*One real example of each problem, with the exact message the editor shows, and a track that passes.*
+
+The rules, in the order they are checked:
+- **Points:** at least 4 and at most 60, all on the screen, and no two neighbouring points closer than 16 px ("Two points are on top of each other").
+- **Fits on the screen:** both walls stay at least 10 px inside the edge of the screen.
+- **Too tight for the car:** the sharpest bend of the road's middle line must have a radius of at least 45 px, half the road width. It's measured with the circle through every three neighbouring samples, 8 px apart. Any tighter and the inside wall folds over itself, so the road stops being a road. (The car alone could turn tighter: at walking pace its middle can follow a circle of about 19.5 px radius, worked out from its turn rate of 3.6 radians per second and the steering rules. So in practice the road's shape is the limit, not the car.)
+- **Crosses or touches itself:** two parts of the road that are more than 180 px apart along the road must be at least 100 px apart on screen. That leaves at least 10 px of ground between their walls.
+- **Exam:** refused, also any track with exactly Exam's points in another order.
+
+All four built-in tracks a car may drive pass this check (a test makes sure). Their tightest bends: Zigzag 46.2 px, Neon Loop 53.4 px, Wide Sweepers 55.2 px.
+
+### Share links
+A link carries only the points: `?t=` followed by `1` (the version) and 4 letters per point, 2 for x and 2 for y.
+
+![How a point becomes letters](docs/img/08-link.svg)
+
+*The first point of Paperclip, (220, 100), becomes `DcBk`. Each letter stands for a number from 0 to 63 (A is 0, B is 1, …, _ is 63), so 2 letters hold any number from 0 to 4095: the first letter is how many whole 64s fit in, the second is what's left over. All 64 letters are safe in a web address as they are.*
+- Paperclip has 18 points, so its link is 18 × 4 + 1 = 73 letters.
+- **Opening a link checks everything** (`decodeTrack()`): the version letter, a length that is a multiple of 4, only the 64 allowed letters, and then the whole track check. Any problem gives a friendly message ("This track link is cut off or has extra letters. Copy the whole link again.") and Neon Loop opens instead. It never crashes: a test feeds it 2000 random strings and a dozen broken links.
+- **Round trip:** every built-in track a car may drive, turned into a link and back, gives exactly the same walls, checkpoints and start position (tested).
+- **Copy link** in the track menu copies the link of the current track. With a champion running, a second button copies "this track + this champion" (`?t=…&champion=3-80`), so a link can say "watch my car fail on your track". Built-in tracks get a short link (`?track=zigzag`). Exam never gets one.
+
+### On any track
+On every track except Exam, built-in, drawn or opened from a link:
+- **Drive it yourself:** the lap timer, and your best lap saved for that exact track (by its fingerprint, so a changed track starts with no best lap).
+- **Test a saved champion:** the picker in the bottom-right corner lists all 30 one-track champions (seeds 1–5, generations 1, 5, 10, 20, 40, 80) and the 7 multi-track ones of Step 7b.
+- **Train from scratch, live:** "train from scratch" in the picker, with the seed box, the speed keys (1, 2, 3) and the fitness chart. On a new track the chart goes wherever it covers the least road.
+- **Same track + same seed = same result.** Checked on Paperclip with seed 3: generations 1 and 2 in the browser and in Node give the same numbers to the last digit.
+
+On Exam you can only drive. Every AI car in the game is created by `createGeneration()`, which refuses Exam until my Exam lap is saved (ghosts/me-exam.json).
+
+### The replay check
+`node tools/replay-check.js` runs six fixed scenarios headless and compares them with the stored golden results in `tools/replay-golden.json`:
+1. My Neon Loop ghost (ghosts/me-v3.json).
+2. Three champion laps on Neon Loop: seed 3 generation 20, generation 80, and the multi-track generation 100.
+3. The first 3 generations of seed 3's evolution: every stats row, the champions, and the 100 brains of generation 4.
+4. Paperclip, opened from its share link: its walls and checkpoints, and the generation 80 champion on it.
+
+It doesn't only compare lap times. Every car's path is kept as a fingerprint of its exact position, heading and speed on every step. That matters: when we changed the car's turn rate by 0.0000001 (in a throwaway copy), all 6 scenarios came out different, but my ghost still finished in exactly 1584 steps. A check of lap times alone would have missed it. It runs in about 2 seconds and is part of `npm test`. `--update` stores new golden results, only for a change we mean, with a DEVLOG note.
+
+**Real numbers**
+
+![Every seed 3 champion on Paperclip](docs/img/08-paperclip-champions.svg)
+
+*Every saved seed 3 champion alone on Paperclip for 60 s. This is not a pre-registered test, just a track drawn for fun.*
+- **Generation 80 (one track):** lap 1 in 14.17 s. In the right-hand hairpin it slows to 7 px/s, almost a stop, and creeps round. On lap 2 it stops dead in the same hairpin at 22.48 s, keeps holding BRAKE, which from a standstill means reverse, and backs into the wall at 23.00 s (out by crash at 155.8% of a lap).
+- **Generations 10 and 20 (one track):** 4 laps each, best 14.32 s and 14.08 s.
+- **Generation 40:** stops in the hairpin on its first visit and stalls at 11.20 s.
+- **Generations 1 and 5:** no lap (stall at 3.00 s, crash at 19.88 s).
+- **Multi-track (Step 7b):** generation 10 drives 4 laps (best 14.38 s). Generations 20, 80 and 100 crash in the hairpin on their first visit, at 8.57, 8.58 and 8.48 s.
+
+**Our best explanation** (an inference, not a measurement): it's the same weakness as in chapter 7. Neon Loop's only hairpin turns left, and none of the three Step 7b training tracks has a right-hand hairpin either, so the later champions never needed one. This is not the exam: no AI has driven Exam.
+
+**What actually happened**
+- **How Paperclip was found.** We drew tracks until one broke the champion, and logged every try, with three champions (seed 3 generation 20, generation 80, and multi-track generation 100):
+  - An oval, a small circle and a rounded square, each driven both ways round: all three champions drove all six for the full 60 s.
+  - Six "paperclip" shapes, a loop with a notch whose end is a hairpin. With the hairpin turning left (two shapes), all three drove them. Of the four with a right-hand hairpin, one was too tight to be valid. On the other three, generation 20 always got round, generation 80 failed on two, and multi-track generation 100 failed on all three.
+  - Paperclip is the one where generation 80 gets round once and fails on lap 2, so it's the one we kept.
+- **The first replay check missed something.** It compared only my ghost's lap time. The deliberate 0.0000001 change showed that the time didn't move while the path did, so the ghost's path fingerprint was added before anything was committed.
+- **An old bug turned up:** pressing R on a multi-track champion restarted the one-track champion of the same generation. Fixed, because the game now remembers each champion by its full name.
+- **Small layout fixes:** the editor's buttons first covered the start point, and on a crowded track the chart landed on the start line. Both moved.
+
+**The prompt:** [entry 17: make your own track](PROMPTS.md#17-step-8-things-for-viewers).
+
+**In the code**
+- `openEditor()` and `customTrack()` in `src/game/editor.js`: the editor. `drawEditor()` in `src/render/editor-view.js` draws it.
+- `checkTrack()` and `tightestTurn()` in `src/sim/track-check.js`: the track check.
+- `encodeTrack()` and `decodeTrack()` in `src/sim/share-link.js`: track to link and back.
+- `isHeldOut()`, `isExamShape()` and `refuseHeldOut()` in `src/sim/held-out.js`: the Exam rule, in one place.
+- `openTrackMenu()` and `linkFor()` in `src/game/track-menu.js`: the T menu and the share links.
+- `runScenarios()` and `compareWithGolden()` in `tools/replay-check.js`: the replay check.
+
+**The full code**
+
+`encodeTrack()`: refuse Exam, then write "1" and, for every point, x and y as two letters each.
+
+<!-- full-code src/sim/share-link.js encodeTrack -->
+```js
+// Turns a track's points into the text that goes in the link.
+export function encodeTrack(points) {
+  if (isExamShape(points)) throw new Error('Exam is held out: it never goes in a link');
+  let link = LINK_VERSION;
+  for (const [x, y] of points) {
+    for (const n of [x, y]) {
+      link += LETTERS[Math.floor(n / 64)];
+      link += LETTERS[n % 64];
+    }
+  }
+  return link;
+}
+```
+<!-- /full-code -->
+
+`decodeTrack()`: the same steps backwards, checking each one, and finally the whole track check. Every way out is a plain message; nothing in it can crash on a bad link.
+
+<!-- full-code src/sim/share-link.js decodeTrack -->
+```js
+// The other way: link text -> {track} (a track definition, already checked) or {error} (a plain message).
+// It never throws: a broken or edited link only ever gets a friendly message.
+export function decodeTrack(text) {
+  if (typeof text !== 'string' || text.length === 0) return { error: 'This link has no track in it.' };
+  if (text[0] !== LINK_VERSION) return { error: "This link isn't a Bug Driver track, or it's from a newer version of the game." };
+  const body = text.slice(1);
+  if (body.length % 4 !== 0) return { error: 'This track link is cut off or has extra letters. Copy the whole link again.' };
+  const numbers = [];
+  for (const letter of body) {
+    const n = LETTERS.indexOf(letter);
+    if (n < 0) return { error: "This track link has letters in it that don't belong. Copy the whole link again." };
+    numbers.push(n);
+  }
+  const points = [];
+  for (let i = 0; i < numbers.length; i += 4) {
+    points.push([numbers[i] * 64 + numbers[i + 1], numbers[i + 2] * 64 + numbers[i + 3]]);
+  }
+  const def = { id: 'custom', name: 'Shared track', width: ROAD_WIDTH, points };
+  let check;
+  try {
+    check = checkTrack(def);
+  } catch {
+    return { error: "This track link opens a track that can't be built." };
+  }
+  if (!check.ok) return { error: `This track link opens a track that can't be driven: ${check.problems[0].message}` };
+  return { track: def };
+}
+```
+<!-- /full-code -->
+
+---
+
 ## Glossary
 
 - **Activation function:** another name for a squash function. See *squash*.
@@ -915,6 +1070,7 @@ export function countExamLap(record, lap) {
 - **Function:** a small, named piece of code that does one job.
 - **Generalize:** do well on something new, not just on what you trained on. A car that generalizes can drive tracks it has never seen.
 - **Generation:** one round of 100 cars driving at the same time.
+- **Golden results:** the stored, known-good results the replay check compares against (`tools/replay-golden.json`).
 - **Ghost:** a recorded lap: the starting position plus the keys held on every step. Replaying it drives exactly the same lap.
 - **Held out:** kept aside on purpose and never used for training, so it can be a fair test later. The Exam track is held out.
 - **Hidden neuron:** a neuron between the inputs and the outputs. It's "hidden" because you never see it from outside.
@@ -932,15 +1088,19 @@ export function countExamLap(record, lap) {
 - **Population:** all the cars of one generation, here 100.
 - **px (pixel):** one dot on the screen. The screen is 1280 × 720 px.
 - **Race:** my ghost lap and a champion's best lap, driven at the same time on the same track. They can't collide.
+- **Replay check:** a fixed set of runs whose results must never change unless we mean them to (`tools/replay-check.js`).
 - **Ray:** one of the car's 5 eyes: a line that goes out until it hits a wall, up to 200 px.
 - **Seed:** the starting number for the random number generator. The same seed always gives the same "random" numbers.
 - **Scoreboard:** my best lap against the champion of each of the six fixed generations (1, 5, 10, 20, 40, 80), and the running score.
 - **Selection:** ranking the cars by fitness and keeping the best as parents.
+- **Share link:** a web address that carries a whole track as letters, 4 per point, so it opens exactly that track.
 - **Sigmoid:** a squash function whose result is always between 0 and 1. Used for the 4 keys.
 - **Simulation:** a pretend world inside the computer that follows fixed rules.
 - **Squash:** turn any number into one in a fixed range, so nothing runs off to infinity.
 - **Stall:** a car that goes 3 seconds without reaching a new checkpoint is out.
 - **Standing start:** a lap that starts from rest, 30 px behind the line. A champion's first lap is one.
 - **Step:** one tick of the simulation, one sixtieth of a second.
+- **Track check:** the automatic test of a drawn track: enough points, on the screen, no turn too tight, and the road doesn't cross or touch itself.
+- **Track editor:** the screen where you click points to draw your own track.
 - **tanh:** a squash function whose result is always between −1 and 1. Used for the hidden neurons.
 - **Weight:** the number a neuron multiplies one input by. A big weight means "this input matters a lot". A negative weight means "this input pushes the other way".

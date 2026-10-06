@@ -682,6 +682,109 @@
   },
   "minSpeed": -90
  },
+ "paperclip": {
+  "link": "1DcBkCgCgCgIwDcJsQkJsRgIwRgH-QaG4G4G4FsGgFUFoFsEwG4EYQaEYRgDSRgCgQkBkIwBk",
+  "points": 18,
+  "letters": 73,
+  "checkpoints": 89,
+  "length": 4260.372194599692,
+  "gen80": {
+   "lap1Seconds": 14.166666666666666,
+   "slowestInHairpinLap1": 6.6183005146617795,
+   "stopSecondsLap2": 22.483333333333334,
+   "crashSeconds": 23,
+   "minSpeed": -90
+  },
+  "champions": [
+   {
+    "name": "seed 3 · gen 1",
+    "laps": [],
+    "out": "stall",
+    "outSeconds": 3,
+    "percent": 0.2
+   },
+   {
+    "name": "seed 3 · gen 5",
+    "laps": [],
+    "out": "crash",
+    "outSeconds": 19.88,
+    "percent": 59.4
+   },
+   {
+    "name": "seed 3 · gen 10",
+    "laps": [
+     14.38,
+     14.35,
+     14.33,
+     14.32
+    ],
+    "out": "time",
+    "outSeconds": 60,
+    "percent": 413.5
+   },
+   {
+    "name": "seed 3 · gen 20",
+    "laps": [
+     14.38,
+     14.08,
+     14.17,
+     14.22
+    ],
+    "out": "time",
+    "outSeconds": 60,
+    "percent": 417.6
+   },
+   {
+    "name": "seed 3 · gen 40",
+    "laps": [],
+    "out": "stall",
+    "outSeconds": 11.2,
+    "percent": 57.2
+   },
+   {
+    "name": "seed 3 · gen 80",
+    "laps": [
+     14.17
+    ],
+    "out": "crash",
+    "outSeconds": 23,
+    "percent": 155.8
+   },
+   {
+    "name": "seed 3 · 3 tracks · gen 10",
+    "laps": [
+     14.55,
+     14.43,
+     14.42,
+     14.38
+    ],
+    "out": "time",
+    "outSeconds": 60,
+    "percent": 410.3
+   },
+   {
+    "name": "seed 3 · 3 tracks · gen 20",
+    "laps": [],
+    "out": "crash",
+    "outSeconds": 8.57,
+    "percent": 57.1
+   },
+   {
+    "name": "seed 3 · 3 tracks · gen 80",
+    "laps": [],
+    "out": "crash",
+    "outSeconds": 8.58,
+    "percent": 57.5
+   },
+   {
+    "name": "seed 3 · 3 tracks · gen 100",
+    "laps": [],
+    "out": "crash",
+    "outSeconds": 8.48,
+    "percent": 56.7
+   }
+  ]
+ },
  "seeds": {
   "1": {
    "firstLap": null,
@@ -938,6 +1041,26 @@
   {
    "name": "simple-7-mirror-crash.svg",
    "about": "Simple guide, ch 7: the champion that beat me stops dead in the mirrored hairpin and reverses into the wall."
+  },
+  {
+   "name": "simple-8-paperclip.svg",
+   "about": "Simple guide, ch 8: on a track drawn in the editor, the gen 80 champion crawls round the right-hand hairpin once, then reverses into the wall."
+  },
+  {
+   "name": "08-paperclip.svg",
+   "about": "Paperclip: lap 1 through the right-hand hairpin at a crawl, lap 2 stops and reverses into the wall."
+  },
+  {
+   "name": "08-paperclip-champions.svg",
+   "about": "Every saved seed 3 champion (one-track and multi-track) on Paperclip."
+  },
+  {
+   "name": "08-track-check.svg",
+   "about": "The editor's live check: one real example of each problem, with the exact message it shows."
+  },
+  {
+   "name": "08-link.svg",
+   "about": "How one clicked point becomes 4 letters of the share link."
   }
  ]
 }

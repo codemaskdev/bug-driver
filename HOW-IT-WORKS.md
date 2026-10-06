@@ -703,4 +703,71 @@ For the curious: [Deep dive →](DEEP-DIVE.md#7-did-it-learn-or-memorize)
 
 ---
 
+## 8. Make your own track
+
+**Draw any track you like. The cars can drive it, learn it, or fail on it, and a link carries it to a friend.**
+
+Think of a toy train set. You lay the rails in any shape you want, and the same little train runs on every layout.
+
+![On a track I drew, the best car of generation 80 crawls round the hairpin once, then reverses into the wall](docs/img/simple-8-paperclip.svg)
+
+Press T in the game and pick "Edit / new track". Click on the screen to place points, and the road joins them into a loop. Drag a point to move it. The road is always the same width, and the car is the same car. The first point is the start line.
+
+The game checks your track while you draw. If the road crosses itself, a turn is too tight, or the track runs off the screen, it says so in plain words, and you can't drive it until it's fixed.
+
+Then the whole track fits in a link: every point becomes 4 letters. Send the link, and a friend opens exactly your track. On it you can drive, let a saved champion try, or let new cars learn it from scratch.
+
+**What really happened:** I drew a track with a hairpin that turns right, and called it Paperclip. The best car of generation 80 crawled round that hairpin on its first lap. On the second lap it stopped in the same hairpin, kept holding the brake, and reversed into the wall. Some older champions drove it without a problem.
+
+<!-- look-at-the-code
+file: src/sim/share-link.js
+function: encodeTrack
+title: how a track becomes a link
+intro: The points you clicked go in, and the letters for the link come out.
+export function encodeTrack(points) { => It gets the points you clicked. Each point is two numbers: x (how far across the screen) and y (how far down).
+  if (isExamShape(points)) throw new Error('Exam is held out: it never goes in a link'); => If these are exactly the Exam track's points, stop with an error: Exam stays secret, so it never goes in a link. (`throw` means "stop everything and report a problem".)
+  let link = LINK_VERSION; => The link starts with "1": which version of this recipe wrote it.
+  for (const [x, y] of points) { => For every point, take out its two numbers, x and y.
+    for (const n of [x, y]) { => Do the same thing for x and then for y:
+      link += LETTERS[Math.floor(n / 64)]; => How many whole 64s fit into the number? (`Math.floor` rounds down.) Add the letter at that place in the list of 64 letters...
+      link += LETTERS[n % 64]; => ...then add the letter for what's left over. (`%` means "the leftover after dividing".) Two letters can stand for any number up to 4095.
+    } => Both numbers done: 4 letters for this point.
+  } => Every point done.
+  return link; => The finished letters. In the web address they go after "?t=".
+} => End.
+-->
+> **Look at the code: how a track becomes a link**
+> The points you clicked go in, and the letters for the link come out.
+>
+> ```js
+> export function encodeTrack(points) {
+>   if (isExamShape(points)) throw new Error('Exam is held out: it never goes in a link');
+>   let link = LINK_VERSION;
+>   for (const [x, y] of points) {
+>     for (const n of [x, y]) {
+>       link += LETTERS[Math.floor(n / 64)];
+>       link += LETTERS[n % 64];
+>     }
+>   }
+>   return link;
+> }
+> ```
+>
+> 1. `export function encodeTrack(points) {` — It gets the points you clicked. Each point is two numbers: x (how far across the screen) and y (how far down).
+> 2. `if (isExamShape(points)) throw new Error('Exam is held out: it never goes in a link');` — If these are exactly the Exam track's points, stop with an error: Exam stays secret, so it never goes in a link. (`throw` means "stop everything and report a problem".)
+> 3. `let link = LINK_VERSION;` — The link starts with "1": which version of this recipe wrote it.
+> 4. `for (const [x, y] of points) {` — For every point, take out its two numbers, x and y.
+> 5. `for (const n of [x, y]) {` — Do the same thing for x and then for y:
+> 6. `link += LETTERS[Math.floor(n / 64)];` — How many whole 64s fit into the number? (`Math.floor` rounds down.) Add the letter at that place in the list of 64 letters...
+> 7. `link += LETTERS[n % 64];` — ...then add the letter for what's left over. (`%` means "the leftover after dividing".) Two letters can stand for any number up to 4095.
+> 8. `}` — Both numbers done: 4 letters for this point.
+> 9. `}` — Every point done.
+> 10. `return link;` — The finished letters. In the web address they go after "?t=".
+> 11. `}` — End.
+<!-- /look-at-the-code -->
+
+For the curious: [Deep dive →](DEEP-DIVE.md#8-make-your-own-track)
+
+---
+
 *Simple, but never wrong: every number here is real and comes from the actual program. The [deep dive](DEEP-DIVE.md) has the precise values and how to check each one yourself.*

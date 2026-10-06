@@ -8,11 +8,14 @@ import { TRACKS, buildTrack } from '../src/sim/track.js';
 import { CAR } from '../src/sim/car.js';
 import { SENSOR_ANGLES, SENSOR_LABELS, SENSOR_RANGE, eyePosition } from '../src/sim/sensors.js';
 import { explainThink, OUTPUT_LABELS, BRAIN_SIZE, INPUTS, HIDDEN, OUTPUTS, tanh, sigmoid } from '../src/sim/brain.js';
-import { createGeneration, stepGeneration, fitness } from '../src/sim/generation.js';
+import { createGeneration, stepGeneration, fitness, progressPercent } from '../src/sim/generation.js';
 import { createEvolution, runEvolution, finishGeneration, nextGeneration } from '../src/sim/evolution.js';
 import { STEPS_PER_SECOND } from '../src/sim/constants.js';
 import { createRace, stepRace, raceResult } from '../src/sim/race.js';
 import { buildScoreboard } from '../src/sim/scoreboard.js';
+import { checkTrack } from '../src/sim/track-check.js';
+import { encodeTrack, decodeTrack, LETTERS } from '../src/sim/share-link.js';
+import { PAPERCLIP_LINK } from './replay-check.js';
 
 const root = new URL('../', import.meta.url);
 const OUT = new URL('docs/img/', root);
@@ -905,6 +908,147 @@ scoreboardFigure('simple-6-scoreboard.svg', true);
   save('07-mirror-crash.svg', draw(false).svg, 'The gen 80 champion in the mirrored hairpin: full speed, a dead stop, then reverse into the wall.');
   save('simple-7-mirror-crash.svg', draw(true).svg, 'Simple guide, ch 7: the champion that beat me stops dead in the mirrored hairpin and reverses into the wall.');
   data.mirrorCrash = { stopSeconds: stopAt.step / 60, crashSeconds: last.step / 60, crashAt: { x: last.x, y: last.y }, minSpeed: Math.min(...trace.map((p) => p.speed)) };
+}
+
+// ===================================================================
+// Chapter 8: make your own track  (no AI car ever drives Exam here)
+// ===================================================================
+// A whole track, scaled: road, glowing walls, the start line and a direction arrow
+function drawAnyTrack(t, v) {
+  const d = (pts) => pts.map((p, i) => `${i ? 'L' : 'M'}${r1(at(v, p).x)},${r1(at(v, p).y)}`).join('') + 'Z';
+  const parts = [`<path d="${d(t.outer)}${d(t.inner)}" fill="${C.road}" fill-rule="evenodd"/>`];
+  parts.push(poly(t.outer.map((p) => at(v, p)), { stroke: C.magenta, width: 2, closed: true, glow: true }));
+  parts.push(poly(t.inner.map((p) => at(v, p)), { stroke: C.magenta, width: 2, closed: true, glow: true }));
+  const cp = t.checkpoints[0], a = at(v, { x: cp.ax, y: cp.ay }), b = at(v, { x: cp.bx, y: cp.by });
+  parts.push(line(a.x, a.y, b.x, b.y, C.text, 4));
+  return parts.join('\n');
+}
+{
+  const paperDef = decodeTrack(PAPERCLIP_LINK).track;
+  const t = buildTrack(paperDef);
+  const run = (brain) => {
+    const gen = createGeneration(t, [brain]);
+    const trace = [], laps = [];
+    while (!gen.over) {
+      for (const e of stepGeneration(gen)) if (e.type === 'lap') laps.push({ at: gen.step, steps: e.steps });
+      const c = gen.cars[0].world.car;
+      trace.push({ x: c.x, y: c.y, angle: c.angle, speed: c.speed, step: gen.step });
+    }
+    const car = gen.cars[0];
+    return { trace, laps, out: car.out, outStep: car.outStep, best: car.bestLapSteps, percent: progressPercent(car.world) };
+  };
+  const g80 = run(champs[3]['80'].brain);
+  const lapEnd = g80.laps[0].at;
+  const lapStart = lapEnd - g80.laps[0].steps;
+  // the hairpin is the part of the road left of x = 470 between the notch's two straights
+  const inHairpin = (p) => p.x < 470 && p.y > 250 && p.y < 470 && p.x > 250;
+  const pin1 = g80.trace.filter((p) => p.step < lapEnd && inHairpin(p));
+  const pin2 = g80.trace.filter((p) => p.step > lapEnd && inHairpin(p));
+  const slowest1 = pin1.reduce((a, p) => (p.speed < a.speed ? p : a));
+  const stop2 = pin2.find((p) => p.speed <= 0);
+  const last = g80.trace[g80.trace.length - 1];
+
+  const draw = (big) => {
+    const v = { x0: 90, y0: 30, scale: big ? 0.68 : 0.62, ox: 20, oy: big ? 20 : 54 };
+    const parts = [drawAnyTrack(t, v)];
+    const lap1 = g80.trace.filter((p) => p.step >= lapStart && p.step <= lapEnd);
+    const lap2 = g80.trace.filter((p) => p.step >= lapEnd);
+    parts.push(poly(lap1.map((p) => at(v, p)), { stroke: C.cyan, width: big ? 4 : 3, opacity: 0.8, glow: true }));
+    parts.push(poly(lap2.map((p) => at(v, p)), { stroke: C.pink, width: big ? 5 : 4, glow: true }));
+    parts.push(drawBug(v, last, { color: C.pink, scale: big ? 1.4 : 1.2 }));
+    const s1 = at(v, slowest1), pl = at(v, last);
+    parts.push(circle(s1.x, s1.y, big ? 7 : 5, { fill: C.cyan, glow: true }));
+    const size = big ? 19 : 13;
+    if (big) {
+      // in the empty strips of ground above and below the hairpin's two straights
+      const above = at(v, { x: 290, y: 200 }), below = at(v, { x: 290, y: 545 });
+      parts.push(text(above.x, above.y, 'lap 1: crawls round the hairpin', { size, color: C.cyan, weight: 'bold', glow: true }));
+      parts.push(text(below.x, below.y, 'lap 2: stops, then reverses into the wall', { size, color: C.pink, weight: 'bold', glow: true }));
+      parts.push(text(30, 535, 'a track I drew, opened from a link:', { size: 18, color: C.text }));
+      parts.push(text(30, 562, 'the best car of generation 80 fails its right-hand hairpin', { size: 18, color: C.text }));
+    } else {
+      parts.push(text(20, 30, 'Paperclip, opened from its share link · the seed 3, generation 80 champion', { size: 14, weight: 'bold', color: C.cyan }));
+      [[`cyan: lap 1, ${sec(g80.laps[0].steps)} s. In the hairpin (it turns right) it slows to ${slowest1.speed.toFixed(0)} px/s, almost a stop, and creeps round`, C.cyan],
+        [`pink: lap 2. Same hairpin: it stops dead at ${sec(stop2.step)} s, keeps holding BRAKE (from a standstill that means reverse),`, C.pink],
+        [`and backs into the wall at ${sec(last.step)} s. It never finishes lap 2.`, C.pink]].forEach(([l, color], i) => parts.push(text(20, 548 + i * 20, l, { size: 12, color })));
+    }
+    return svg(big ? 920 : 900, big ? 590 : 618, 'My track breaks the champion', parts.join('\n'));
+  };
+  save('simple-8-paperclip.svg', draw(true), 'Simple guide, ch 8: on a track drawn in the editor, the gen 80 champion crawls round the right-hand hairpin once, then reverses into the wall.');
+  save('08-paperclip.svg', draw(false), 'Paperclip: lap 1 through the right-hand hairpin at a crawl, lap 2 stops and reverses into the wall.');
+
+  // every saved champion of seed 3 on Paperclip
+  const tried = [['seed 3 · gen 1', champs[3]['1']], ['seed 3 · gen 5', champs[3]['5']], ['seed 3 · gen 10', champs[3]['10']], ['seed 3 · gen 20', champs[3]['20']],
+    ['seed 3 · gen 40', champs[3]['40']], ['seed 3 · gen 80', champs[3]['80']]];
+  const multi = json('champions/seed-3-multi.json').champions;
+  for (const g of ['10', '20', '80', '100']) tried.push([`seed 3 · 3 tracks · gen ${g}`, multi[g]]);
+  const rows = tried.map(([name, c]) => {
+    const r = run(c.brain);
+    return { name, laps: r.laps.map((l) => +sec(l.steps)), out: r.out, outSeconds: +sec(r.outStep), percent: +r.percent.toFixed(1) };
+  });
+  const m = [text(20, 34, 'every saved champion of seed 3, alone on Paperclip for 60 s', { size: 14, weight: 'bold', color: C.cyan })];
+  rows.forEach((r, i) => {
+    const y = 66 + i * 28, ok = r.laps.length > 0;
+    m.push(text(20, y, r.name, { size: 12, color: C.text }));
+    const what = r.out === 'time' ? `${r.laps.length} laps, best ${Math.min(...r.laps).toFixed(2)} s` : ok ? `${r.laps.length} lap (${r.laps[0].toFixed(2)} s), then ${r.out} at ${r.outSeconds.toFixed(2)} s` : `no lap: ${r.out} at ${r.outSeconds.toFixed(2)} s`;
+    m.push(rect(250, y - 16, 360, 23, { fill: r.out === 'time' ? C.cyan : C.pink, opacity: 0.16, rx: 5 }));
+    m.push(text(430, y, what, { anchor: 'middle', size: 12, color: r.out === 'time' ? C.cyan : C.pink, weight: 'bold' }));
+  });
+  m.push(text(20, 66 + rows.length * 28 + 4, 'cyan = still driving at 60 s · pink = out (crash or stall) · a track drawn for fun, not a pre-registered test', { size: 11, color: C.dim }));
+  save('08-paperclip-champions.svg', svg(720, 66 + rows.length * 28 + 24, 'Every seed 3 champion on Paperclip', m.join('\n')), 'Every saved seed 3 champion (one-track and multi-track) on Paperclip.');
+
+  // the track check: one real example of each problem, with the editor's own message
+  const examples = [
+    ['crosses', 'a figure eight', [[340, 200], [640, 360], [940, 520], [1100, 360], [940, 200], [660, 360], [340, 520], [180, 360]]],
+    ['too-tight', 'a sharp corner', [[300, 200], [900, 200], [320, 230], [300, 500]]],
+    ['off-screen', 'too close to the edge', Array.from({ length: 16 }, (_, i) => { const a = (i / 16) * 2 * Math.PI; return [Math.round(640 + 420 * Math.cos(a)), Math.round(480 + 220 * Math.sin(a))]; })],
+    ['ok', 'Paperclip', paperDef.points],
+  ];
+  const k = [];
+  examples.forEach(([kind, title, pts], i) => {
+    const def = { id: 'custom', name: title, width: 90, points: pts };
+    const check = checkTrack(def);
+    const v = { x0: 0, y0: 0, scale: 0.3, ox: 30 + (i % 2) * 420, oy: 80 + Math.floor(i / 2) * 290 };
+    k.push(rect(v.ox, v.oy, 1280 * 0.3, 720 * 0.3, { stroke: C.cyan, strokeOpacity: 0.25, rx: 4 }));
+    const built = check.track ?? buildTrack(def);
+    k.push(drawAnyTrack(built, v));
+    for (const p of pts) { const q = at(v, { x: p[0], y: p[1] }); k.push(circle(q.x, q.y, 2.5, { fill: C.cyan })); }
+    const first = check.problems[0];
+    if (first) { const q = at(v, first); k.push(circle(q.x, q.y, 14, { stroke: C.pink, width: 2.5, glow: true })); }
+    const msg = first ? first.message : `Ready: ${check.track.checkpoints.length} checkpoints, ${Math.round(check.track.length)} px of road.`;
+    // the message in at most two lines that fit over the panel
+    const words = msg.split(' '), lines = [''];
+    for (const w of words) { if ((lines[lines.length - 1] + ' ' + w).trim().length > 58) lines.push(''); lines[lines.length - 1] = (lines[lines.length - 1] + ' ' + w).trim(); }
+    k.push(text(v.ox, v.oy - 40, title, { size: 13, weight: 'bold', color: first ? C.pink : C.green }));
+    lines.forEach((l, j) => k.push(text(v.ox, v.oy - 23 + j * 14, l, { size: 10.5, color: first ? C.pink : C.green })));
+    if (kind !== 'ok' && first?.kind !== kind) throw new Error(`track check example "${title}" gave ${first?.kind}, expected ${kind}`);
+  });
+  save('08-track-check.svg', svg(860, 600 + 20, 'The track check', k.join('\n')), 'The editor\'s live check: one real example of each problem, with the exact message it shows.');
+
+  // how a point becomes four letters
+  const [px, py] = paperDef.points[0];
+  const link = encodeTrack(paperDef.points);
+  const L = [text(20, 34, 'how one point becomes 4 letters of the link', { size: 14, weight: 'bold', color: C.cyan })];
+  const part = (n, x, label) => {
+    const hi = Math.floor(n / 64), lo = n % 64;
+    L.push(text(x, 76, `${label} = ${n}`, { size: 16, weight: 'bold', color: C.text }));
+    L.push(text(x, 104, `${n} = ${hi} × 64 + ${lo}`, { size: 13, color: C.dim }));
+    L.push(text(x, 132, `letter no. ${hi} = ${LETTERS[hi]}   letter no. ${lo} = ${LETTERS[lo]}`, { size: 13, color: C.dim }));
+    L.push(text(x, 168, `${LETTERS[hi]}${LETTERS[lo]}`, { size: 30, weight: 'bold', color: C.yellow, glow: true }));
+  };
+  part(px, 30, 'x');
+  part(py, 330, 'y');
+  L.push(text(30, 196, `the 64 letters, numbered from 0: ${LETTERS}`, { size: 10, color: C.dim }));
+  L.push(text(30, 220, `the first point (${px}, ${py}) → ${link.slice(1, 5)} · the link starts with "1", the version`, { size: 12, color: C.text }));
+  L.push(text(30, 244, `?t=${link}`, { size: 11, color: C.cyan }));
+  L.push(text(30, 266, `${paperDef.points.length} points × 4 letters + 1 = ${link.length} letters for the whole track`, { size: 12, color: C.dim }));
+  save('08-link.svg', svg(680, 294, 'A track in a link', L.join('\n')), 'How one clicked point becomes 4 letters of the share link.');
+
+  data.paperclip = {
+    link, points: paperDef.points.length, letters: link.length, checkpoints: t.checkpoints.length, length: t.length,
+    gen80: { lap1Seconds: g80.laps[0].steps / 60, slowestInHairpinLap1: slowest1.speed, stopSecondsLap2: stop2.step / 60, crashSeconds: last.step / 60, minSpeed: Math.min(...g80.trace.map((p) => p.speed)) },
+    champions: rows,
+  };
 }
 
 // ---------- tables the guide quotes ----------

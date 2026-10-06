@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="370" viewBox="0 0 720 370" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+<title>Every seed 3 champion on Paperclip</title>
+<defs><filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="720" height="370"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9fb3c8"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="369" rx="16" fill="#0b0d13" stroke="#00f0ff" stroke-opacity="0.25"/>
+<text x="20" y="34" font-size="14" fill="#00f0ff" fill-opacity="1" text-anchor="start" font-weight="bold">every saved champion of seed 3, alone on Paperclip for 60 s</text>
+<text x="20" y="66" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · gen 1</text>
+<rect x="250" y="50" width="360" height="23" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="430" y="66" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">no lap: stall at 3.00 s</text>
+<text x="20" y="94" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · gen 5</text>
+<rect x="250" y="78" width="360" height="23" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="430" y="94" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">no lap: crash at 19.88 s</text>
+<text x="20" y="122" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · gen 10</text>
+<rect x="250" y="106" width="360" height="23" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="430" y="122" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">4 laps, best 14.32 s</text>
+<text x="20" y="150" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · gen 20</text>
+<rect x="250" y="134" width="360" height="23" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="430" y="150" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">4 laps, best 14.08 s</text>
+<text x="20" y="178" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · gen 40</text>
+<rect x="250" y="162" width="360" height="23" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="430" y="178" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">no lap: stall at 11.20 s</text>
+<text x="20" y="206" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · gen 80</text>
+<rect x="250" y="190" width="360" height="23" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="430" y="206" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">1 lap (14.17 s), then crash at 23.00 s</text>
+<text x="20" y="234" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · 3 tracks · gen 10</text>
+<rect x="250" y="218" width="360" height="23" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="430" y="234" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">4 laps, best 14.38 s</text>
+<text x="20" y="262" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · 3 tracks · gen 20</text>
+<rect x="250" y="246" width="360" height="23" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="430" y="262" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">no lap: crash at 8.57 s</text>
+<text x="20" y="290" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · 3 tracks · gen 80</text>
+<rect x="250" y="274" width="360" height="23" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="430" y="290" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">no lap: crash at 8.58 s</text>
+<text x="20" y="318" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · 3 tracks · gen 100</text>
+<rect x="250" y="302" width="360" height="23" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="430" y="318" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">no lap: crash at 8.48 s</text>
+<text x="20" y="350" font-size="11" fill="#9fb3c8" fill-opacity="1" text-anchor="start" font-weight="normal">cyan = still driving at 60 s · pink = out (crash or stall) · a track drawn for fun, not a pre-registered test</text>
+</svg>
