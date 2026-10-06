@@ -401,3 +401,34 @@ I drove Exam: 3 counted laps, best 21.37 s.  ## 1. My Exam ghost Move it to ghos
 
 Built: Step 7b exactly as pre-registered. Seed 3 was trained from scratch on three tracks, and its champions are saved. Races now work on other tracks, but only where there's a ghost of mine.
 What broke: there was no me-exam.json anywhere, and no Exam lap in the browser. The 21.37 s lap is the best lap stored for Zigzag (exactly 1282 steps), so it looks like the drive was on Zigzag, not Exam. Exam is still undriven, so part 1 and the exam itself (part 3) wait for that drive.
+
+## 16. Real code in the guide, every line explained
+
+````text
+<pasted_content id="4e88">
+New goal for the guide and the video: a complete beginner should understand everything, including the code. Real code, in small pieces, every line explained in plain words.
+
+## 1. A new intro chapter in HOW-IT-WORKS.md: "What is all this?"
+- What "AI", a "neural network" and "learning" mean here, in plain words (no history, no hype).
+- What Claude Code is: I describe what I want in English, it writes the code. Everything in this project was built that way.
+- What we're building, and what you need to do it yourself: a browser, Claude Code, one evening.
+- How to run the project locally: the exact commands, each one explained in one line.
+
+## 2. A "Look at the code" box in every chapter (simple guide)
+- Real code from the project, never a retyped or "simplified" copy. tools/guide-page.js extracts each function from its source file by name, so the guide always matches the running code. The build fails if a function is missing.
+- At most 10–12 lines per snippet. If a function is longer, show the core and say in plain words what the skipped part does ("… the rest checks the walls").
+- Every line gets a plain-English explanation next to it (a two-column layout on the web page, line-by-line comments under the snippet in Markdown). Explain what it does in the car's world, not programming jargon: "multiply what this eye sees by how much this eye matters, and add it to the total".
+- Explain any code symbol the first time it appears (what [ ] means, what a function is, what a loop is), once, in the intro or the first snippet.
+- Snippets: getInputs (eyes), neuron and think (brain), fitness, selection, mutate, nextGeneration (evolution), and the main step loop (what happens 60 times a second).
+
+## 3. Readability pass on exactly those functions
+If any of them is dense or clever, rewrite it to read like plain steps (clear names, one idea per line, short comment above). Behavior must not change at all: the replay check, all champion lap times and the seed 3 evolution history must stay bit-identical. Prove it with the existing tests plus a full seed 3 rerun compared to runs/seed-3.json.
+
+## 4. Deep dive
+Add the full code of each of those functions to DEEP-DIVE.md (also extracted by name), with a short walkthrough.
+
+Update CLAUDE.md: every new step's chapter must include a "Look at the code" box. Rebuild the web page, commit, and send me the intro chapter plus two finished "Look at the code" boxes (neuron and mutate) so I can check the tone.
+````
+
+Built: an intro chapter for complete beginners, and a "Look at the code" box in every chapter of the simple guide. Each box is real code, pulled from the source by function name (tools/code-boxes.js), with every line explained. The deep dive has the full functions. Nine functions were rewritten to read like plain steps.
+What broke: nothing in behavior. All 55 tests pass, and a full seed 3 rerun is identical to runs/seed-3.json. Two snags in the tooling, both fixed before committing: the box matcher first ignored indentation, so a `}` could match the wrong closing brace, and the deep dive used "÷".

@@ -394,3 +394,28 @@ Multi-track champions (`node tools/multi-train.js`, champions/seed-3-multi.json)
 
 - Also new: `?race=exam&champion=3-multi-100` races a champion against my ghost on another track. It refuses when I have no ghost lap there; for Exam that means until ghosts/me-exam.json exists.
 - 55 tests pass.
+
+## 2026-10-06 — Real code in the guide
+Commits b16d35e (readability pass) and 87083da (intro chapter, code boxes, deep-dive code).
+
+**The goal:** a complete beginner should be able to follow everything, including the code.
+
+**The readability pass.** These functions were rewritten to read like plain steps: getInputs (now split, with the maths in inputsFromView), neuron, think, fitness, the step loop in stepGeneration, selection, mutate, crossedCheckpoint and raceResult. The changes were clear names, one idea per line and plain loops instead of chains of array tricks. selectionBy is gone: selection now takes the score as an optional second argument, which the multi-track run uses. nextGeneration was already plain and stays as it was.
+
+**The proof that nothing changed:**
+- All 55 tests pass, including the ghost replay check and every champion lap time.
+- `node tools/verify-seed.js 3` reruns all 100 generations of seed 3 from scratch (232 s). Its history is identical to runs/seed-3.json, and its champions (all 70 numbers, laps, fitness, family lines) are identical to champions/seed-3.json.
+- The full rerun was done twice. The first ran before the last two rewrites (crossedCheckpoint, raceResult); the second ran after them. Both came out identical.
+
+**The boxes.**
+- tools/code-boxes.js pulls each function out of its source file by name. Each box is written once in HOW-IT-WORKS.md as a hidden spec: one line of code and its explanation per row.
+- The build fails in any of these cases: a function is missing, a line in the box no longer matches the real code, a line has no explanation, lines are skipped without saying what they do, or a box shows more than 12 lines.
+- On the web page each box is two columns, code on the left and the explanation on the right; on a phone they stack.
+- In Markdown, the code comes first, then a numbered explanation for every line.
+- There are 13 boxes across chapters 0–7. The deep dive shows each function in full, with a short walkthrough.
+
+**What broke (in the tooling, before anything was committed):**
+- The first matcher compared lines with their indentation stripped, so a `}` could match the wrong closing brace. It now compares lines with their indentation.
+- The deep dive wrote "÷", which goes against the guide's no-maths-symbols rule; it now says "divided by".
+
+Checked in Chrome at 390 px and 1100 px: 13 boxes, 8 of 8 images, no sideways scroll.
