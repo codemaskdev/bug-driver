@@ -331,3 +331,35 @@ Send me: the full text of the new HOW-IT-WORKS.md (chapters 0–6), how to open 
 
 Built: DEEP-DIVE.md (the full guide, with a new analogy and the seed 1 reason labelled as our best explanation), and a new simple HOW-IT-WORKS.md for chapters 0–6 with seven big-text figures. The web guide is in docs/guide/. Race mode: my ghost against a champion's best lap, with a live gap and the result; the scoreboard is built from the files; ?race and ?scoreboard URLs. All six races match the recorded laps, and the score is 2:4.
 What broke: my first simple draft had three sentences that weren't true or weren't sourced ("the hairpin can't be driven without braking", "most of the rest never left the start", "it was no fun to drive"). They were fixed before the commit. Four of the Part 1 commit messages have the attribution glued onto the subject line. In the race screen, the live gap sat on a wall and two tags overlapped; both were fixed.
+
+## 11. No images in the web guide
+
+````text
+I opened docs/guide/index.html (double-click, file://) and I don't see any images, only text.
+
+1. Find the cause. Likely the image paths: the Markdown uses docs/img/..., relative to the repo root, but the page lives in docs/guide/, so they should resolve to ../img/... Fix it in tools/guide-page.js, so the generated page always has correct relative paths. Don't hand-edit the HTML.
+2. Add a check to the page build: every <img> src in every generated page must exist on disk, or the build fails.
+3. Verify the way I open it: load the page via file:// in headless Chrome, confirm every image has naturalWidth > 0, and take a screenshot at phone width (390 px) and desktop width. Tell me the image count found vs. loaded.
+4. Also confirm the images show on GitHub: the paths in HOW-IT-WORKS.md and DEEP-DIVE.md must be valid relative to the repo root.
+
+Commit as a fix, update DEVLOG. Then tell me to reopen the page.
+````
+
+Built: the paths were already ../img/ and correct. Safari blocks a local page from reading ../ folders (reproduced with WebKit), so the figures were copied next to the page, and the build now fails on a missing image (972e5f8).
+What broke: that fix wasn't the one the user needed; the next prompt shows the scoreboard still broken.
+
+## 12. (a screenshot)
+
+The message was only a screenshot, no text: chapter 6 of the web guide, with the scoreboard picture shown as a broken image.
+
+Built: every figure is now built into the page itself as a data: URL, so it no longer depends on what the viewer allows (0407de0). Checked with the HTML files alone in an empty folder: 7/7 and 22/22 images.
+What broke: I never found out for sure which app showed the page. My best explanation is a viewer that lets local pages load no other files.
+
+## 13. Images show now
+
+````text
+Images show now, all good
+````
+
+Built: nothing new; this entry, and the two above that I had forgotten to log at the time.
+What broke: I skipped the PROMPTS.md entries for prompts 11 and 12, against the rules. They were added here, late.
