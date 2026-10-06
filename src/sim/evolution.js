@@ -28,7 +28,12 @@ export function createEvolution(track, seed) {
 
 // Selection: rank all cars by fitness, best first, and keep the top 10 as parents.
 export function selection(cars) {
-  const ranked = [...cars].sort((a, b) => fitness(b) - fitness(a)); // stable: ties keep their order
+  return selectionBy(cars, fitness);
+}
+
+// The same, with any way of scoring a car (Step 7b scores the sum over several tracks).
+export function selectionBy(cars, score) {
+  const ranked = [...cars].sort((a, b) => score(b) - score(a)); // stable: ties keep their order
   return ranked.slice(0, PARENTS);
 }
 
