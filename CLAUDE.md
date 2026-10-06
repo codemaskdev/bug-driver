@@ -39,10 +39,11 @@ material for the video and the guides.
 - My official ghost lap is ghosts/me-v3.json (26.40 s). The scoreboard and
   every race against me use this file, never localStorage.
   tests/ghost.test.js must keep replaying it to the exact step.
-- Exam is held out: nobody trains on it, ever. Until ghosts/me-exam.json
-  exists, no AI car drives it at all (createGeneration() refuses it, see
-  src/sim/held-out.js), and it never appears in the track editor, in a share
-  link, or in any test that runs a brain on it.
+- Exam is held out: nobody trains on it, ever (every evolution refuses it,
+  see src/sim/held-out.js). My Exam lap is ghosts/me-exam.json (32.02 s);
+  tests/exam-ghost.test.js must keep replaying it to the exact step. Saved
+  champions may be tested and raced on Exam only after unlockExam() has
+  checked that ghost. Exam never appears in the track editor or in a share link.
 
 ## Replay check
 - `node tools/replay-check.js` (also part of `npm test`) runs fixed scenarios
