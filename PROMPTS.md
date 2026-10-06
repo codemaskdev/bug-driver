@@ -43,3 +43,27 @@ Commit in CodeMask as CodeMask. Then show me the bug-driver CLAUDE.md and the Gi
 
 Built: the standalone repo with CLAUDE.md (project rules), README placeholder, empty PROMPTS/DEVLOG, MIT LICENSE, pushed to a private codemaskdev/bug-driver; plus episodes/02-bug-driver/plan.md in the CodeMask repo. No game code yet.
 What broke: nothing broke.
+
+## 2. Three new rules, then Step 1: a track and a car I can drive
+
+````text
+First, three additions to CLAUDE.md (one commit, "docs: ..."):
+- Fixed timestep: the simulation advances in fixed steps of 1/60 s, independent of the frame rate and rendering. Determinism must hold on any monitor.
+- Simulation and rendering are separate. The simulation can run at x1, x10, and "max" (no rendering, as fast as possible), and headless in Node for tests and benchmarks.
+- PROMPTS.md is public and English-only: if a prompt isn't in English, log a faithful English version of it, with no translation marker.
+
+Then, Step 1: a track and a car I can drive myself.
+
+- One closed-loop track on a dark neon canvas: two glowing wall lines (inner and outer), a few real turns including one tight hairpin, a start/finish line. The whole track fits on screen.
+- Store the track as data (an ordered list of centerline points plus a width), so later we can add more tracks and encode a track into a share link.
+- Invisible checkpoints along the track, in order. They'll be used later to measure how far a car got, and they make sure a lap only counts if you drive the whole loop in the right direction.
+- The car: small bug-shaped car, cyan, pixel-neon style, with simple arcade physics: acceleration, braking, steering that depends on speed, a bit of friction. It should feel fun to drive with arrow keys/WASD, not floaty, not twitchy.
+- Hitting a wall = crash: the car stops, a short neon spark, "CRASHED" and R to restart. No sliding along walls.
+- HUD: current lap time, best lap, lap counter. Best lap is saved in localStorage.
+- Record my inputs every step during each lap, so my best lap can be replayed later as a "ghost" (we'll need it for the race). Store the best lap's inputs, not positions.
+
+Before committing: drive it yourself with synthetic inputs, check that a full lap counts, a wrong-way or shortcut lap doesn't, and crashing works. Tell me your best lap time from a scripted driver, so I know what a decent time looks like. Update PROMPTS.md and DEVLOG.md as the rules say.
+````
+
+Built: the three rules; the Neon Loop track (33 centerline points, 64 px wide, 83 invisible checkpoints, a hairpin) with a ladybug car, crashes, lap timer, a best lap saved with its per-step inputs, and 8 headless tests. Scripted driver: 17.20 s careful, 12.88 s fastest.
+What broke: two of my own tests were wrong on the first run (the lap logic was fine); the first car sprite looked like a capsule, not a bug, so it was redrawn bigger; I accidentally committed a .DS_Store and removed it in the next commit.
