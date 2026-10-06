@@ -49,7 +49,7 @@ export function drawHud(hud) {
   glowText('laps done', VIEW_W - 16, 34, 'rgba(0, 240, 255, 0.35)', '11px monospace', 0);
 
   ctx.textAlign = 'left';
-  glowText('ARROWS / WASD  drive     R  restart     E  explain     T  change track     TAB  let the AI drive', 16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
+  glowText('ARROWS / WASD  drive     R  restart     E  explain     T  tracks & editor     TAB  let the AI drive', 16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
 
   // On Exam: only my first 3 completed laps count
   if (hud.exam) {
@@ -80,7 +80,7 @@ export function drawHud(hud) {
   }
 }
 
-const AI_KEYS = '1 2 3 speed   R restart   E eyes   B brain   F explain one decision   N 70 numbers   click a car   TAB drive';
+const AI_KEYS = '1 2 3 speed   R restart   E eyes   B brain   F explain one decision   N 70 numbers   click a car   T tracks   TAB drive';
 
 function drawFrozen() {
   ctx.textAlign = 'right';
@@ -163,4 +163,19 @@ export function drawMaxSpeedScreen(ai) {
     VIEW_W / 2, 236, DIM, '13px monospace', 0);
   glowText('the track is not drawn at this speed: press 1 or 2 to watch', VIEW_W / 2, 262, 'rgba(230, 235, 242, 0.4)', '12px monospace', 0);
   if (ai.flash) glowText(ai.flash, VIEW_W / 2, 150, YELLOW, 'bold 30px monospace', 16);
+}
+
+// A short message across the middle of the screen (a broken share link, "Exam is held out", ...)
+export function drawNotice(text) {
+  ctx.save();
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 15px monospace';
+  const w = Math.min(VIEW_W - 32, ctx.measureText(text).width + 40);
+  ctx.fillStyle = 'rgba(5, 6, 10, 0.88)';
+  ctx.fillRect(VIEW_W / 2 - w / 2, 104, w, 38);
+  ctx.strokeStyle = 'rgba(255, 210, 63, 0.6)';
+  ctx.strokeRect(VIEW_W / 2 - w / 2 + 0.5, 104.5, w - 1, 37);
+  ctx.restore();
+  glowText(text, VIEW_W / 2, 123, YELLOW, 'bold 15px monospace', 6);
 }

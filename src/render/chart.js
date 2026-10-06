@@ -1,14 +1,36 @@
 // A small live chart: best and average fitness of every finished generation.
-// Drawn in the empty infield between the hairpin and the U-turn.
+// On Neon Loop it sits in the empty infield between the hairpin and the U-turn; on other tracks, see chartSpot().
 
 import { ctx } from './canvas.js';
 
-const X = 352, Y = 308, W = 296, H = 90;
+const W = 296, H = 90;
+const NEON_INFIELD = { x: 352, y: 308 };
+
+// Where the chart goes on a track: Neon Loop's infield, or else the spot (scanning the screen,
+// clear of the HUD at the top and bottom) that covers the least road, ideally none.
+export function chartSpot(track) {
+  const roadUnder = (x, y) => track.center.filter((p) => {
+    const dx = Math.max(x - p.x, 0, p.x - (x + W)), dy = Math.max(y - p.y, 0, p.y - (y + H));
+    return Math.hypot(dx, dy) < track.width / 2;
+  }).length;
+  if (roadUnder(NEON_INFIELD.x, NEON_INFIELD.y) === 0) return NEON_INFIELD;
+  let best = { x: 16, y: 70 }, least = Infinity;
+  for (let y = 70; y + H <= 670; y += 20) {
+    for (let x = 16; x + W <= 1264; x += 20) {
+      const n = roadUnder(x, y);
+      if (n < least) { least = n; best = { x, y }; }
+      if (n === 0) return best;
+    }
+  }
+  return best;
+}
+
 const BEST = '#00f0ff';
 const AVERAGE = '#ffd23f';
 
 // history = rows from generationStats(): {generation, bestFitness, averageFitness}
-export function drawChart(history) {
+export function drawChart(history, at = NEON_INFIELD) {
+  const X = at.x, Y = at.y;
   ctx.save();
   ctx.fillStyle = 'rgba(5, 6, 10, 0.8)';
   ctx.fillRect(X, Y, W, H);

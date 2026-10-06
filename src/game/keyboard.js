@@ -9,12 +9,14 @@ const KEYS = {
   ArrowRight: RIGHT, KeyD: RIGHT,
 };
 const held = new Set();
-// Keys that act once per press (R restart, E explain, Tab mode, 1/2/3 speed, B brain, F freeze, N numbers, ← → pick)
+// Keys that act once per press (R restart, E explain, Tab mode, 1/2/3 speed, B brain, F freeze, N numbers, ← → pick,
+// T tracks, Backspace undo in the editor)
 const ONCE = new Set(['KeyR', 'KeyE', 'Tab', 'Digit1', 'Digit2', 'Digit3', 'KeyB', 'KeyF', 'KeyN', 'ArrowLeft', 'ArrowRight',
-  'ArrowUp', 'ArrowDown', 'KeyS', 'Space', 'Enter', 'Escape', 'KeyT', 'KeyG']);
+  'ArrowUp', 'ArrowDown', 'KeyS', 'Space', 'Enter', 'Escape', 'KeyT', 'KeyG', 'Backspace', 'Delete']);
 const pressed = new Set();
 
 window.addEventListener('keydown', (e) => {
+  if (e.target instanceof HTMLInputElement) return; // typing a seed is not driving
   if (e.code in KEYS) { held.add(e.code); e.preventDefault(); }
   if (ONCE.has(e.code)) {
     if (e.code === 'Tab' || e.code === 'Space') e.preventDefault(); // don't move focus or scroll the page
