@@ -363,3 +363,32 @@ Images show now, all good
 
 Built: nothing new; this entry, and the two above that I had forgotten to log at the time.
 What broke: I skipped the PROMPTS.md entries for prompts 11 and 12, against the rules. They were added here, late.
+
+## 14. Step 7a: did it learn, or memorize?
+
+````text
+Step 7a: does the car know how to drive, or did it just memorize one track?
+
+Pre-register first (one commit, before any testing):
+- Add 4 new tracks, same format, same road width (90 px), same physics. Physics and car stay frozen; these are new tracks, not changes to Neon Loop.
+  - "Neon Loop Mirrored": Neon Loop driven the other way round (clockwise).
+  - "Zigzag": many quick left-right turns, no hairpin.
+  - "Wide Sweepers": long fast curves, one tight corner at the end.
+  - "Exam": a held-out track for later, with a mix of everything, including a hairpin turning the opposite way to Neon Loop's. Nobody trains on Exam, ever.
+- Write in DEVLOG, before running anything: the 4 tracks, that Zigzag + Wide Sweepers will be the extra training tracks in Step 7b, that Exam is held out, and the exact tests below. Commit with the track data's SHA-256 in the message. After this commit the tracks never change.
+
+Then test, and don't change anything based on the results:
+- Run every saved seed 3 champion (gens 1, 5, 10, 20, 40, 80) alone on each new track. Report for each: lap time, or how far it got (%) and how it got out (crash/stall, where).
+- Also the gen 80 champions of seeds 2, 4 and 5, for comparison.
+- Screenshot or record the most telling failure (🎬): ideally the champion that beat me by 14 s crashing in the first corner of a track it has never seen.
+
+Me on the Exam track:
+- Add Exam as a drivable track in manual mode (track picker), with its own lap timer and ghost recording, saved to ghosts/me-exam.json. I'll drive it for the first time, and my best of my first 3 laps counts. Don't show me any AI result on Exam before I drive.
+
+Guide chapter 7 "Did it learn, or memorize?" in both levels (simple HOW-IT-WORKS.md + DEEP-DIVE.md): the simple version explains memorizing vs. understanding with an everyday analogy (e.g. a student who memorized last year's exam answers), and shows the real result, whatever it is. If the champion actually drives the new tracks fine, that's the honest story and we say so.
+
+Update PROMPTS.md and DEVLOG.md. Report the results table and tell me when Exam is ready for me to drive.
+````
+
+Built: four new frozen tracks, pre-registered with their SHA-256 (fa2a3a1) before any car drove them. Then the pre-registered tests, a track picker (T), Exam with a first-3-laps record and a ghost download (G), and guide chapter 7 in both levels.
+What broke: nothing in the code. The result: the champions drive Zigzag and Wide Sweepers fine, but every gen 80 champion fails the mirrored hairpin. The "first corner" crash we expected never happened. No AI has driven Exam.

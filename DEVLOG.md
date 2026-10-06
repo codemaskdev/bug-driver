@@ -323,3 +323,38 @@ SHA-256 of the four tracks' data (`node tools/track-hash.js`): **f4fccfefb8b4897
 - 🎬: the most telling failure, ideally the champion that beat me by 14 s crashing in the first corner of a track it has never seen.
 
 **Me on Exam.** Exam becomes drivable in manual mode (track picker). My first 3 completed laps on it count, and the best of the three is my Exam time. Crashed attempts are not laps. The laps are saved and exported to ghosts/me-exam.json. No AI result on Exam is shown to me before I drive.
+
+## 2026-10-06 — Step 7a: did it learn, or memorize?
+Commits fa2a3a1 (pre-registration, track SHA-256 f4fccfef…6a2d9c), b4def4f (track picker, Exam record, tests), 130c825 (guide chapter 7, both levels). The pre-registered tests were run exactly as written, and nothing was changed after seeing the results. Exam was not run.
+
+Results (`node tools/generalization-report.js`, saved in runs/step7a.json, re-checked by tests/step7.test.js). Each cell is the best lap, or how the car got out and how far it got.
+| car | Neon Loop (home) | Mirrored | Zigzag | Wide Sweepers |
+| --- | --- | --- | --- | --- |
+| seed 3 gen 1 | no lap | crash at 10.5% (1.98 s, outer wall, first corner after the start) | stall at 0.1% (3.00 s, never really moves) | crash at 60.2% (7.43 s, inner wall) |
+| seed 3 gen 5 | 30.02 | crash at 50.4% (14.93 s, outer wall, mirrored hairpin) | 19.77 s | 20.47 s |
+| seed 3 gen 10 | 13.17 | 13.33 s | 9.37 s | 8.23 s |
+| seed 3 gen 20 | 12.65 | 13.20 s | 9.25 s | 8.17 s |
+| seed 3 gen 40 | 12.53 | 13.92 s (1 lap; then stall at the hairpin on lap 2, 23.62 s) | 9.83 s | 8.25 s |
+| seed 3 gen 80 | 12.47 | crash at 49.8% (7.63 s, inner wall, mirrored hairpin) | 9.38 s | 8.33 s |
+| seed 2 gen 80 | 12.58 | stall at 50.0% (9.95 s, mirrored hairpin) | 9.65 s | 8.08 s |
+| seed 4 gen 80 | 13.28 | crash at 53.0% (7.88 s, outer wall, hairpin exit) | 9.30 s | 8.47 s |
+| seed 5 gen 80 | 12.57 | crash at 51.5% (7.78 s, inner wall, mirrored hairpin) | 9.88 s | 8.23 s |
+
+The mirrored hairpin is around checkpoint 41 of 82, i.e. 50% of the lap.
+
+- **Zigzag and Wide Sweepers transfer almost perfectly.** Every champion from gen 5 on finishes; from gen 10 on, all four seeds are within 0.6 s of each other.
+- **Neon Loop Mirrored splits them.**
+  - Gens 10 and 20 drive it (13.33 and 13.20 s, close to their home laps).
+  - Gen 40 finishes once, then fails its second, faster lap at the hairpin.
+  - All four gen 80 champions fail at the hairpin, which now turns right.
+- **The 🎬 failure, traced step by step.** The seed 3 gen 80 champion (the one that beat me by 13.93 s) arrives at 330 px/s at 6.6 s, brakes, and is at 0 px/s by 7.10 s. It keeps holding BRAKE + RIGHT. From a standstill BRAKE is reverse, so it backs up at up to 90 px/s into the inner wall at 7.63 s. Recorded with `?champion=3-80&track=neon-loop-mirrored`.
+- **Interpretation (labelled as an inference in the guide):** the general skills transfer, but the longest-trained champions look specialized to Neon Loop's one left-turning hairpin. That rests on one seed across generations plus three at gen 80, so it is a pattern, not a proof.
+- **Exam is ready for me.** It's drivable with T or `?track=exam`; the HUD counts "counted laps 0/3"; crashes don't count; G downloads me-exam.json after 3 laps. Checks:
+  - In headless Chrome, the hand-written scripted driver (not AI) completed laps on Exam. Only 3 counted, and G downloaded a file whose best lap replays headless to the exact step. That run happened in my headless profile only; its time isn't reported anywhere.
+  - `?champion=…&track=exam` falls back to Neon Loop.
+  - No AI has driven Exam.
+- 52 tests pass.
+
+What broke: nothing in the code. While designing, before registration, Wide Sweepers' inner wall crossed itself (fixed by opening the corner) and Zigzag was lifted 8 px. The prompt hoped for a first-corner crash; the real failure is mid-lap, at the mirrored hairpin, and that's what's reported.
+
+🎬 The champion that beat me by 14 s stops dead in its own hairpin driven backwards, keeps the brake down, and reverses into the wall (`?champion=3-80&track=neon-loop-mirrored`, crash at 7.63 s).
