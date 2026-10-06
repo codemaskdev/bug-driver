@@ -90,7 +90,7 @@ Why it matters: if the step length changed with the screen, the same key presses
 
 ### One seed: same seed, same everything
 Later we need random numbers, for the first brains and for the small changes in evolution. A computer can make random-looking numbers from a starting number called a **seed**. The same seed always gives the same list of "random" numbers. We use one seed for everything, so the same seed replays the exact same evolution, every car and every crash.
-*Reproduce it: run `node tools/evolution-report.js 3` twice. Both runs write exactly the same `runs/seed-3.json`.*
+*Reproduce it: run `node tools/evolution-report.js 3` twice. Both runs write exactly the same generation history to `runs/seed-3.json`; only the line saying how long it took differs. The test `tests/step5.test.js` checks the first 6 generations against the saved file.*
 
 **Real numbers:** my best lap is stored as a **ghost**: where the car started, plus the keys I held on every one of the 1584 steps. Replaying those keys through the simulation drives exactly the same lap again, to the step: 1584 steps, 26.40 seconds.
 *Reproduce it: `node --test tests/ghost.test.js`.*
