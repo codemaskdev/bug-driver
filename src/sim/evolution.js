@@ -27,13 +27,10 @@ export function createEvolution(track, seed) {
 }
 
 // Selection: rank all cars by fitness, best first, and keep the top 10 as parents.
-export function selection(cars) {
-  return selectionBy(cars, fitness);
-}
-
-// The same, with any way of scoring a car (Step 7b scores the sum over several tracks).
-export function selectionBy(cars, score) {
-  const ranked = [...cars].sort((a, b) => score(b) - score(a)); // stable: ties keep their order
+// (Step 7b scores a car differently, by its fitness summed over three tracks, and passes that in as `score`.)
+export function selection(cars, score = fitness) {
+  const ranked = cars.slice();
+  ranked.sort((a, b) => score(b) - score(a));
   return ranked.slice(0, PARENTS);
 }
 
@@ -45,7 +42,15 @@ export function gaussian(rand) {
 
 // Mutation: copy a parent's 70 numbers, and give each one a 10% chance to be nudged a little.
 export function mutate(brain, rand) {
-  return brain.map((w) => (rand() < MUTATION_RATE ? w + gaussian(rand) * MUTATION_SIZE : w));
+  const child = [];
+  for (const number of brain) {
+    if (rand() < MUTATION_RATE) {
+      child.push(number + gaussian(rand) * MUTATION_SIZE);
+    } else {
+      child.push(number);
+    }
+  }
+  return child;
 }
 
 // Picks a parent, weighted by rank: the best of the 10 is picked 10x as often as the 10th.

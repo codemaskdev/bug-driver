@@ -5,7 +5,7 @@
 
 import { makeRng } from './rng.js';
 import { createGeneration, randomBrains, runGeneration, fitness, trackProgress, POPULATION } from './generation.js';
-import { selectionBy, pickParent, mutate } from './evolution.js';
+import { selection, pickParent, mutate } from './evolution.js';
 
 export const MULTI_CHAMPION_GENERATIONS = [1, 5, 10, 20, 40, 80, 100];
 
@@ -39,7 +39,7 @@ export function runMultiGeneration(evo) {
 // 1 elite + 99 mutated children of the top 10, exactly like nextGeneration().
 export function stepMultiEvolution(evo) {
   const cars = runMultiGeneration(evo);
-  const parents = selectionBy(cars, (c) => c.fitness);
+  const parents = selection(cars, (c) => c.fitness);
   const best = parents[0];
   const fits = cars.map((c) => c.fitness);
   const row = {

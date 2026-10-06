@@ -94,9 +94,14 @@ export function raceGap(race) {
 export function raceResult(race) {
   const { me, ai } = race;
   if (!race.over) return null;
-  if (!ai.finishSteps) return { winner: 'me', by: null, aiOut: ai.out, aiProgress: progressShare(ai), meSteps: me.finishSteps, aiSteps: null };
+  if (!ai.finishSteps) {
+    return { winner: 'me', by: null, aiOut: ai.out, aiProgress: progressShare(ai), meSteps: me.finishSteps, aiSteps: null };
+  }
   const diff = me.finishSteps - ai.finishSteps;
-  return { winner: diff > 0 ? 'ai' : diff < 0 ? 'me' : 'tie', by: Math.abs(diff) / STEPS_PER_SECOND, meSteps: me.finishSteps, aiSteps: ai.finishSteps };
+  let winner = 'tie';
+  if (diff > 0) winner = 'ai';
+  if (diff < 0) winner = 'me';
+  return { winner, by: Math.abs(diff) / STEPS_PER_SECOND, meSteps: me.finishSteps, aiSteps: ai.finishSteps };
 }
 
 // How far a lane got, as a share of one lap (the start line counts as the first checkpoint).

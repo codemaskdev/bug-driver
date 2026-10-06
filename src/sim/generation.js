@@ -60,9 +60,13 @@ export function trackProgress(world) {
 }
 
 // How good a car was: go as far as you can; if you finish a lap, finish fast (a bonus that grows as the lap time shrinks).
-export function fitness(c) {
-  const lapBonus = c.bestLapSteps ? LAP_BONUS / (c.bestLapSteps / STEPS_PER_SECOND) : 0;
-  return trackProgress(c.world) + lapBonus;
+export function fitness(car) {
+  let score = trackProgress(car.world);
+  if (car.bestLapSteps !== null) {
+    const lapSeconds = car.bestLapSteps / STEPS_PER_SECOND;
+    score += LAP_BONUS / lapSeconds;
+  }
+  return score;
 }
 
 // Fitness as a share of one lap. A full lap is the start line plus every checkpoint plus the start line again.
@@ -70,22 +74,23 @@ export function progressPercent(world) {
   return (trackProgress(world) / (world.track.checkpoints.length + 1)) * 100;
 }
 
-// Advances every car that's still driving by one step: look, think, press keys, move.
+// Advances every car that's still driving by one step (1/60 s): look, think, press keys, move.
 export function stepGeneration(gen) {
   if (gen.over) return [];
   gen.step++;
   const events = [];
   let driving = 0;
-  gen.cars.forEach((c, index) => {
-    if (c.out) return;
+  for (let index = 0; index < gen.cars.length; index++) {
+    const c = gen.cars[index];
+    if (c.out) continue;
     c.view = readSensors(c.world.car, gen.track.walls);
     c.inputs = inputsFromView(c.view, c.world.car.speed);
     c.keys = think(c.brain, c.inputs);
-    for (const e of stepWorld(c.world, c.keys)) {
+    const happened = stepWorld(c.world, c.keys);
+    for (const e of happened) {
       if (e.type === 'lap' && (c.bestLapSteps === null || e.steps < c.bestLapSteps)) c.bestLapSteps = e.steps;
       events.push({ ...e, index });
     }
-
     if (c.world.laps.checkpointsPassed > c.progressSeen) {
       c.progressSeen = c.world.laps.checkpointsPassed;
       c.lastProgressStep = gen.step;
@@ -95,7 +100,7 @@ export function stepGeneration(gen) {
     else if (gen.step >= GENERATION_STEPS) c.out = 'time';
     if (c.out) c.outStep = gen.step;
     else driving++;
-  });
+  }
   if (driving === 0) gen.over = true;
   return events;
 }

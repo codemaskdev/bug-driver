@@ -49,9 +49,14 @@ export function getInputs(car, walls) {
 }
 
 // The same 6 numbers, from 5 distances already measured with readSensors() and the car's speed.
-export function inputsFromView(view, speed) {
-  const eyes = view.map((d) => 1 - d / SENSOR_RANGE);
-  return [...eyes, Math.max(0, Math.min(1, speed / CAR.maxSpeed))];
+export function inputsFromView(distances, speed) {
+  const inputs = [];
+  for (const distance of distances) {
+    inputs.push(1 - distance / SENSOR_RANGE);
+  }
+  const speedShare = speed / CAR.maxSpeed;
+  inputs.push(Math.max(0, Math.min(1, speedShare)));
+  return inputs;
 }
 
 // Distance from the car's center to its hitbox outline in direction (dx, dy), in the car's own frame.

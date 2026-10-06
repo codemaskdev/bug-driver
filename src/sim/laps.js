@@ -20,8 +20,10 @@ export function createLaps() {
 
 // Did the car's center cross this checkpoint during the last step, moving forward along the track?
 export function crossedCheckpoint(car, cp) {
-  const dx = car.x - car.prevX, dy = car.y - car.prevY;
-  if (dx * cp.tx + dy * cp.ty <= 0) return false; // moving backward along the track
+  const movedX = car.x - car.prevX;
+  const movedY = car.y - car.prevY;
+  const forward = movedX * cp.tx + movedY * cp.ty;
+  if (forward <= 0) return false;
   return segmentHit(car.prevX, car.prevY, car.x, car.y, cp.ax, cp.ay, cp.bx, cp.by) >= 0;
 }
 

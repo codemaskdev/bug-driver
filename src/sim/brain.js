@@ -33,8 +33,12 @@ export function sigmoid(x) {
 // One neuron: multiply each input by its weight, add them up, add the bias, squash.
 export function neuron(inputs, brain, start, squash) {
   let sum = 0;
-  for (let i = 0; i < inputs.length; i++) sum += inputs[i] * brain[start + i];
-  sum += brain[start + inputs.length]; // the bias
+  for (let i = 0; i < inputs.length; i++) {
+    const weight = brain[start + i];
+    sum += inputs[i] * weight;
+  }
+  const bias = brain[start + inputs.length];
+  sum += bias;
   return squash(sum);
 }
 
@@ -54,9 +58,12 @@ export function outputs(brain, inputs) {
 
 // Which keys to press this step: every output above 0.5 is a key held down.
 export function think(brain, inputs) {
-  const out = outputs(brain, inputs);
+  const [gas, brake, left, right] = outputs(brain, inputs);
   let keys = 0;
-  for (let k = 0; k < OUTPUTS; k++) if (out[k] > 0.5) keys |= OUTPUT_KEYS[k];
+  if (gas > 0.5) keys += UP;
+  if (brake > 0.5) keys += DOWN;
+  if (left > 0.5) keys += LEFT;
+  if (right > 0.5) keys += RIGHT;
   return keys;
 }
 
