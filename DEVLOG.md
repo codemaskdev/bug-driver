@@ -14,7 +14,7 @@ Real numbers, from a scripted driver (it follows the centerline and slows for cu
 - Theoretical floor: 3961 px at 330 px/s, flat out on the centerline, is 12.00 s.
 - Cars that finished a lap: 1 (the scripted one). No AI yet, so no generations.
 
-Checks (8 tests, `npm test`, all pass): walls never cross; a full lap counts; a whole wrong-way loop counts nothing; crossing the line, reversing back over it and crossing again counts nothing; skipping 61 of 83 checkpoints counts nothing; flat out with no steering crashes once, the car stays put, and R restarts. A recorded flying lap replayed from its 1032 inputs finishes in exactly 1032 steps, in the same state the real car was in. Two identical runs match bit for bit.
+Checks (8 tests, `npm test`, all pass): walls never cross; a full lap counts; a whole wrong-way loop counts nothing; crossing the line, reversing back over it and crossing again counts nothing; skipping 63 of 83 checkpoints counts nothing; flat out with no steering crashes once, the car stays put, and R restarts. A recorded flying lap replayed from its 1032 inputs finishes in exactly 1032 steps, in the same state the real car was in. Two identical runs match bit for bit.
 In real Chrome (headless, synthetic key presses driven by the same scripted driver): 2 laps counted, best lap 1032 steps saved to localStorage with 1032 inputs, crash and R work, no errors.
 
 What broke:
