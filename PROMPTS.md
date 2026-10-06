@@ -97,3 +97,23 @@ Update PROMPTS.md and DEVLOG.md as usual.
 
 Built: the road is 90 px wide, with the same layout and turns. The hairpin was redrawn as a rounder half-circle, and the top straight and the infield moved down 12–22 px so the walls clear the HUD. PHYSICS_VERSION is 3, the 82 checkpoints follow the new centerline, and there is a new test that the road is full width everywhere. Reference laps: 17.25 s careful, 12.68 s fastest, 543 of 980 settings crash (at 64 px: 17.20 s, 13.00 s, 806).
 What broke: at 90 px the old points didn't work. The hairpin's inner wall shrank to an almost-sharp point, and the top wall ran into the lap time HUD. The layout was adjusted to fix both. Car physics and hitbox untouched.
+
+## 5. Physics freeze, then Step 2: give the car eyes
+
+````text
+Physics freeze: the car physics, hitbox, track (90 px) and PHYSICS_VERSION 3 are now final. Add to CLAUDE.md: "Physics and track are frozen at PHYSICS_VERSION 3. Do not change them without asking me first: any change invalidates my ghost lap and all training." Commit that separately.
+
+Then, Step 2: give the car eyes.
+
+- Add 5 distance sensors (rays) fanned out in front of the car: −60°, −30°, 0°, +30°, +60° from the heading, each up to 200 px long. Each ray reports the distance to the nearest wall along it (200 if nothing within range).
+- Put this in clearly named functions with one-line plain-English comments, e.g. castRay() ("how far can the car see in one direction") and readSensors() ("the car's whole view of the world: 5 numbers"). The beginner guide will link to these.
+- Also define the brain's future input now: the 5 distances normalized to 0..1 (1 = wall touching the car, 0 = nothing in range), plus the car's speed normalized to 0..1. That's 6 numbers, the only things the car will ever know. Function: getInputs(), with a comment saying so.
+- Visuals: draw the rays as thin glowing lines from the car, turning from cyan (far) to pink-red (close), with a small dot where each hits the wall.
+- Explain overlay: press E to toggle. When on, each ray shows its real distance in px next to the hit point, and a small panel lists the 6 input values with labels (left 60°, left 30°, ahead, right 30°, right 60°, speed). These are the exact numbers the brain will get. When off, just the rays.
+- Rays are visual and informational only: they must not change the physics, the ghost, or determinism.
+
+Check: drive a scripted lap and confirm the ray distances are right at a few known spots (straight in the middle of the road: side rays symmetric; facing a wall up close: front ray small). Tell me those numbers. Update PROMPTS.md and DEVLOG.md, and mark a 🎬 if the E overlay looks good for a Short.
+````
+
+Built: the freeze rule; castRay(), readSensors() and getInputs() in src/sim/sensors.js. There are 5 rays starting on the car's outline, so 0 px means touching. They are drawn cyan to pink-red with hit dots, and E shows the px labels plus a BRAIN INPUTS panel. 6 new tests, including an independent ray-walk check over a scripted lap (worst error 0.34 px).
+What broke: one new test was wrong on its first run (its test wall was too short for the 30° ray to reach); the code was fine. The first rays were too faint, so they were made brighter.

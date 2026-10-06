@@ -69,3 +69,26 @@ Reference laps (`node tools/reference-lap.js`, same 980 driver settings), 64 px 
 All 9 tests pass. In headless Chrome: 2 laps counted, best lap saved under the physics-3 key, crash and R work, no errors.
 
 🎬 Maybe: the same hand-coded driver, 64 px vs 90 px road: 806 → 543 crashes out of 980.
+
+## 2026-10-06 — Physics freeze
+Commit 29a3ff9. CLAUDE.md now says physics and track are frozen at PHYSICS_VERSION 3, and changing them needs the user's OK first, because it would invalidate the ghost lap and all training. No game change. Nothing broke.
+
+## 2026-10-06 — Step 2: the car gets eyes
+Commit 6903182. 5 distance rays at −60°, −30°, 0°, +30°, +60° from the heading, each up to 200 px. They live in src/sim/sensors.js:
+- castRay(): how far the car can see in one direction.
+- readSensors(): the car's whole view, 5 distances in px.
+- getInputs(): the brain's future input, and the only 6 numbers the car will ever know. Each eye becomes 1 − distance/200 (1 = touching, 0 = nothing in range), and speed becomes speed/330, with reversing counted as 0.
+Each eye sits on the car's hitbox outline, not at its center, so "0 px" really means the wall touches the car. From the center, the nose eye is 21 px out, the 30° eyes 15.9 px and the 60° eyes 12.4 px.
+On screen the rays go from cyan (far) to pink-red (close), with a dot at each hit. E toggles the explain overlay: the real distance next to each hit, plus a BRAIN INPUTS panel with the 6 values. With the overlay on, the car is drawn at the exact simulation pose, not the smoothed one, so the numbers on screen are the ones the brain will get. Sensors only read the car; a test confirms a lap with sensors read every step is identical, bit for bit, to one without.
+
+Ray distances at known spots (rays left 60 / left 30 / ahead / right 30 / right 60, px):
+- Parked in the middle of the bottom straight, facing along the track: 39.58 / 74.50 / 200 / 73.76 / 39.47. On paper, a wall 45 px to each side gives 39.52 for the 60° rays and 74.14 for the 30° rays. The small left/right difference is because the track there is tilted −0.18°.
+- Turned to face the outer wall, 35 px from the car's center: 57.12 / 24.52 / 14.00 / 24.52 / 57.22. Front ray 14.00 = 35 − 21 (the nose), front input 0.930.
+- Scripted lap, step 200, right side, 299 px/s: 39.8 / 91.6 / 200 / 65.7 / 39.5, speed input 0.908.
+- Scripted lap, step 510, hairpin apex, 125 px/s: 200 / 111.0 / 70.7 / 52.5 / 44.1. That is the closest the front ray gets on the lap.
+- Independent check: the test walks along 150 rays from one scripted lap in 0.25 px steps until it leaves the road, with no ray-wall math. Worst disagreement with castRay 0.34 px, mean 0.13 px.
+Lap numbers are unchanged (physics frozen): scripted careful lap 17.25 s, browser run 2 laps, no errors. Cars that finished a lap: 1 (scripted). No AI yet.
+
+What broke: one new test failed on its first run because its test wall was ±50 px long, too short for a 30° ray to reach; the code was right. The rays were too faint on the first look, so the line went from 1.5 to 2 px and got brighter, and the panel bars now use the same cyan-to-pink-red as the rays.
+
+🎬 The E overlay: the ladybug in the hairpin with five rays, the 43–153 px labels, and the BRAIN INPUTS panel next to it. "These 6 numbers are all it will ever know" is a ready-made Short.
