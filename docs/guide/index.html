@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How a little car taught itself to drive</title>
+<link rel="icon" href="data:,">
+<style>
+:root { --bg: #0b0d13; --panel: #11141d; --cyan: #00f0ff; --pink: #ff2e63; --yellow: #ffd23f; --text: #e6ebf2; --dim: #9fb3c8; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 18px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 760px; margin: 0 auto; padding: 24px 16px 80px; }
+nav { position: sticky; top: 0; z-index: 2; background: rgba(11, 13, 19, 0.92); backdrop-filter: blur(6px); border-bottom: 1px solid rgba(0, 240, 255, 0.2); }
+nav div { max-width: 760px; margin: 0 auto; padding: 10px 16px; display: flex; gap: 18px; font: 600 15px ui-monospace, Menlo, monospace; }
+nav a { color: var(--dim); text-decoration: none; }
+nav a.here { color: var(--cyan); text-shadow: 0 0 8px rgba(0, 240, 255, 0.6); }
+h1, h2, h3 { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; line-height: 1.25; }
+h1 { font-size: 30px; color: var(--cyan); text-shadow: 0 0 14px rgba(0, 240, 255, 0.45); margin: 12px 0 20px; }
+h2 { font-size: 24px; color: var(--yellow); margin: 44px 0 12px; }
+h3 { font-size: 19px; color: var(--cyan); margin: 28px 0 8px; }
+p, li { max-width: 68ch; }
+a { color: var(--cyan); }
+strong { color: #fff; }
+hr { border: 0; border-top: 1px solid rgba(0, 240, 255, 0.15); margin: 36px 0; }
+figure { margin: 20px 0; }
+figure img { display: block; width: 100%; height: auto; border-radius: 16px; box-shadow: 0 0 24px rgba(0, 240, 255, 0.12); }
+blockquote { margin: 20px 0; padding: 4px 20px; background: var(--panel); border: 1px solid rgba(0, 240, 255, 0.35); border-radius: 14px; }
+blockquote li { margin: 6px 0; }
+code { font: 0.88em ui-monospace, Menlo, monospace; background: #1a1f2e; padding: 1px 5px; border-radius: 4px; color: #b8fbff; }
+em { color: var(--dim); }
+.table { overflow-x: auto; margin: 16px 0; }
+table { border-collapse: collapse; font-size: 15px; min-width: 100%; }
+th, td { padding: 6px 10px; border-bottom: 1px solid rgba(0, 240, 255, 0.15); text-align: left; white-space: nowrap; }
+th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
+@media (max-width: 480px) { body { font-size: 17px; } h1 { font-size: 25px; } h2 { font-size: 21px; } }
+</style>
+</head>
+<body>
+<nav><div><a href="index.html" class="here">How it works</a><a href="deep-dive.html">Deep dive</a></div></nav>
+<main>
+<h1 id="how-a-little-car-taught-itself-to-drive">How a little car taught itself to drive</h1>
+<blockquote><p><strong>In 30 seconds</strong></p>
+<ul><li>A tiny ladybug car drives around a race track in your web browser.</li><li>It can't see the track. It only feels how far away the walls are.</li><li>Its brain is just 70 numbers. They turn what it feels into gas, brake, left and right.</li><li>We start with 100 cars with random numbers. The ones that get furthest become the parents of the next 100.</li><li>After 4 rounds a car finishes a lap. Later the best car is about 14 seconds faster than me.</li></ul></blockquote>
+<p>Want every detail, table and number? Read the <a href="deep-dive.html">deep dive</a>.</p>
+<hr>
+<h2 id="0-the-big-idea">0. The big idea</h2>
+<p><strong>A car learns to drive with no teacher. It only has trial and error, over many generations.</strong> (A generation is one round of 100 cars.)</p>
+<p>Imagine 100 blindfolded drivers on a race track. Nobody tells them how to drive. Nobody gets better during a drive, either. But the ones who get furthest pass their habits on to their children, with small copying mistakes. Some of those mistakes happen to help.</p>
+<figure><img src="../img/simple-0-big-idea.svg" alt="Eyes feed the brain, the brain presses keys, and the best cars get children"></figure>
+<p>Each car has eyes that feel the walls. It has a brain that decides. And it has the same 4 keys I use when I drive myself.</p>
+<p><strong>What really happened:</strong> nobody wrote a single rule like "brake before a corner". The program only says: drive, and the ones who got furthest have children. In our main run, the first car finished a full lap in the 4th round.</p>
+<p>For the curious: <a href="deep-dive.html#0-what-were-building">Deep dive →</a></p>
+<hr>
+<h2 id="1-the-track">1. The track</h2>
+<p><strong>Before anything can learn, it needs a world whose rules never change.</strong></p>
+<p>Think of a board game. If two players make exactly the same moves, the game ends exactly the same way. Our track works like that.</p>
+<figure><img src="../img/simple-1-track.svg" alt="The race track with its hairpin"></figure>
+<p>The walls glow pink. Touching one is a crash, and that car is out. Invisible lines across the road check that a car really drives the whole lap, in the right direction. No shortcuts.</p>
+<p>The world moves in tiny ticks, 60 per second, the same on every computer. So the same key presses always give exactly the same lap. That matters later, when we race.</p>
+<p>I drove it myself with the arrow keys. My best lap: about 26 seconds.</p>
+<p><strong>What really happened:</strong> the road was too narrow at first. On a test drive it felt too tight, so we made it wider and redrew the tight hairpin turn. Then we froze the rules for good.</p>
+<p>For the curious: <a href="deep-dive.html#1-the-world">Deep dive →</a></p>
+<hr>
+<h2 id="2-eyes">2. Eyes</h2>
+<p><strong>The car can't see. It only knows how far away the wall is in 5 directions, and how fast it's going.</strong></p>
+<p>It's like the parking sensors on a real car. They don't show a picture. They only beep: something is close, over there.</p>
+<figure><img src="../img/simple-2-eyes.svg" alt="Five eyes reach out from the car until they hit a wall"></figure>
+<p>Five invisible lines go out from the car, like whiskers. Each one stops at the first wall it meets. The closer the wall, the bigger the number that eye sends. Add the speed, and that's 6 numbers.</p>
+<p>Those 6 numbers are everything the car will ever know. It has no map. It has no idea where the finish line is.</p>
+<p><strong>What really happened:</strong> we froze one moment in the tight hairpin turn. The car's left eye saw the wall only about 23 pixels away. That's less than its own width.</p>
+<p>For the curious: <a href="deep-dive.html#2-eyes">Deep dive →</a></p>
+<hr>
+<h2 id="3-the-brain">3. The brain</h2>
+<p><strong>The brain is 70 numbers. They turn the 6 things the car feels into 4 key presses.</strong></p>
+<p>Picture a mixing desk full of knobs. The car's 6 feelings come in on one side. The knobs decide how much each one counts. The keys come out on the other side.</p>
+<figure><img src="../img/simple-3-brain.svg" alt="The real brain at the hairpin: BRAKE and LEFT are on"></figure>
+<p>The brain is made of small parts called <strong>neurons</strong>. A neuron takes some numbers in, gives each one a weight, adds it all up, and keeps the result between two limits. A <strong>weight</strong> is how much the neuron cares about one input. A big weight means a lot. A negative weight means it pushes the other way.</p>
+<p>The last neurons are the keys: one for gas, one for brake, one for left, one for right. When a key's neuron ends up past halfway, that key is pressed. Count every weight, plus one extra number per neuron, and you get exactly 70 numbers.</p>
+<p><strong>What really happened:</strong> the first brains got random numbers, and it was chaos. In one run, more than a quarter of the cars crashed in the first couple of seconds, and almost half barely moved at all.</p>
+<p>For the curious: <a href="deep-dive.html#3-brain">Deep dive →</a></p>
+<hr>
+<h2 id="4-evolution">4. Evolution</h2>
+<p><strong>Keep the cars that got furthest, copy their numbers with tiny changes, and repeat.</strong></p>
+<p>It's like breeding. A farmer doesn't design a faster horse. They let the fastest horses have foals, again and again.</p>
+<figure><img src="../img/simple-4-evolution.svg" alt="100 cars ranked; the best 10 become the parents of the next 100"></figure>
+<p>One round of 100 cars driving together is a <strong>generation</strong>. Each car gets a score, its <strong>fitness</strong>: how far it got, plus a bonus for a fast lap. The best 10 become parents. The very best one is copied exactly, so the best can never get worse. Every other child is a copy of a parent with a few numbers nudged a little. That nudge is a <strong>mutation</strong>.</p>
+<p><strong>What really happened:</strong> the first full lap came in generation 4, and it was slower than mine. But one of our runs never learned at all. For 95 generations it was stuck at the same spot. In one of those generations, not a single car ever touched the brake. Its best car drove flat out all the way, and the hairpin is far too tight to take flat out. Our best guess: it got stuck on a hill that isn't the top. Every small change made things worse, and the real top was too far away to reach in tiny steps.</p>
+<p>For the curious: <a href="deep-dive.html#4-evolution">Deep dive →</a></p>
+<hr>
+<h2 id="5-reading-a-brain">5. Reading a brain</h2>
+<p><strong>We can freeze one moment and see exactly why the car pressed a key.</strong></p>
+<p>It's like a sports replay with the referee's notes. You don't just see the turn. You see what pushed the car into it.</p>
+<figure><img src="../img/simple-5-inside-line.svg" alt="Generation 1 drives down the middle of the hairpin; generation 80 hugs the inside"></figure>
+<p>In the hairpin, the wall on the car's left was about 23 pixels away. You might expect it to steer away. Instead, the numbers flowed through the brain, and LEFT came out on. It turned toward that wall.</p>
+<p>Why? That wall is the inside of the corner, and the inside is the shortest way round. The best car of generation 80 passes just a few pixels from it. The best car of generation 1 drove down the middle.</p>
+<p>Nobody taught it that. The only rule was "go far, and finish fast". It isn't a perfect racing line, though. A real racing driver swings wide before the turn, and our cars don't.</p>
+<p><strong>What really happened:</strong> every number we show when we freeze a moment is checked by a test. It's exactly what the brain computed in that tick.</p>
+<p>For the curious: <a href="deep-dive.html#5-reading-a-brain">Deep dive →</a></p>
+<hr>
+<p><em>Simple, but never wrong: every number here is real and comes from the actual program. The <a href="deep-dive.html">deep dive</a> has the precise values and how to check each one yourself.</em></p>
+</main>
+</body>
+</html>
