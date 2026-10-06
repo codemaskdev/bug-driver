@@ -13,6 +13,7 @@ Every number in this guide is real. It comes from the actual program, not from a
 3. [Brain](#3-brain)
 4. [Evolution](#4-evolution)
 5. [Reading a brain](#5-reading-a-brain)
+6. [Me vs the AI](#6-me-vs-the-ai)
 - [Glossary](#glossary)
 
 ---
@@ -509,10 +510,79 @@ The brain didn't grow or get new parts. It's the same 70 slots from the first ra
 
 ---
 
+## 6. Me vs the AI
+
+**The one idea:** my best lap and the AI's best lap drive at the same time, side by side, and the clock decides.
+
+**Analogy:** racing your own ghost in a video game. Here the ghost is my recorded lap, and the challenger is a car that taught itself.
+
+**Key figure**
+
+![The scoreboard: me 2, AI 4](docs/img/06-scoreboard.svg)
+
+*My best lap (26.40 s) against the best car (the champion) of each of the six fixed generations of seed 3. I win generations 1 and 5; the AI wins 10, 20, 40 and 80. Final score 2 : 4 to the AI. Built only from the saved files: my ghost lap and the champions file.*
+
+### The rules of a race
+- My car (cyan) replays my ghost: the exact keys I held on each of my 1584 steps.
+- The AI's car (yellow) is driven live by the champion's brain, step by step, exactly as in chapter 3.
+- They start together and don't collide: each drives in its own copy of the world.
+- **Best lap vs best lap.** My 26.40 s lap was a *flying lap*: I crossed the start line already moving, at 142 px/s. So the AI also drives its best lap, from exactly where that lap really began, at the speed it really had. A champion's first lap is a *standing start*: from rest, 30 px behind the line. It's always a little slower. For example, the gen 40 champion's first lap is 12.78 s and its best is 12.53 s; it races with the 12.53 s.
+- A champion that never finished a lap starts from the normal start spot and drives until it crashes or stalls. I win that row by default.
+- During the race the screen shows the live gap. That's the answer to "when did the leading car pass the spot where the other car is now?"
+
+**Real numbers**
+
+| gen | me | AI | winner | by | score |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 26.40 s | no lap (crashes at 65% of a lap) | me | by default | 1 : 0 |
+| 5 | 26.40 s | 30.02 s | me | 3.62 s | 2 : 0 |
+| 10 | 26.40 s | 13.17 s | AI | 13.23 s | 2 : 1 |
+| 20 | 26.40 s | 12.65 s | AI | 13.75 s | 2 : 2 |
+| 40 | 26.40 s | 12.53 s | AI | 13.87 s | 2 : 3 |
+| 80 | 26.40 s | 12.47 s | AI | 13.93 s | 2 : 4 |
+
+Every race was actually driven, and each one ends with exactly the lap times recorded during evolution, to the step: 1584 steps for me, and 1801, 790, 759, 752 and 748 steps for the AI.
+*Reproduce it: `node --test tests/step6.test.js`, or in the game `index.html?race=3-10&autoplay=1` (any seed-generation pair), and `index.html?scoreboard=3&autoplay=1`.*
+
+![Generation 5 vs me, the moment I finish](docs/img/06-race-gen5.svg)
+
+*One race as a picture: generation 5 against me. At 26.40 s I cross the line. The generation 5 car is still in the last corner and needs another 3.62 s. The thin lines are both paths. Mine wobbles; the AI's is smoother.*
+
+![Lap progress over time](docs/img/06-progress-race.svg)
+
+*The same races as lines. Generation 10 (green) is about twice as fast as me the whole way round. Generation 5 (yellow) is slow but steady. I (cyan) am faster than generation 5 at the start, slow down around the middle of the lap, and finish 3.62 s ahead of it.*
+
+Where do I lose to generation 10? Everywhere, by about half. From the start to 40% of the lap I take 8.28 s, and it takes 4.65 s. From 40% to 65% (the top straight, the hairpin and the leg after it) I take 8.12 s against its 3.58 s, the biggest difference. The last 35% is 9.98 s against 4.92 s.
+*Reproduce it: `node tools/figures.js` (`raceGen5` in `docs/img/figure-data.json`); the split times come from the same race, gen 10 against me.*
+
+> **Interactive later:** pick any generation and race it against your own lap, recorded right there in the page.
+
+**What actually happened**
+- The race code matched the recorded laps on the first run. All six races end at exactly the recorded step.
+- On screen, three things needed fixing after the first screenshots:
+  - The live gap sat on top of the top wall.
+  - At the finish, the "ME" and "GEN 10" tags covered each other.
+  - The "crashed here" label hid under the generation 1 car.
+- Generation 10 is the first time the AI beats me. It does it by 13.23 s, and its 13.17 s lap is half of mine.
+
+**The prompt:** [entry 10: the guide in two levels, then me vs the AI](PROMPTS.md#10-the-guide-in-two-levels-then-step-6-me-vs-the-ai).
+
+**In the code**
+- `createRace()` in `src/sim/race.js`: my ghost and one champion, each at the start of its best lap.
+- `championBestLap()` in `src/sim/race.js`: drives a champion alone and keeps its fastest lap and where it began.
+- `stepRace()` and `runRace()` in `src/sim/race.js`: one step, or a whole race, for both cars.
+- `raceGap()` in `src/sim/race.js`: who's ahead right now, and by how many seconds.
+- `raceResult()` in `src/sim/race.js`: who won and by how much, or how the AI got out.
+- `buildScoreboard()` in `src/sim/scoreboard.js`: the six rows and the running score, from the saved files only.
+- `drawRaceHud()` and `drawScoreboard()` in `src/render/race-view.js`: the race screen and the scoreboard.
+
+---
+
 ## Glossary
 
 - **Activation function:** another name for a squash function. See *squash*.
 - **Apex:** the innermost point of a curve.
+- **Best lap:** a car's fastest lap. In races, both sides drive their best lap.
 - **Bias:** one extra number a neuron adds after summing up. It shifts the neuron's result up or down, whatever the inputs are.
 - **Brain:** here, a neural network of 70 numbers that turns 6 inputs into 4 key presses.
 - **Champion:** the car with the highest fitness in its generation.
@@ -522,6 +592,7 @@ The brain didn't grow or get new parts. It's the same 70 slots from the first ra
 - **Elitism:** copying the single best brain into the next generation unchanged, so the best can never get worse.
 - **Evolution:** keep the best, copy them with small changes, repeat.
 - **Fitness:** the score that decides who becomes a parent. Here: how far along the track, plus a bonus for a fast lap.
+- **Flying lap:** a lap that starts with the car already moving across the line, like my 26.40 s lap.
 - **Fixed timestep:** the simulation always moves forward in steps of the same length (one sixtieth of a second), whatever the screen does.
 - **Function:** a small, named piece of code that does one job.
 - **Generation:** one round of 100 cars driving at the same time.
@@ -539,13 +610,16 @@ The brain didn't grow or get new parts. It's the same 70 slots from the first ra
 - **Parent:** one of the top 10 cars of a generation, whose numbers are copied into the next one.
 - **Population:** all the cars of one generation, here 100.
 - **px (pixel):** one dot on the screen. The screen is 1280 × 720 px.
+- **Race:** my ghost lap and a champion's best lap, driven at the same time on the same track. They can't collide.
 - **Ray:** one of the car's 5 eyes: a line that goes out until it hits a wall, up to 200 px.
 - **Seed:** the starting number for the random number generator. The same seed always gives the same "random" numbers.
+- **Scoreboard:** my best lap against the champion of each of the six fixed generations (1, 5, 10, 20, 40, 80), and the running score.
 - **Selection:** ranking the cars by fitness and keeping the best as parents.
 - **Sigmoid:** a squash function whose result is always between 0 and 1. Used for the 4 keys.
 - **Simulation:** a pretend world inside the computer that follows fixed rules.
 - **Squash:** turn any number into one in a fixed range, so nothing runs off to infinity.
 - **Stall:** a car that goes 3 seconds without reaching a new checkpoint is out.
+- **Standing start:** a lap that starts from rest, 30 px behind the line. A champion's first lap is one.
 - **Step:** one tick of the simulation, one sixtieth of a second.
 - **tanh:** a squash function whose result is always between −1 and 1. Used for the hidden neurons.
 - **Weight:** the number a neuron multiplies one input by. A big weight means "this input matters a lot". A negative weight means "this input pushes the other way".

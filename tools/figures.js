@@ -11,6 +11,8 @@ import { explainThink, OUTPUT_LABELS, BRAIN_SIZE, INPUTS, HIDDEN, OUTPUTS, tanh,
 import { createGeneration, stepGeneration, fitness } from '../src/sim/generation.js';
 import { createEvolution, runEvolution, finishGeneration, nextGeneration } from '../src/sim/evolution.js';
 import { STEPS_PER_SECOND } from '../src/sim/constants.js';
+import { createRace, stepRace, raceResult } from '../src/sim/race.js';
+import { buildScoreboard } from '../src/sim/scoreboard.js';
 
 const root = new URL('../', import.meta.url);
 const OUT = new URL('docs/img/', root);
@@ -737,6 +739,88 @@ const BIG = 30, MID = 24;
   parts.push(text(290, 232, 'gen 1: down the middle', { size: 22, color: C.pink, weight: 'bold' }));
   parts.push(text(290, 270, 'gen 80: hugs the inside', { size: 22, color: C.yellow, weight: 'bold' }));
   save('simple-5-inside-line.svg', svg(720, 500, 'Nobody taught it the inside line', parts.join('\n')), 'Simple guide, ch 5: generation 1 drives the hairpin down the middle; generation 80 hugs the inside.');
+}
+
+// ===================================================================
+// Chapter 6: me vs the AI
+// ===================================================================
+const ghost = json('ghosts/me-v3.json');
+const board = buildScoreboard(ghost, champs[3]);
+// a race, step by step: both positions and how far through the lap each car is
+function raceTrace(generation) {
+  const race = createRace(track, ghost, { generation, brain: champs[3][String(generation)].brain });
+  const me = [], ai = [];
+  while (!race.over) { stepRace(race); me.push({ ...pick(race.me.world.car) }); ai.push({ ...pick(race.ai.world.car) }); }
+  return { race, me, ai };
+}
+const pick = (car) => ({ x: car.x, y: car.y, angle: car.angle });
+function scoreboardFigure(name, big) {
+  const W = 760, parts = [];
+  const f = big ? 26 : 16, rowH = big ? 56 : 34, top = big ? 120 : 92;
+  parts.push(text(W / 2, big ? 56 : 44, 'ME vs THE AI', { anchor: 'middle', size: big ? 38 : 26, weight: 'bold', color: C.text, glow: true }));
+  if (!big) parts.push(text(W / 2, 68, 'my best lap against the best car of each generation (seed 3)', { anchor: 'middle', size: 12, color: C.dim }));
+  const cols = big ? [110, 290, 470, 640] : [90, 230, 370, 510, 650];
+  const heads = big ? ['GEN', 'ME', 'AI', 'WINS'] : ['GEN', 'ME', 'AI', 'WINNER', 'SCORE'];
+  heads.forEach((h, i) => parts.push(text(cols[i], top, h, { anchor: 'middle', size: big ? 20 : 13, color: C.dim, weight: 'bold' })));
+  board.rows.forEach((row, i) => {
+    const y = top + 40 + i * rowH;
+    const cells = [String(row.generation), sec(row.meSteps), row.aiSteps == null ? 'no lap' : sec(row.aiSteps), row.winner === 'ai' ? 'AI' : 'ME'];
+    if (!big) cells.push(`${row.score.me} : ${row.score.ai}`);
+    const colors = [C.text, C.cyan, C.yellow, row.winner === 'ai' ? C.yellow : C.cyan, C.text];
+    cells.forEach((c, j) => parts.push(text(cols[j], y, c, { anchor: 'middle', size: f, color: colors[j], weight: j === 3 ? 'bold' : 'normal', glow: j === 3 })));
+  });
+  const yEnd = top + 40 + board.rows.length * rowH + (big ? 30 : 16);
+  parts.push(text(W / 2, yEnd, `ME ${board.total.me} : ${board.total.ai} AI`, { anchor: 'middle', size: big ? 44 : 30, weight: 'bold', color: C.yellow, glow: true }));
+  if (!big) parts.push(text(W / 2, yEnd + 28, 'best lap vs best lap · built from ghosts/me-v3.json and champions/seed-3.json', { anchor: 'middle', size: 11, color: C.dim }));
+  save(name, svg(W, yEnd + (big ? 34 : 46), 'Me vs the AI: the scoreboard', parts.join('\n')),
+    big ? 'Simple guide, ch 6: the scoreboard, me 2 : 4 AI.' : 'The scoreboard: my 26.40 s lap against seed 3\'s champions of gens 1, 5, 10, 20, 40, 80 → 2:4.');
+}
+scoreboardFigure('06-scoreboard.svg', false);
+scoreboardFigure('simple-6-scoreboard.svg', true);
+{
+  // one race as a picture: gen 5 vs me, the moment I cross the line
+  const { race, me, ai } = raceTrace(5);
+  const res = raceResult(race);
+  const tMe = race.me.finishSteps; // the step I finish
+  const v = { x0: 80, y0: 40, scale: 0.62, ox: 20, oy: 40 }, parts = [drawTrack(v)];
+  parts.push(poly(ai.slice(0, tMe).map((p) => at(v, p)), { stroke: C.yellow, width: 2, opacity: 0.55 }));
+  parts.push(poly(me.slice(0, tMe).map((p) => at(v, p)), { stroke: C.cyan, width: 2, opacity: 0.55 }));
+  const aiAt = ai[tMe - 1], meAt = me[tMe - 1];
+  parts.push(`<g>${drawBug(v, aiAt, { color: C.yellow })}</g>`, drawBug(v, meAt));
+  const pa = at(v, aiAt), pm = at(v, meAt);
+  parts.push(text(pm.x, pm.y - 22, 'ME: finished', { anchor: 'middle', size: 13, color: C.cyan, weight: 'bold' }));
+  parts.push(text(pa.x, pa.y - 22, 'GEN 5: not yet', { anchor: 'middle', size: 13, color: C.yellow, weight: 'bold' }));
+  parts.push(text(430, 470, `at ${sec(tMe)} s I cross the line. Generation 5 needs ${res.by.toFixed(2)} s more: ME WINS by ${res.by.toFixed(2)} s.`, { anchor: 'middle', size: 13, color: C.text }));
+  save('06-race-gen5.svg', svg(860, 490, 'Gen 5 vs me', parts.join('\n')), 'One race: the moment I finish (26.40 s), the gen 5 champion still has 3.62 s to go.');
+  data.raceGen5 = { meSteps: res.meSteps, aiSteps: res.aiSteps, by: res.by, aiAtMyFinish: aiAt };
+}
+{
+  // progress through the lap over time: me vs generation 5 vs generation 10
+  const lines = [[5, C.yellow], [10, C.green]].map(([g, color]) => ({ g, color, ...raceTrace(g) }));
+  const parts = [];
+  const x0 = 80, y0 = 50, w = 680, h = 250, tMax = 32;
+  const X = (t) => x0 + (t / tMax) * w, Y = (p) => y0 + h - p * h;
+  parts.push(rect(x0, y0, w, h, { fill: C.road, rx: 6 }));
+  for (const t of [0, 5, 10, 15, 20, 25, 30]) parts.push(text(X(t), y0 + h + 16, `${t} s`, { anchor: 'middle', size: 10, color: C.dim }));
+  for (const p of [0, 0.5, 1]) parts.push(text(x0 - 6, Y(p) + 4, `${p * 100}%`, { anchor: 'end', size: 10, color: C.dim }), line(x0, Y(p), x0 + w, Y(p), C.dim, 1, { opacity: 0.12 }));
+  const share = (lane) => lane.progress.map((p) => p / (track.checkpoints.length + 1));
+  const ends = [];
+  const plot = (vals, color, label) => {
+    const pts = vals.map((p, i) => ({ x: X((i + 1) / STEPS_PER_SECOND), y: Y(Math.min(1, Math.max(0, p - 1 / (track.checkpoints.length + 1)) / (track.checkpoints.length / (track.checkpoints.length + 1)))) }));
+    parts.push(poly(pts, { stroke: color, width: 2.5, glow: true }));
+    const end = pts[pts.length - 1];
+    ends.push({ x: end.x + 6, y: end.y + 4, label, color });
+  };
+  const me = lines[0].race.me;
+  plot(share(me).slice(0, me.finishSteps), C.cyan, `ME ${sec(me.finishSteps)} s`);
+  for (const l of lines) plot(share(l.race.ai).slice(0, l.race.ai.finishSteps), l.color, `GEN ${l.g} ${sec(l.race.ai.finishSteps)} s`);
+  // labels that would sit on top of each other go one under the other
+  ends.sort((a, b) => a.x - b.x).forEach((e, i, all) => {
+    const clash = all.slice(0, i).some((o) => Math.abs(o.y - e.y) < 12 && e.x - o.x < 110);
+    parts.push(text(e.x, clash ? e.y + 16 : e.y, e.label, { size: 11, color: e.color }));
+  });
+  parts.push(text(x0, y0 - 14, 'how far through the lap, over time (100% = across the finish line)', { size: 12, weight: 'bold', color: C.cyan }));
+  save('06-progress-race.svg', svg(860, 330, 'Lap progress over time', parts.join('\n')), 'The same races as lines: me (26.40 s), gen 5 (30.02 s, slower) and gen 10 (13.17 s, twice as fast).');
 }
 
 // ---------- tables the guide quotes ----------

@@ -663,6 +663,16 @@
   "firstLapCarInLine": false,
   "championsInLine": 54
  },
+ "raceGen5": {
+  "meSteps": 1584,
+  "aiSteps": 1801,
+  "by": 3.6166666666666667,
+  "aiAtMyFinish": {
+   "x": 163.9412471948741,
+   "y": 538.4950876723382,
+   "angle": -4.633321833476496
+  }
+ },
  "seeds": {
   "1": {
    "firstLap": null,
@@ -887,6 +897,22 @@
   {
    "name": "simple-5-inside-line.svg",
    "about": "Simple guide, ch 5: generation 1 drives the hairpin down the middle; generation 80 hugs the inside."
+  },
+  {
+   "name": "06-scoreboard.svg",
+   "about": "The scoreboard: my 26.40 s lap against seed 3's champions of gens 1, 5, 10, 20, 40, 80 → 2:4."
+  },
+  {
+   "name": "simple-6-scoreboard.svg",
+   "about": "Simple guide, ch 6: the scoreboard, me 2 : 4 AI."
+  },
+  {
+   "name": "06-race-gen5.svg",
+   "about": "One race: the moment I finish (26.40 s), the gen 5 champion still has 3.62 s to go."
+  },
+  {
+   "name": "06-progress-race.svg",
+   "about": "The same races as lines: me (26.40 s), gen 5 (30.02 s, slower) and gen 10 (13.17 s, twice as fast)."
   }
  ]
 }

@@ -119,4 +119,22 @@ For the curious: [Deep dive →](DEEP-DIVE.md#5-reading-a-brain)
 
 ---
 
+## 6. Me vs the AI
+
+**My best lap against the best car of each generation, side by side.**
+
+It's like racing your own ghost in a video game. Here, the ghost is me. The challenger is a car that taught itself.
+
+![The scoreboard: me 2, AI 4](docs/img/simple-6-scoreboard.svg)
+
+Both cars drive their best lap at the same moment, and they can't bump into each other. In generation 1 the AI never finishes a lap, so I win. In generation 5 it finishes, but I'm still faster, by about 4 seconds. From generation 10 on, it wins every race.
+
+**Final score: me 2, AI 4.**
+
+**What really happened:** the first time the AI beat me, in generation 10, it won by about 13 seconds. Its lap took half as long as mine. And it's a fair fight: both cars drive their best lap, and each one starts exactly where that lap really began.
+
+For the curious: [Deep dive →](DEEP-DIVE.md#6-me-vs-the-ai)
+
+---
+
 *Simple, but never wrong: every number here is real and comes from the actual program. The [deep dive](DEEP-DIVE.md) has the precise values and how to check each one yourself.*

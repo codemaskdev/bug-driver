@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="398" viewBox="0 0 760 398" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+<title>Me vs the AI: the scoreboard</title>
+<defs><filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="760" height="398"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9fb3c8"/></marker></defs>
+<rect x="0.5" y="0.5" width="759" height="397" rx="16" fill="#0b0d13" stroke="#00f0ff" stroke-opacity="0.25"/>
+<text x="380" y="44" font-size="26" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">ME vs THE AI</text>
+<text x="380" y="68" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="normal">my best lap against the best car of each generation (seed 3)</text>
+<text x="90" y="92" font-size="13" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">GEN</text>
+<text x="230" y="92" font-size="13" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">ME</text>
+<text x="370" y="92" font-size="13" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">AI</text>
+<text x="510" y="92" font-size="13" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">WINNER</text>
+<text x="650" y="92" font-size="13" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">SCORE</text>
+<text x="90" y="132" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">1</text>
+<text x="230" y="132" font-size="16" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="370" y="132" font-size="16" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">no lap</text>
+<text x="510" y="132" font-size="16" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">ME</text>
+<text x="650" y="132" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">1 : 0</text>
+<text x="90" y="166" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">5</text>
+<text x="230" y="166" font-size="16" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="370" y="166" font-size="16" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">30.02</text>
+<text x="510" y="166" font-size="16" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">ME</text>
+<text x="650" y="166" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">2 : 0</text>
+<text x="90" y="200" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">10</text>
+<text x="230" y="200" font-size="16" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="370" y="200" font-size="16" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">13.17</text>
+<text x="510" y="200" font-size="16" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">AI</text>
+<text x="650" y="200" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">2 : 1</text>
+<text x="90" y="234" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">20</text>
+<text x="230" y="234" font-size="16" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="370" y="234" font-size="16" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">12.65</text>
+<text x="510" y="234" font-size="16" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">AI</text>
+<text x="650" y="234" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">2 : 2</text>
+<text x="90" y="268" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">40</text>
+<text x="230" y="268" font-size="16" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="370" y="268" font-size="16" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">12.53</text>
+<text x="510" y="268" font-size="16" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">AI</text>
+<text x="650" y="268" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">2 : 3</text>
+<text x="90" y="302" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">80</text>
+<text x="230" y="302" font-size="16" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="370" y="302" font-size="16" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">12.47</text>
+<text x="510" y="302" font-size="16" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">AI</text>
+<text x="650" y="302" font-size="16" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">2 : 4</text>
+<text x="380" y="352" font-size="30" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">ME 2 : 4 AI</text>
+<text x="380" y="380" font-size="11" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="normal">best lap vs best lap · built from ghosts/me-v3.json and champions/seed-3.json</text>
+</svg>
