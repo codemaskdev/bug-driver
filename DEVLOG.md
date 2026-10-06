@@ -580,3 +580,48 @@ How they got out:
 - No other track is added or changed. Exam's own hairpin is not copied into training: Mirrored's hairpin is Neon Loop's, driven the other way.
 
 **Whatever happens is the result.** No retries, no other seeds, no changes to the method, the tracks or the fitness after seeing anything.
+
+## 2026-10-06 — Step 7c: four training tracks, and the second Exam test
+Commits 41039bd (pre-registration, before any training), 9f3ea61 (training), b726c2d (the game loads the four-track champions), 935829d (the one Exam test and the race), 2a8e52d (race HUD fix), 9f15254 (guide chapter 7). Everything was run exactly as pre-registered. Nothing was changed after seeing a result, and nothing was retried.
+
+**Training** (`node tools/multi-train.js multi4`, 1073 s in Node). Seed 3, 100 generations, Neon Loop + Mirrored + Zigzag + Wide Sweepers, fitness = the sum of the four.
+- The first lap on all four tracks came in generation 5.
+- Best fitness: 97.7 at gen 1, 3276.3 at gen 10, 3957.7 at gen 40, 4029.6 at gen 100.
+- tests/step7c.test.js checks the training rules and that every champion drives its recorded laps again.
+
+**The table.** Every cell is the best lap, or how it got out and how far it got. Exam was run once, after training:
+| champion | Neon Loop | Mirrored | Zigzag | Wide Sweepers | **Exam** |
+| --- | --- | --- | --- | --- | --- |
+| gen 1 | crash 65.1% | crash 10.5% | stall 0.1% | crash 60.2% | crash 13.3% (2.53 s) |
+| gen 5 | 20.48 s | 22.25 s | 13.22 s | 13.08 s | **22.95 s** (60 s, 2 laps) |
+| gen 10 | 14.75 s | 16.08 s | 10.58 s | 9.72 s | **16.42 s** (60 s, 3 laps) |
+| gen 20 | 13.53 s | 13.80 s | 9.92 s | 8.67 s | **14.72 s**, then a crash in the hairpin on lap 3 (35.65 s) |
+| gen 40 | 13.15 s | 12.85 s | 8.35 s | 8.15 s | **13.72 s**, then a dead stop in the hairpin on lap 2 (19.87 s), stall at 22.35 s, no reverse |
+| gen 80 | 12.87 s | 12.67 s | 8.22 s | 8.13 s | **13.33 s** (60 s, 4 laps) |
+| gen 100 | 12.63 s | 12.68 s | 8.20 s | 8.13 s | **13.25 s** (60 s, 4 laps) |
+
+- **Headline, the pre-registered comparison (gens 10, 20, 80, 100): 4 of 4 finish a lap on Exam.** The Step 7b three-track champions managed 0 of 4, the one-track ones 2 of 3.
+- Gen 100's 13.25 s is the fastest Exam lap of any champion. The one-track best was gen 20's 13.83 s.
+- Not perfect: gens 20 and 40 each finish laps, then fail the right-hand hairpin on a later lap.
+- At home on Neon Loop, gen 100 drives 12.63 s: slower than the one-track gen 80 (12.47 s), faster than the three-track gen 100 (13.17 s).
+
+**The race:**
+- My Exam lap (32.02 s) against the best of them on Exam, the four-track gen 100 champion (13.25 s), best lap vs best lap.
+- **The AI wins by 18.77 s.** The browser gives the same result as Node.
+- That's 0.59 s more than the Step 7b exam's winner (one-track gen 20, by 18.18 s).
+
+**What it means:**
+- It fits our best explanation from the exam: once a right-hand hairpin was in the training, the cars learned one, and drove Exam's, which they had never seen.
+- But the fix was chosen after seeing the exam, and this was Exam's second use as a test, so the pass counts for less than a first pass would. It's one seed, and two champions still failed the hairpin on a later lap.
+- Mirrored's numbers are training results now, not a test.
+
+**Disclosed:**
+- Before the real test, the new tool (tools/exam-7c-report.js) was checked on the Step 7b three-track champions with `node tools/exam-7c-report.js multi`. It reproduced their known Exam results exactly (gens 10, 20, 80, 100).
+- That check also ran their gens 1, 5 and 40 on Exam for the first time: they crashed at 2.53 s, 8.05 s and 5.90 s.
+- The four-track champions never drove Exam before the one real test.
+
+**Also fixed** (2a8e52d): the race HUD wrote both lap times left-aligned 170 px from the right edge. "GEN 100 ×4 TRACKS 13.25" ran off the screen; "×3 TRACKS" would have too. They're right-aligned now.
+
+🎬 **The outcome:** `index.html?race=exam&champion=3-multi4-100&autoplay=1`. The car that trained on a right-hand hairpin drives clean through Exam's and beats me by 18.77 s. For the before/after, the same hairpin with the one-track gen 80 first: `index.html?track=exam&champion=3-80` (it reverses into the wall), then `index.html?track=exam&champion=3-multi4-100` (clean laps).
+
+- 69 tests pass; the replay check is unchanged (7 of 7).

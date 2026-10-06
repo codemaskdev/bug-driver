@@ -474,3 +474,20 @@ What broke: the first replay check compared only my ghost's lap time, and a deli
 
 Built: my Exam lap saved as ghosts/me-exam.json (32.02 s, the best of my first 3 counted laps), Exam opened for testing champions (never for training), the exam itself (Step 7b part 3), the race, and guide chapter 7 with the results.
 What broke: nothing in the code. The lap in the file is 32.02 s, not the 21.37 s from prompt 15 (that one was on Zigzag). And training on three tracks didn't help on Exam: all four three-track champions crashed there.
+
+## 19. Step 7c: one more try, decided after the exam
+
+````text
+Step 7c, decided after seeing the exam, and we'll say so openly.
+
+Pre-register in DEVLOG first (commit before training):
+- Why: Exam showed every multi-track champion crashing in the right-hand hairpin, and none of the 3 training tracks has one.
+- Plan: train seed 3 from scratch for 100 generations on 4 tracks: Neon Loop, Neon Loop Mirrored, Zigzag, Wide Sweepers. Fitness = sum of the 4. Everything else unchanged. Champions at gens 1, 5, 10, 20, 40, 80, 100 → champions/seed-3-multi4.json.
+- Test: those champions on Exam, once, after training. Exam is still never trained on. Note that this is the second time Exam is used for testing.
+- Whatever happens is the result. No retries, no tuning.
+
+Then run it, report the table (all 4 training tracks + Exam), race my Exam ghost against the best on Exam, and add it to chapter 7 in both guides. Update PROMPTS.md and DEVLOG.md, 🎬-mark the outcome.
+````
+
+Built: the Step 7c pre-registration, committed before any training (41039bd). Then the four-track training, the one Exam test, the race, and chapter 7 in both guides.
+What broke: nothing in the training. Two small things: the race HUD's lap times ran off the screen with a long name like "GEN 100 ×4 TRACKS" (fixed). And a check of the new exam tool, run on the Step 7b champions, also put their gens 1, 5 and 40 on Exam, which the 7b exam hadn't included.
