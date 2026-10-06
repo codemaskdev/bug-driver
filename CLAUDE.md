@@ -59,6 +59,7 @@ material for the video and the guides.
 - Message format: `<type>: <what changed, in plain English>`
   types: feat, fix, tweak, refactor, docs.
 - Never squash, amend or rewrite history. Corrections are new commits.
+- DEVLOG/PROMPTS updates go in a separate commit: `docs: devlog for <hash>`.
 
 ## PROMPTS.md
 - After every prompt the user sends, append an entry: the prompt copied
