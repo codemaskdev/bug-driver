@@ -264,3 +264,15 @@ What broke:
 - Small and not fixed: two presses of the same key within one frame count once (a scripted test that pressed ↓ twice in a row moved one row). A person pressing keys won't hit this.
 
 🎬 Generation 10, the first time the AI beats me. It leads from the first quarter of a second. When it crosses the line at 13.17 s I'm only 53% of the way round, and it's 6.4 s ahead of me at that moment. Final: AI WINS by 13.23 s (`?race=3-10&autoplay=1`).
+
+## 2026-10-06 — Fix: no pictures in the web guide when double-clicked
+Commit 972e5f8. Opening docs/guide/index.html by double-click showed text but no images.
+- **Cause: Safari, not the paths.** The paths in the page were already correct (`../img/...` from docs/guide/), and all SVGs are valid XML. In headless Chrome via file:// (no flags) all 7 + 22 images loaded. But on this Mac a double-clicked .html opens in Safari, the system default (Chrome is only set for http links). Safari lets a local page read files in its own folder and below, and `../img/` is outside that.
+- **Reproduced with Safari's engine.** WKWebView with read access limited to the page's folder (docs/guide/): 0 of 7 images loaded. With access one folder up (docs/): 7 of 7.
+- **Fix:** tools/guide-page.js now copies every figure the pages use into docs/guide/img/ (29 SVGs + figure-data.json) and links them as `img/...`. The HTML is still never edited by hand.
+- **New check in the build:** every `<img>` in every generated page must exist on disk and stay inside the page's folder, and every image path in the Markdown must exist relative to the repo root. Otherwise it fails. Tested by hiding one SVG: the build stopped with "image docs/img/simple-2-eyes.svg does not exist" and exit code 1.
+- **After the fix:**
+  - Chrome file://, at 390 px and at 1280 px: index.html found 7, loaded 7; deep-dive.html found 22, loaded 22; no sideways scrolling.
+  - WebKit with access to docs/guide/ only: 7/7 and 22/22.
+  - GitHub: all 7 + 22 image paths in HOW-IT-WORKS.md and DEEP-DIVE.md exist and are tracked in git.
+- **What broke, honestly:** my earlier page check passed because it ran in Chrome only, never in the browser that actually opens the file here.
