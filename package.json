@@ -1,0 +1,9 @@
+{
+  "name": "bug-driver",
+  "private": true,
+  "type": "module",
+  "description": "No dependencies. This file only tells Node that src/ uses ES modules, so the simulation runs headless in tests.",
+  "scripts": {
+    "test": "node --test tests/"
+  }
+}
