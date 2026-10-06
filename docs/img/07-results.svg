@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="428" viewBox="0 0 860 428" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+<title>Did it learn, or memorize?</title>
+<defs><filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="860" height="428"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9fb3c8"/></marker></defs>
+<rect x="0.5" y="0.5" width="859" height="427" rx="16" fill="#0b0d13" stroke="#00f0ff" stroke-opacity="0.25"/>
+<text x="20" y="34" font-size="14" fill="#00f0ff" fill-opacity="1" text-anchor="start" font-weight="bold">every champion, alone on tracks it has never seen</text>
+<text x="150" y="66" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">Neon Loop</text>
+<text x="290" y="66" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">Mirrored</text>
+<text x="480" y="66" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">Zigzag</text>
+<text x="670" y="66" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">Wide Sweepers</text>
+<text x="20" y="96" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 gen 1</text>
+<text x="150" y="96" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="normal">no lap</text>
+<rect x="210" y="80" width="160" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="290" y="96" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 11%</text>
+<rect x="400" y="80" width="160" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="480" y="96" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">stall at 0%</text>
+<rect x="590" y="80" width="160" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="670" y="96" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 60%</text>
+<text x="20" y="130" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 gen 5</text>
+<text x="150" y="130" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="normal">30.02 s</text>
+<rect x="210" y="114" width="160" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="290" y="130" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 50%</text>
+<rect x="400" y="114" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="480" y="130" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">19.77 s</text>
+<rect x="590" y="114" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="670" y="130" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">20.47 s</text>
+<text x="20" y="164" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 gen 10</text>
+<text x="150" y="164" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="normal">13.17 s</text>
+<rect x="210" y="148" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="290" y="164" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.33 s</text>
+<rect x="400" y="148" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="480" y="164" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">9.37 s</text>
+<rect x="590" y="148" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="670" y="164" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.23 s</text>
+<text x="20" y="198" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 gen 20</text>
+<text x="150" y="198" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="normal">12.65 s</text>
+<rect x="210" y="182" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="290" y="198" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.20 s</text>
+<rect x="400" y="182" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="480" y="198" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">9.25 s</text>
+<rect x="590" y="182" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="670" y="198" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.17 s</text>
+<text x="20" y="232" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 gen 40</text>
+<text x="150" y="232" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="normal">12.53 s</text>
+<rect x="210" y="216" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="290" y="232" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.92 s</text>
+<rect x="400" y="216" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="480" y="232" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">9.83 s</text>
+<rect x="590" y="216" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="670" y="232" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.25 s</text>
+<text x="20" y="266" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 gen 80</text>
+<text x="150" y="266" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="normal">12.47 s</text>
+<rect x="210" y="250" width="160" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="290" y="266" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 50%</text>
+<rect x="400" y="250" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="480" y="266" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">9.38 s</text>
+<rect x="590" y="250" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="670" y="266" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.33 s</text>
+<text x="20" y="300" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="start" font-weight="normal">seed 2 gen 80</text>
+<text x="150" y="300" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="normal">12.58 s</text>
+<rect x="210" y="284" width="160" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="290" y="300" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">stall at 50%</text>
+<rect x="400" y="284" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="480" y="300" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">9.65 s</text>
+<rect x="590" y="284" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="670" y="300" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.08 s</text>
+<text x="20" y="334" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="start" font-weight="normal">seed 4 gen 80</text>
+<text x="150" y="334" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="normal">13.28 s</text>
+<rect x="210" y="318" width="160" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="290" y="334" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 53%</text>
+<rect x="400" y="318" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="480" y="334" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">9.30 s</text>
+<rect x="590" y="318" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="670" y="334" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.47 s</text>
+<text x="20" y="368" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="start" font-weight="normal">seed 5 gen 80</text>
+<text x="150" y="368" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="normal">12.57 s</text>
+<rect x="210" y="352" width="160" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="290" y="368" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 52%</text>
+<rect x="400" y="352" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="480" y="368" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">9.88 s</text>
+<rect x="590" y="352" width="160" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="670" y="368" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.23 s</text>
+<text x="20" y="408" font-size="11" fill="#9fb3c8" fill-opacity="1" text-anchor="start" font-weight="normal">cyan = best lap · pink = never finished a lap: how it got out, and how far it got · Neon Loop = its home track</text>
+</svg>

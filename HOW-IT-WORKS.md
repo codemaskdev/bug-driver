@@ -137,4 +137,20 @@ For the curious: [Deep dive →](DEEP-DIVE.md#6-me-vs-the-ai)
 
 ---
 
+## 7. Did it learn, or memorize?
+
+**A car that really learned to drive should handle a track it has never seen.**
+
+Think of a student who memorized last year's exam answers. They score perfectly on last year's exam, and they're lost on a new one.
+
+![The champion that beat me stops dead in the mirrored hairpin and reverses into the wall](docs/img/simple-7-mirror-crash.svg)
+
+We built new tracks with the same road and the same rules, and let the best cars try them with no practice. On a wiggly track and on a fast, curvy one, almost every car drove fine. Then we turned the home track around and drove it the other way. The best car of generation 80, the one that beat me by 14 seconds, reached the hairpin at full speed. It stopped dead, kept holding the brake (which in this game means reverse), and backed into the wall.
+
+**What really happened:** some earlier champions did get round that backwards track. So the honest answer is: both. It learned to drive, and the cars that trained the longest also learned tricks that only work at home. That last part is our best guess, not something we measured. Next comes a final exam track that nobody has trained on, and I drive it first.
+
+For the curious: [Deep dive →](DEEP-DIVE.md#7-did-it-learn-or-memorize)
+
+---
+
 *Simple, but never wrong: every number here is real and comes from the actual program. The [deep dive](DEEP-DIVE.md) has the precise values and how to check each one yourself.*

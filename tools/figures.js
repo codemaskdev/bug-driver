@@ -823,6 +823,90 @@ scoreboardFigure('simple-6-scoreboard.svg', true);
   save('06-progress-race.svg', svg(860, 330, 'Lap progress over time', parts.join('\n')), 'The same races as lines: me (26.40 s), gen 5 (30.02 s, slower) and gen 10 (13.17 s, twice as fast).');
 }
 
+// ===================================================================
+// Chapter 7: did it learn, or memorize?  (Exam is held out: its shape is shown, no car ever drives it here)
+// ===================================================================
+{
+  const step7 = json('runs/step7a.json').results;
+  const tracks7 = ['neon-loop-mirrored', 'zigzag', 'wide-sweepers'];
+  // the four new tracks, small
+  const parts = [];
+  ['neon-loop-mirrored', 'zigzag', 'wide-sweepers', 'exam'].forEach((id, k) => {
+    const def = TRACKS.find((t) => t.id === id), t = buildTrack(def);
+    const v = { x0: 80, y0: 40, scale: 0.3, ox: 20 + (k % 2) * 420, oy: 50 + Math.floor(k / 2) * 230 };
+    const d = (pts) => pts.map((p, i) => `${i ? 'L' : 'M'}${r1(at(v, p).x)},${r1(at(v, p).y)}`).join('') + 'Z';
+    parts.push(`<path d="${d(t.outer)}${d(t.inner)}" fill="${C.road}" fill-rule="evenodd"/>`);
+    parts.push(poly(t.outer.map((p) => at(v, p)), { stroke: C.magenta, width: 1.5, closed: true }), poly(t.inner.map((p) => at(v, p)), { stroke: C.magenta, width: 1.5, closed: true }));
+    const cp = t.checkpoints[0], a = at(v, { x: cp.ax, y: cp.ay }), b = at(v, { x: cp.bx, y: cp.by });
+    parts.push(line(a.x, a.y, b.x, b.y, C.text, 3));
+    const p0 = at(v, t.center[10]), tg = t.tangents[10];
+    parts.push(line(p0.x - tg.x * 10, p0.y - tg.y * 10, p0.x + tg.x * 10, p0.y + tg.y * 10, C.cyan, 3, { arrow: true }));
+    parts.push(text(v.ox + 10, v.oy - 14, def.name + (id === 'exam' ? ' (held out: nobody trains on it)' : ''), { size: 13, weight: 'bold', color: id === 'exam' ? C.yellow : C.cyan }));
+  });
+  save('07-new-tracks.svg', svg(860, 520, 'The four new tracks', parts.join('\n')), 'The four new tracks (same road, same physics); Exam is held out.');
+
+  // the results matrix
+  const cars = [[3, 1], [3, 5], [3, 10], [3, 20], [3, 40], [3, 80], [2, 80], [4, 80], [5, 80]];
+  const names = { 'neon-loop-mirrored': 'Mirrored', zigzag: 'Zigzag', 'wide-sweepers': 'Wide Sweepers' };
+  const m = [];
+  m.push(text(20, 34, 'every champion, alone on tracks it has never seen', { size: 14, weight: 'bold', color: C.cyan }));
+  m.push(text(150, 66, 'Neon Loop', { anchor: 'middle', size: 12, color: C.dim, weight: 'bold' }));
+  tracks7.forEach((id, j) => m.push(text(290 + j * 190, 66, names[id], { anchor: 'middle', size: 12, color: C.dim, weight: 'bold' })));
+  cars.forEach(([seed, gen], i) => {
+    const y = 96 + i * 34;
+    m.push(text(20, y, `seed ${seed} gen ${gen}`, { size: 12, color: seed === 3 ? C.text : C.dim }));
+    const home = champs[seed][String(gen)].lapSteps;
+    m.push(text(150, y, home ? `${sec(home)} s` : 'no lap', { anchor: 'middle', size: 12, color: C.dim }));
+    tracks7.forEach((id, j) => {
+      const r = step7.find((x) => x.track === id && x.seed === seed && x.generation === gen);
+      const ok = r.lapSeconds !== null;
+      const label = ok ? `${r.lapSeconds.toFixed(2)} s` : `${r.out} at ${Math.round(r.progress)}%`;
+      m.push(rect(290 + j * 190 - 80, y - 16, 160, 24, { fill: ok ? C.cyan : C.pink, opacity: 0.16, rx: 5 }));
+      m.push(text(290 + j * 190, y, label, { anchor: 'middle', size: 12, color: ok ? C.cyan : C.pink, weight: 'bold' }));
+    });
+  });
+  m.push(text(20, 96 + cars.length * 34 + 6, 'cyan = best lap · pink = never finished a lap: how it got out, and how far it got · Neon Loop = its home track', { size: 11, color: C.dim }));
+  save('07-results.svg', svg(860, 96 + cars.length * 34 + 26, 'Did it learn, or memorize?', m.join('\n')), 'Every tested champion on the three new test tracks: best lap, or how far it got and how it got out.');
+}
+{
+  // the most telling failure: the gen 80 champion in Neon Loop Mirrored's hairpin
+  const t = buildTrack(TRACKS.find((x) => x.id === 'neon-loop-mirrored'));
+  const gen = createGeneration(t, [champs[3]['80'].brain]);
+  const trace = [];
+  while (!gen.over) { stepGeneration(gen); const c = gen.cars[0].world.car; trace.push({ x: c.x, y: c.y, angle: c.angle, speed: c.speed, step: gen.step }); }
+  const stopAt = trace.find((p) => p.step > 380 && p.speed <= 0);
+  const last = trace[trace.length - 1];
+  const draw = (big) => {
+    // zoomed in on the spot where it stops, so the short reverse is visible
+    const v = big ? { x0: 196, y0: 150, scale: 3.2, ox: 0, oy: 0 } : { x0: 186, y0: 140, scale: 3.1, ox: 10, oy: 10 };
+    const W = big ? 720 : 800, H = big ? 560 : 640, clip = { w: W, h: big ? 470 : 480 };
+    const parts = [drawTrack(v, { clip })];
+    const forward = trace.filter((p) => p.step >= 360 && p.step <= stopAt.step);
+    const backward = trace.filter((p) => p.step >= stopAt.step);
+    parts.push(`<g clip-path="url(#map)">${poly(forward.map((p) => at(v, p)), { stroke: C.yellow, width: big ? 6 : 4, glow: true })}</g>`);
+    parts.push(poly(backward.map((p) => at(v, p)), { stroke: C.pink, width: big ? 7 : 5, glow: true }));
+    const ps = at(v, stopAt), pl = at(v, last);
+    parts.push(drawBug(v, last, { color: C.pink }));
+    parts.push(circle(ps.x, ps.y, 7, { fill: C.text, glow: true }));
+    const label = (x, y, s, color) => parts.push(text(x, y, s, { size: big ? 24 : 15, color, weight: 'bold', glow: true }));
+    label(ps.x - (big ? 150 : 110), ps.y - 26, 'stops dead', C.text);
+    label(pl.x + 30, pl.y + 48, big ? 'backs into the wall' : 'reverses into the wall', C.pink);
+    label(big ? 470 : 520, big ? 420 : 430, '← full speed', C.yellow);
+    if (big) {
+      parts.push(text(30, 520, 'its home track, driven the other way round', { size: 20, color: C.text }));
+    } else {
+      [[`seed 3, gen 80 champion (it beat me by 13.93 s on Neon Loop), alone on Neon Loop Mirrored`, C.text],
+        [`yellow: it reaches the hairpin, which now turns right, at 330 px/s and brakes to a stop by ${(stopAt.step / 60).toFixed(2)} s`, C.yellow],
+        [`pink: it keeps holding BRAKE, which from a standstill means reverse,`, C.pink],
+        [`and backs into the inner wall at ${(last.step / 60).toFixed(2)} s`, C.pink]].forEach(([l, color], i) => parts.push(text(30, 516 + i * 22, l, { size: 13, color })));
+    }
+    return { svg: svg(W, H, 'The champion reverses into the wall', parts.join('\n')) };
+  };
+  save('07-mirror-crash.svg', draw(false).svg, 'The gen 80 champion in the mirrored hairpin: full speed, a dead stop, then reverse into the wall.');
+  save('simple-7-mirror-crash.svg', draw(true).svg, 'Simple guide, ch 7: the champion that beat me stops dead in the mirrored hairpin and reverses into the wall.');
+  data.mirrorCrash = { stopSeconds: stopAt.step / 60, crashSeconds: last.step / 60, crashAt: { x: last.x, y: last.y }, minSpeed: Math.min(...trace.map((p) => p.speed)) };
+}
+
 // ---------- tables the guide quotes ----------
 data.seeds = Object.fromEntries([1, 2, 3, 4, 5].map((s) => [s, {
   firstLap: runs[s].firstLap, bestLapAt: runs[s].bestLapAt, finishedAt100: runs[s].finishedLapAt['100'], nodeSeconds: runs[s].nodeSeconds,

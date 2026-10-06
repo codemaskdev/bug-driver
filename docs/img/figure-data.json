@@ -673,6 +673,15 @@
    "angle": -4.633321833476496
   }
  },
+ "mirrorCrash": {
+  "stopSeconds": 7.1,
+  "crashSeconds": 7.633333333333334,
+  "crashAt": {
+   "x": 308.2320411582911,
+   "y": 214.76672726598255
+  },
+  "minSpeed": -90
+ },
  "seeds": {
   "1": {
    "firstLap": null,
@@ -913,6 +922,22 @@
   {
    "name": "06-progress-race.svg",
    "about": "The same races as lines: me (26.40 s), gen 5 (30.02 s, slower) and gen 10 (13.17 s, twice as fast)."
+  },
+  {
+   "name": "07-new-tracks.svg",
+   "about": "The four new tracks (same road, same physics); Exam is held out."
+  },
+  {
+   "name": "07-results.svg",
+   "about": "Every tested champion on the three new test tracks: best lap, or how far it got and how it got out."
+  },
+  {
+   "name": "07-mirror-crash.svg",
+   "about": "The gen 80 champion in the mirrored hairpin: full speed, a dead stop, then reverse into the wall."
+  },
+  {
+   "name": "simple-7-mirror-crash.svg",
+   "about": "Simple guide, ch 7: the champion that beat me stops dead in the mirrored hairpin and reverses into the wall."
   }
  ]
 }

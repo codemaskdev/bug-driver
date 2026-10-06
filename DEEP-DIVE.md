@@ -14,6 +14,7 @@ Every number in this guide is real. It comes from the actual program, not from a
 4. [Evolution](#4-evolution)
 5. [Reading a brain](#5-reading-a-brain)
 6. [Me vs the AI](#6-me-vs-the-ai)
+7. [Did it learn, or memorize?](#7-did-it-learn-or-memorize)
 - [Glossary](#glossary)
 
 ---
@@ -578,6 +579,69 @@ Where do I lose to generation 10? Everywhere, by about half. From the start to 4
 
 ---
 
+## 7. Did it learn, or memorize?
+
+**The one idea:** a car that really learned to drive should manage a track it has never seen; one that only memorized its home track shouldn't.
+
+**Analogy:** a student who memorized last year's exam answers scores perfectly on last year's exam, and is lost on a new one. A student who understood the subject does fine on both.
+
+**Key figure**
+
+![Every champion on tracks it has never seen](docs/img/07-results.svg)
+
+*Every tested champion, alone on three tracks it has never driven. Cyan: its best lap. Pink: it never finished a lap; the cell says how it got out and how far it got. Left column: its lap on Neon Loop, its home track, for comparison.*
+
+### Pre-registered: the tests were fixed before any car drove
+Before running anything, we added four new tracks and wrote down the exact tests in [DEVLOG.md](DEVLOG.md) ("Step 7a pre-registration", commit fa2a3a1). That way the results couldn't change the questions. All four tracks use the same 90 px road and the same frozen physics. Their data has a fingerprint (SHA-256 `f4fccfef…6a2d9c`), and a test fails if they ever change.
+
+![The four new tracks](docs/img/07-new-tracks.svg)
+
+*The four new tracks.*
+- **Neon Loop Mirrored** is the home track driven the other way round, so every turn goes the other way, including the hairpin, which now turns right.
+- **Zigzag** has many quick left-right turns and no hairpin.
+- **Wide Sweepers** has long fast curves and one tight corner at the end.
+- **Exam** is held out: nobody trains on it, ever, and no AI drives it until I have.
+
+The test: each champion drives alone, from the track's normal start, under the same rules as in evolution. It is out on a crash, after 3 s without a new checkpoint, or at 60 s.
+
+**Real numbers**
+- **Zigzag and Wide Sweepers: it learned.** Every champion from generation 5 on finishes laps on both. From generation 10 on, the best laps are 9.25–9.88 s on Zigzag and 8.08–8.47 s on Wide Sweepers, for all four seeds. Only the generation 1 champion fails: it stalls at the start of Zigzag and crashes at 60% of Wide Sweepers.
+- **Neon Loop Mirrored: it's complicated.**
+  - Generations 10 and 20 drive it fine: 13.33 s and 13.20 s, close to their home laps of 13.17 s and 12.65 s.
+  - Generation 40 finishes one lap (13.92 s), then gets stuck in the hairpin on its second, faster lap.
+  - All four generation 80 champions (seeds 2, 3, 4, 5) fail at the same place, about halfway round: the hairpin, which now turns right. Three crash and one stalls.
+  - Generations 1 and 5 fail too, earlier or in the same hairpin. But they couldn't drive their home track well either: no lap, and 30.02 s.
+
+![The gen 80 champion reverses into the wall](docs/img/07-mirror-crash.svg)
+
+*The most telling failure: the seed 3, generation 80 champion, the one that beat me by 13.93 s on its home track. It reaches the mirrored hairpin at full speed (330 px/s) and brakes to a dead stop by 7.10 s. Then it keeps holding BRAKE. From a standstill that means reverse, so it backs into the inner wall at 7.63 s.*
+
+*Reproduce it: `node tools/generalization-report.js` (writes `runs/step7a.json`; `tests/step7.test.js` checks it), or in the game `index.html?champion=3-80&track=neon-loop-mirrored`.*
+
+**So, learned or memorized? Both.** Our best explanation, which is an inference and not a measurement:
+- The general skills transfer: follow the road, slow down for corners, take the inside. That's why Zigzag and Wide Sweepers are no problem, even though they look nothing like Neon Loop.
+- But Neon Loop has one hairpin, and it always turns left. The champions that trained longest seem to have tuned their 70 numbers to that one corner, in a way that falls apart when the corner turns the other way.
+- We only tested one seed at every generation, and three more seeds at generation 80. So "longer training means more specialized" is a pattern in this data, not a proof.
+
+**Exam is still untouched.** No AI has driven it. I drive it first, and my first 3 completed laps count. Then the champions get their turn.
+
+> **Interactive later:** pick any champion and any track, and watch it try.
+
+**What actually happened**
+- **While designing the tracks**, before registering them: Wide Sweepers' tight corner was so tight that its inner wall crossed itself, so the corner was opened up a little. Zigzag was raised 8 px so its wall clears the key hints at the bottom of the screen.
+- **After registering**, nothing changed. The results are as they came out.
+- **The prediction was wrong in an interesting way.** We expected the best car to crash "in the first corner of a track it has never seen". It never did. It handled the first corners of every new track; it was the mirrored hairpin that broke it.
+
+**The prompt:** [entry 14: did it learn, or memorize?](PROMPTS.md#14-step-7a-did-it-learn-or-memorize).
+
+**In the code**
+- `trackDef()` in `src/sim/track.js`: a track's data by its id (Neon Loop, Mirrored, Zigzag, Wide Sweepers, Exam).
+- `trackData()` and `sha256()` in `tools/track-hash.js`: the frozen tracks' fingerprint.
+- `trialRun()` in `tools/generalization-report.js`: one champion alone on one track, under the evolution rules.
+- `countExamLap()`, `bestExamLap()` and `examGhost()` in `src/sim/exam.js`: my first 3 Exam laps, the best of them, and the ghost file.
+
+---
+
 ## Glossary
 
 - **Activation function:** another name for a squash function. See *squash*.
@@ -595,8 +659,10 @@ Where do I lose to generation 10? Everywhere, by about half. From the start to 4
 - **Flying lap:** a lap that starts with the car already moving across the line, like my 26.40 s lap.
 - **Fixed timestep:** the simulation always moves forward in steps of the same length (one sixtieth of a second), whatever the screen does.
 - **Function:** a small, named piece of code that does one job.
+- **Generalize:** do well on something new, not just on what you trained on. A car that generalizes can drive tracks it has never seen.
 - **Generation:** one round of 100 cars driving at the same time.
 - **Ghost:** a recorded lap: the starting position plus the keys held on every step. Replaying it drives exactly the same lap.
+- **Held out:** kept aside on purpose and never used for training, so it can be a fair test later. The Exam track is held out.
 - **Hidden neuron:** a neuron between the inputs and the outputs. It's "hidden" because you never see it from outside.
 - **Hitbox:** the shape the program uses to decide whether the car touched a wall.
 - **Input:** one of the 6 numbers the brain gets: 5 eyes and the speed, each between 0 and 1.
@@ -608,6 +674,7 @@ Where do I lose to generation 10? Everywhere, by about half. From the start to 4
 - **Normalize:** turn a number into a common range, here 0 to 1, so that every input gets a fair say.
 - **Output:** one of the 4 numbers the brain produces, one per key. Above 0.5 means that key is pressed.
 - **Parent:** one of the top 10 cars of a generation, whose numbers are copied into the next one.
+- **Pre-register:** write down the exact test before running it, so the results can't change the question.
 - **Population:** all the cars of one generation, here 100.
 - **px (pixel):** one dot on the screen. The screen is 1280 × 720 px.
 - **Race:** my ghost lap and a champion's best lap, driven at the same time on the same track. They can't collide.
