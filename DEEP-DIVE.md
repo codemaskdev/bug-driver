@@ -1,4 +1,6 @@
-# How it works: a self-driving car AI, explained from zero
+# Deep dive: a self-driving car AI, in full detail
+
+This is the full-detail version of the guide: every table, every precise number, every function name. For the short, simple version, start with [HOW-IT-WORKS.md](HOW-IT-WORKS.md).
 
 This guide explains every part of Bug Driver: a small car that teaches itself to drive. You don't need to know anything about AI. You don't even need to code. Every word that might be new is explained the first time it shows up, and it's also in the [glossary](#glossary) at the end.
 
@@ -19,7 +21,7 @@ Every number in this guide is real. It comes from the actual program, not from a
 
 **The one idea:** a little car learns to drive a race track by itself, using nothing but 70 numbers and a lot of trial and error.
 
-**Analogy:** think of a dog learning a trick. Nobody explains the trick. The dog tries things, and the tries that work get rewarded. Our cars work the same way, except there are 100 of them, and the ones that got furthest get to have "children".
+**Analogy:** imagine 100 blindfolded drivers on a track. Nobody tells them how to drive, and nobody gets better during a drive. But the ones who get furthest pass their driving habits on to their children, with small copying mistakes. Some of those mistakes happen to help. After many generations, the children of the children drive well. That is exactly what happens here (chapter 4).
 
 **Key figure**
 
@@ -372,7 +374,7 @@ Seed 1 never finished a lap. Its best fitness reached 43.0 (51.8% of a lap) in g
 
 *Seed 1, generation 31. The yellow line is the best car's path. It drives flat out the whole way and hits the outer wall at the hairpin exit at 330 px/s. 9 cars crashed on exactly that spot. Not one of the 100 cars pressed BRAKE even once.*
 
-**Why it gets stuck, in plain English.** Early on, seed 1's best brain was one that never brakes. It's fast, so it scored well, and every following generation was made from it and from brains like it. But nobody can drive this hairpin flat out. At 330 px/s the car can only turn in a wide arc, and the hairpin is far tighter. To get past, a brain would need to start braking, and that's a big change, not a small nudge. So every child is still a "never brake" driver. Some turn in too early and hit the inner wall (48 of the 100 crashes in generation 31). Others go just as far and hit the outer wall (52 of them). The best score can't go up, and thanks to the elite copy it can't go down either. It sits there forever.
+**Why it gets stuck.** The facts above are measured. The "why" is not; it is an inference from them. Our best explanation: early on, seed 1's best brain was one that never brakes. It's fast, so it scored well, and every following generation was made from it and from brains like it. But nobody can drive this hairpin flat out. At 330 px/s the car can only turn in a wide arc, and the hairpin is far tighter. To get past, a brain would need to slow down for the hairpin (brake, or at least let go of the gas), and that's a big change, not a small nudge. So every child is still a "never brake" driver. Some turn in too early and hit the inner wall (48 of the 100 crashes in generation 31). Others go just as far and hit the outer wall (52 of them). The best score can't go up, and thanks to the elite copy it can't go down either, so it sits there. (We didn't test this explanation directly, for example by forcing a car to brake; it fits everything we measured.)
 
 This is called a **local optimum**: a dead end that looks like the top. From where you stand, every small step goes down, even though a much higher place exists somewhere else. Evolution with small nudges is good at climbing, but it can't jump.
 *Reproduce it: `node tools/evolution-report.js 1` for the flat line, `node tools/figures.js` for generation 31 (`seed1` in `docs/img/figure-data.json`).*
