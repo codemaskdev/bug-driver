@@ -37,6 +37,15 @@ test('track: walls never cross themselves or each other, the car spawns clear of
   assert.ok(track.checkpoints.length > 40, `only ${track.checkpoints.length} checkpoints`);
 });
 
+test('track: the road is its full width everywhere (no other part of the track pinches it)', () => {
+  const half = TRACKS[0].width / 2;
+  let narrowest = Infinity;
+  for (const c of track.center) {
+    for (const w of [...track.inner, ...track.outer]) narrowest = Math.min(narrowest, Math.hypot(c.x - w.x, c.y - w.y));
+  }
+  assert.ok(narrowest > half - 0.5, `a wall comes within ${narrowest.toFixed(1)} px of the centerline`);
+});
+
 test('a full lap in the right direction counts, with a sensible time', () => {
   const world = createWorld(track);
   const laps = drive(world, makeScriptedDriver(track), 60 * 60).filter((e) => e.type === 'lap');

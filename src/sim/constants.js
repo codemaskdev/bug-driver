@@ -6,4 +6,4 @@ export const STEPS_PER_SECOND = 60;
 
 // Bump this whenever car physics or lap rules change: saved best laps
 // (and their ghost inputs) from an older version would no longer replay.
-export const PHYSICS_VERSION = 2;
+export const PHYSICS_VERSION = 3;
