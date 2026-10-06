@@ -32,6 +32,11 @@ material for the video and the guides.
   independent of the frame rate and rendering. Determinism must hold on
   any monitor.
 
+## Frozen
+- Physics and track are frozen at PHYSICS_VERSION 3. Do not change them
+  without asking me first: any change invalidates my ghost lap and all
+  training.
+
 ## Simulation vs rendering
 - The simulation and the rendering are separate. Simulation code never
   touches the DOM, the canvas or localStorage.
