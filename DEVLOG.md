@@ -92,3 +92,29 @@ Lap numbers are unchanged (physics frozen): scripted careful lap 17.25 s, browse
 What broke: one new test failed on its first run because its test wall was ±50 px long, too short for a 30° ray to reach; the code was right. The rays were too faint on the first look, so the line went from 1.5 to 2 px and got brighter, and the panel bars now use the same cyan-to-pink-red as the rays.
 
 🎬 The E overlay: the ladybug in the hairpin with five rays, the 43–153 px labels, and the BRAIN INPUTS panel next to it. "These 6 numbers are all it will ever know" is a ready-made Short.
+
+## 2026-10-06 — Step 3: a brain, and generation 1
+Commit e1f268d. The brain is a tiny neural network written from scratch in src/sim/brain.js. 6 inputs (getInputs) go to 6 hidden neurons (tanh), then to 4 outputs (sigmoid): gas, brake, left, right. An output above 0.5 holds that key for the step, so the AI uses exactly the player's 4 keys. The whole brain is one flat array of 70 numbers (6×(6+1) + 4×(6+1)), seeded random in −1..1. The functions are neuron(), layer(), outputs() and think().
+100 cars start together and don't collide with each other. A car is out on a crash, or after 3 s without a new checkpoint (stall); a generation ends when all are out or at 60 s. fitness() = checkpoints passed in order plus the fraction of the way to the next one. Progress % = fitness / 83 (82 checkpoints plus the start line again), so 100% is one lap.
+Tab switches to AI mode. 1/2/3 set x1/x10/max: max draws nothing while the generation runs, only a "MAX SPEED" line. `?autoplay=1&seed=N` starts in AI mode and reruns generation 1 every 4 s after it ends. E shows the leader's rays, its 6 inputs, and its 4 outputs with the pressed keys lit. The leader is drawn bigger and bright, live cars at 45%, wrecks at 22%. Manual mode, the lap timer and the ghost recording are untouched.
+
+Generation 1, headless (`node tools/generation-report.js`). Rules for counting: "barely moved" = never got 36 px (one car length) from the start; "backwards" = got out more than 36 px behind the start, measured along the track. The categories overlap.
+
+| seed | barely moved | backwards | crashed in first 2 s | all crashes / stalls | best | best car out by |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 57 | 16 | 25 | 33 / 67 | 14.5% | crash at 2.97 s |
+| 2 | 46 | 17 | 28 | 40 / 60 | 20.6% | stall at 6.97 s |
+| 3 | 61 | 20 | 14 | 24 / 76 | 65.1% | crash at 11.40 s |
+| 4 | 68 | 5 | 22 | 30 / 70 | 49.6% | crash at 6.52 s |
+| 5 | 48 | 23 | 28 | 40 / 60 | 50.6% | crash at 6.62 s |
+
+No generation came close to the 60 s limit; every one was over in 5.1–11.4 s. Generations finished, cars that finished a lap: 0. Nothing was tuned based on these numbers.
+Speed: a whole generation of 100 cars simulates headless in 0.21–0.25 s, so no spatial index was needed and wall collisions still run through the exact same code.
+In Chrome, seed 3 (x1, then x10, then max) ended at the same step as headless: 684 steps, best 65.1%, out by crash, 24 crashes. The browser and Node agree. Tab back to manual mode drives and starts the lap timer; the manual lap check still passes (2 laps, best lap saved). 22 tests pass. New tests cover the 70-number brain, the neuron math on a hand example, think() pressing exactly the outputs above 0.5, a do-nothing brain stalling after exactly 180 steps, a gas-only brain crashing in the first turn, and same seed = same generation.
+
+What broke:
+- On screen, about 50 stalled cars parked in exactly the same spot on the start line. Their 22% transparency stacked up until the pile looked like a live, bright car, even at ALIVE 2/100. Wrecks in the same spot are now drawn once.
+- A leader's "right" output of 0.49982 was shown as "0.500", and in an earlier frame a value just above 0.5 showed "0.500" with the key lit. Both were true but confusing, so values within 0.0005 of 0.5 now show 5 decimals.
+- The explain panels' top corner sat on the inner wall of the top-right curve, so they moved 18 px down and got 6 px narrower.
+
+🎬 Seed 2: the best-looking chaos. At 1.5 s there are wrecks scattered all over the start straight, spark bursts on both walls, and cars sitting backwards, and 28 cars are dead in the first 2 seconds. Runner-up for a different Short is seed 3: a random brain, with no learning at all, still gets 65.1% of the way round before crashing in the U-turn. A "beginner's luck" moment.

@@ -117,3 +117,32 @@ Check: drive a scripted lap and confirm the ray distances are right at a few kno
 
 Built: the freeze rule; castRay(), readSensors() and getInputs() in src/sim/sensors.js. There are 5 rays starting on the car's outline, so 0 px means touching. They are drawn cyan to pink-red with hit dots, and E shows the px labels plus a BRAIN INPUTS panel. 6 new tests, including an independent ray-walk check over a scripted lap (worst error 0.34 px).
 What broke: one new test was wrong on its first run (its test wall was too short for the 30° ray to reach); the code was fine. The first rays were too faint, so they were made brighter.
+
+## 6. Step 3: a brain, and 100 cars with random brains
+
+````text
+Step 3: a brain, and 100 cars with random brains. No evolution yet — this step is only about generation 1.
+
+The brain (from scratch, in its own file, every function with a one-line plain-English comment):
+- A tiny neural network: 6 inputs (from getInputs) → 6 hidden neurons (tanh) → 4 outputs (sigmoid).
+- The 4 outputs are the same 4 keys I press: gas, brake, left, right. An output above 0.5 means that key is held this step. The AI drives with exactly my controls, no special powers.
+- That's 70 numbers in total (weights + biases). Keep them in one flat array, so "the whole brain is 70 numbers" is literally true in the code, and later evolution can copy and mutate that array.
+- Clearly named functions: neuron() ("multiply each input by its weight, add them up, add the bias, squash"), layer(), think(inputs) → which keys to press. Initial weights: seeded random in −1..1.
+
+The population:
+- 100 cars start together on the start line. They don't collide with each other, only with walls.
+- A car is out when it crashes, or when it makes no progress (no new checkpoint) for 3 seconds, so cars spinning in place or driving backwards don't run forever. A generation ends when every car is out, or after 60 seconds.
+- Progress for now = number of checkpoints passed in the right order, plus a fraction toward the next one. Name it fitness() with a plain-English comment. Show the current leader highlighted (brighter, slightly bigger), the rest semi-transparent. Crashed cars stay where they crashed as dim wrecks: generation 1 should look like glorious chaos.
+- HUD in AI mode: generation number, cars still alive (e.g. "ALIVE 37/100"), leader's progress in %.
+
+Modes and speed:
+- A toggle between "I drive" and "AI drives" (key: Tab). My manual mode, lap timer and ghost recording stay exactly as they are.
+- Speed keys in AI mode: 1 = x1, 2 = x10, 3 = max (no rendering until the generation ends).
+- ?autoplay=1&seed=N starts straight in AI mode.
+- The E explain overlay also works in AI mode for the leader: its rays, its 6 inputs, and its 4 outputs as numbers with the pressed keys lit.
+
+Check, headless: run generation 1 for seeds 1–5 and report for each: how many cars barely moved, how many went backwards, how many crashed in the first 2 seconds, the best progress %, and how the best car got out (crash or stall). Don't change anything based on those numbers — they're the honest starting point. Update PROMPTS.md and DEVLOG.md, and 🎬-mark the best-looking chaos seed.
+````
+
+Built: src/sim/brain.js, a 6→6→4 network whose whole brain is one array of 70 numbers, with neuron(), layer(), outputs() and think(). src/sim/generation.js runs 100 cars with fitness(), stalls, and the 60 s limit. AI mode on Tab, speeds x1/x10/max, autoplay, E for the leader with inputs and outputs. tools/generation-report.js reports generation 1: the best car reached 14.5% to 65.1% of a lap across seeds 1–5.
+What broke: stalled cars all parked on the same spot stacked their transparency until they looked like a live car, so identical wrecks are now drawn once. An output of 0.4998 showed as "0.500", which looked like a pressed key, so values right at 0.5 now show 5 decimals. The panels were moved off a wall.
