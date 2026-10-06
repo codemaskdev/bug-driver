@@ -1,0 +1,868 @@
+{
+ "frame": {
+  "seed": 3,
+  "generation": 40,
+  "step": 368,
+  "view": [
+   23.30525467418878,
+   132.28229978130517,
+   94.02111304830792,
+   69.47410165460145,
+   54.23157214014923
+  ],
+  "inputs": [
+   0.8834737266290561,
+   0.33858850109347416,
+   0.5298944347584604,
+   0.6526294917269928,
+   0.7288421392992539,
+   0.7675169560189669
+  ],
+  "speed": 253.28059548625907,
+  "keys": 6,
+  "hidden": [
+   {
+    "terms": [
+     {
+      "input": 0.8834737266290561,
+      "weight": -0.6635382020808468,
+      "product": -0.5862185681531095
+     },
+     {
+      "input": 0.33858850109347416,
+      "weight": -1.4042396334722702,
+      "product": -0.4754593926734255
+     },
+     {
+      "input": 0.5298944347584604,
+      "weight": 0.6930614043867372,
+      "product": 0.3672493811304149
+     },
+     {
+      "input": 0.6526294917269928,
+      "weight": 0.6283479321527341,
+      "product": 0.4100783915885458
+     },
+     {
+      "input": 0.7288421392992539,
+      "weight": -0.8400228860627683,
+      "product": -0.6122440773383214
+     },
+     {
+      "input": 0.7675169560189669,
+      "weight": 0.5775710040029773,
+      "product": 0.4432955388771837
+     }
+    ],
+    "sum": -0.4532987265687119,
+    "bias": 0.012669567221725152,
+    "total": -0.44062915934698677,
+    "value": -0.41416581552953163
+   },
+   {
+    "terms": [
+     {
+      "input": 0.8834737266290561,
+      "weight": -0.4117344790138304,
+      "product": -0.36375659455602166
+     },
+     {
+      "input": 0.33858850109347416,
+      "weight": 0.26474579020786015,
+      "product": 0.08963988027728674
+     },
+     {
+      "input": 0.5298944347584604,
+      "weight": -0.5353562290848104,
+      "product": -0.28368228640531645
+     },
+     {
+      "input": 0.6526294917269928,
+      "weight": -0.5247337863838915,
+      "product": -0.3424567442996995
+     },
+     {
+      "input": 0.7288421392992539,
+      "weight": -0.13580533841877818,
+      "product": -0.09898065338140144
+     },
+     {
+      "input": 0.7675169560189669,
+      "weight": 0.497441165866685,
+      "product": 0.3817945294245241
+     }
+    ],
+    "sum": -0.6174418689406284,
+    "bias": 0.46109938999044287,
+    "total": -0.1563424789501855,
+    "value": -0.1550809864868365
+   },
+   {
+    "terms": [
+     {
+      "input": 0.8834737266290561,
+      "weight": 0.8538047200983635,
+      "product": 0.7543140378787794
+     },
+     {
+      "input": 0.33858850109347416,
+      "weight": 0.026869297815022508,
+      "product": 0.00909763527262263
+     },
+     {
+      "input": 0.5298944347584604,
+      "weight": -1.1018941963736173,
+      "product": -0.583887602351026
+     },
+     {
+      "input": 0.6526294917269928,
+      "weight": -0.9205722176355553,
+      "product": -0.6007925784934831
+     },
+     {
+      "input": 0.7288421392992539,
+      "weight": 0.4665888757444918,
+      "product": 0.3400696343708492
+     },
+     {
+      "input": 0.7675169560189669,
+      "weight": -0.3893379527144134,
+      "product": -0.29882348033002304
+     }
+    ],
+    "sum": -0.38002235365228093,
+    "bias": 0.13033094726212724,
+    "total": -0.2496914063901537,
+    "value": -0.24462855791122126
+   },
+   {
+    "terms": [
+     {
+      "input": 0.8834737266290561,
+      "weight": 0.8306009140796959,
+      "product": 0.7338140849034894
+     },
+     {
+      "input": 0.33858850109347416,
+      "weight": -1.0461684176553216,
+      "product": -0.354220596425247
+     },
+     {
+      "input": 0.5298944347584604,
+      "weight": -0.17762023832369211,
+      "product": -0.09411997578819586
+     },
+     {
+      "input": 0.6526294917269928,
+      "weight": -0.9429048201969611,
+      "product": -0.6153674935520742
+     },
+     {
+      "input": 0.7288421392992539,
+      "weight": -0.7465689294014362,
+      "product": -0.5441308956392964
+     },
+     {
+      "input": 0.7675169560189669,
+      "weight": -0.8960240355747493,
+      "product": -0.687713640304162
+     }
+    ],
+    "sum": -1.561738516805486,
+    "bias": 0.7984488195673078,
+    "total": -0.7632896972381782,
+    "value": -0.6430105748695337
+   },
+   {
+    "terms": [
+     {
+      "input": 0.8834737266290561,
+      "weight": 0.47416503448907665,
+      "product": 0.41891235005725946
+     },
+     {
+      "input": 0.33858850109347416,
+      "weight": 1.3832970433940388,
+      "product": 0.46836847248982205
+     },
+     {
+      "input": 0.5298944347584604,
+      "weight": 0.2848004875704646,
+      "product": 0.15091419338008527
+     },
+     {
+      "input": 0.6526294917269928,
+      "weight": -1.1682683916325747,
+      "product": -0.7624464066318786
+     },
+     {
+      "input": 0.7288421392992539,
+      "weight": -0.9454292292973034,
+      "product": -0.6890686620370915
+     },
+     {
+      "input": 0.7675169560189669,
+      "weight": 0.8150281640700996,
+      "product": 0.62554793555681
+     }
+    ],
+    "sum": 0.2122278828150066,
+    "bias": -0.6689748268630897,
+    "total": -0.45674694404808314,
+    "value": -0.42742917584795326
+   },
+   {
+    "terms": [
+     {
+      "input": 0.8834737266290561,
+      "weight": -1.116891869285909,
+      "product": -0.9867446219997146
+     },
+     {
+      "input": 0.33858850109347416,
+      "weight": 0.7327457988841956,
+      "product": 0.24809930172674005
+     },
+     {
+      "input": 0.5298944347584604,
+      "weight": 1.3767442101527052,
+      "product": 0.7295290950458508
+     },
+     {
+      "input": 0.6526294917269928,
+      "weight": -0.18196879177014075,
+      "product": -0.11875820008312195
+     },
+     {
+      "input": 0.7288421392992539,
+      "weight": -0.3059599516515486,
+      "product": -0.22299650570161098
+     },
+     {
+      "input": 0.7675169560189669,
+      "weight": -0.03844088780938645,
+      "product": -0.029504033198126896
+     }
+    ],
+    "sum": -0.3803749642099835,
+    "bias": -1.1734378949723652,
+    "total": -1.5538128591823486,
+    "value": -0.914412409618622
+   }
+  ],
+  "output": [
+   {
+    "terms": [
+     {
+      "input": -0.41416581552953163,
+      "weight": -0.7046463006579767,
+      "product": 0.2918404097718785
+     },
+     {
+      "input": -0.1550809864868365,
+      "weight": 2.27803989186974,
+      "product": -0.35328067368752564
+     },
+     {
+      "input": -0.24462855791122126,
+      "weight": 0.24187082642332014,
+      "product": -0.059168511468732116
+     },
+     {
+      "input": -0.6430105748695337,
+      "weight": 1.1172055334312727,
+      "product": -0.7183749722990668
+     },
+     {
+      "input": -0.42742917584795326,
+      "weight": -1.2068957996647376,
+      "product": 0.5158624769850553
+     },
+     {
+      "input": -0.914412409618622,
+      "weight": 0.028420450178965856,
+      "product": -0.025988012330594164
+     }
+    ],
+    "sum": -0.349109283028985,
+    "bias": 0.2941292804960175,
+    "total": -0.054980002532967476,
+    "value": 0.48625846068691053
+   },
+   {
+    "terms": [
+     {
+      "input": -0.41416581552953163,
+      "weight": -0.7480973760063548,
+      "product": 0.3098363598291746
+     },
+     {
+      "input": -0.1550809864868365,
+      "weight": 0.5012444467420223,
+      "product": -0.07773348327180139
+     },
+     {
+      "input": -0.24462855791122126,
+      "weight": -1.9635161181792895,
+      "product": 0.48033211642563867
+     },
+     {
+      "input": -0.6430105748695337,
+      "weight": 0.15296288014431036,
+      "product": -0.09835674949529259
+     },
+     {
+      "input": -0.42742917584795326,
+      "weight": -0.3686632486060262,
+      "product": 0.15757742851710288
+     },
+     {
+      "input": -0.914412409618622,
+      "weight": 0.9668371427499555,
+      "product": -0.8840878814107704
+     }
+    ],
+    "sum": -0.11243220940594834,
+    "bias": 0.3092427393421531,
+    "total": 0.19681052993620474,
+    "value": 0.5490444257851704
+   },
+   {
+    "terms": [
+     {
+      "input": -0.41416581552953163,
+      "weight": -0.18124171532690525,
+      "product": 0.07506412283633893
+     },
+     {
+      "input": -0.1550809864868365,
+      "weight": 0.06766236040407525,
+      "product": -0.010493145599491854
+     },
+     {
+      "input": -0.24462855791122126,
+      "weight": -0.38165570928202475,
+      "product": 0.09336388578024601
+     },
+     {
+      "input": -0.6430105748695337,
+      "weight": -0.8343308557161926,
+      "product": 0.536483563165459
+     },
+     {
+      "input": -0.42742917584795326,
+      "weight": -1.1732419959538518,
+      "product": 0.5014778594007626
+     },
+     {
+      "input": -0.914412409618622,
+      "weight": -0.614817746793177,
+      "product": 0.5621969773214408
+     }
+    ],
+    "sum": 1.7580932629047554,
+    "bias": -1.0857938452569071,
+    "total": 0.6722994176478483,
+    "value": 0.6620178459200785
+   },
+   {
+    "terms": [
+     {
+      "input": -0.41416581552953163,
+      "weight": -1.0592839292008769,
+      "product": 0.43871919241480783
+     },
+     {
+      "input": -0.1550809864868365,
+      "weight": 0.016321544692781548,
+      "product": -0.002531161251945553
+     },
+     {
+      "input": -0.24462855791122126,
+      "weight": -0.49756010332139095,
+      "product": 0.12171741054967011
+     },
+     {
+      "input": -0.6430105748695337,
+      "weight": 0.7163165758670126,
+      "product": -0.4605991332368237
+     },
+     {
+      "input": -0.42742917584795326,
+      "weight": 1.1386636634138443,
+      "product": -0.48669807122099074
+     },
+     {
+      "input": -0.914412409618622,
+      "weight": -0.49793421925755815,
+      "product": 0.455317229262871
+     }
+    ],
+    "sum": 0.06592546651758896,
+    "bias": -0.6594128361503002,
+    "total": -0.5934873696327112,
+    "value": 0.35583509044213285
+   }
+  ],
+  "strongestHiddenForLeft": 6
+ },
+ "track": {
+  "width": 90,
+  "length": 3939,
+  "checkpoints": 82,
+  "checkpointEvery": 48
+ },
+ "roadWidth": {
+  "before": {
+   "width": 64,
+   "crashed": 806,
+   "careful": 17.2,
+   "fastest": 13
+  },
+  "after": {
+   "width": 90,
+   "crashed": 543,
+   "careful": 17.25,
+   "fastest": 12.68
+  },
+  "roomBefore": 19,
+  "roomAfter": 32
+ },
+ "brainCount": {
+  "hidden": 42,
+  "output": 28,
+  "total": 70
+ },
+ "gen1Chaos": {
+  "seed": 2,
+  "step": 90,
+  "out": 26,
+  "alive": 74
+ },
+ "oneGeneration": {
+  "seed": 3,
+  "generation": 4,
+  "best": {
+   "id": "4-78",
+   "fitness": 291.0007718435601
+  },
+  "top10": [
+   {
+    "id": "4-78",
+    "fitness": 291.0007718435601,
+    "children": 20
+   },
+   {
+    "id": "4-77",
+    "fitness": 244.3838401890504,
+    "children": 17
+   },
+   {
+    "id": "4-0",
+    "fitness": 58.57710910244782,
+    "children": 17
+   },
+   {
+    "id": "4-31",
+    "fitness": 58.42703638360101,
+    "children": 11
+   },
+   {
+    "id": "4-93",
+    "fitness": 57.66784382669014,
+    "children": 10
+   },
+   {
+    "id": "4-48",
+    "fitness": 57.15891504955241,
+    "children": 11
+   },
+   {
+    "id": "4-82",
+    "fitness": 57,
+    "children": 4
+   },
+   {
+    "id": "4-32",
+    "fitness": 56.94735786834002,
+    "children": 4
+   },
+   {
+    "id": "4-21",
+    "fitness": 56.42293211135361,
+    "children": 4
+   },
+   {
+    "id": "4-33",
+    "fitness": 55.45019985430874,
+    "children": 1
+   }
+  ],
+  "worst": 0.41913296827549806
+ },
+ "mutation": {
+  "child": "5-13",
+  "parent": "4-31",
+  "changed": 7,
+  "example": {
+   "index": 21,
+   "from": 0.19245093688368797,
+   "to": 0.3430683665891462
+  },
+  "allChildren": {
+   "min": 1,
+   "max": 14,
+   "mean": 6.848484848484849
+  }
+ },
+ "seed1": {
+  "sameSpot": 9,
+  "hitInner": 48,
+  "hitOuter": 52,
+  "generation": 31,
+  "bestFitness": 43,
+  "topTenAtBest": 6,
+  "everBraked": 0,
+  "bestId": "31-0",
+  "bestCrashSpeed": 330,
+  "bestTopSpeed": 330,
+  "crashPoint": {
+   "x": 251.72578185137854,
+   "y": 266.42162339583473
+  },
+  "crashed": 100,
+  "stuckFrom": 6,
+  "childrenTried": 9306
+ },
+ "decisionPath": {
+  "eye": "left 60°",
+  "distance": 23.30525467418878,
+  "strongestTermInHidden": 1
+ },
+ "insideLine": {
+  "apexSample": 246,
+  "maxOffset": 32,
+  "table": {
+   "1": [
+    {
+     "where": "96 px before the apex",
+     "offset": 2.4,
+     "speed": 222
+    },
+    {
+     "where": "at the apex",
+     "offset": 7.4,
+     "speed": 188
+    },
+    {
+     "where": "48 px after the apex",
+     "offset": 1.5,
+     "speed": 156
+    }
+   ],
+   "5": [
+    {
+     "where": "96 px before the apex",
+     "offset": 10.1,
+     "speed": 106
+    },
+    {
+     "where": "at the apex",
+     "offset": 19.6,
+     "speed": 106
+    },
+    {
+     "where": "48 px after the apex",
+     "offset": 21,
+     "speed": 114
+    }
+   ],
+   "10": [
+    {
+     "where": "96 px before the apex",
+     "offset": 10.9,
+     "speed": 282
+    },
+    {
+     "where": "at the apex",
+     "offset": 2.2,
+     "speed": 214
+    },
+    {
+     "where": "48 px after the apex",
+     "offset": -14.6,
+     "speed": 160
+    }
+   ],
+   "20": [
+    {
+     "where": "96 px before the apex",
+     "offset": 10.3,
+     "speed": 297
+    },
+    {
+     "where": "at the apex",
+     "offset": 16.4,
+     "speed": 94
+    },
+    {
+     "where": "48 px after the apex",
+     "offset": 21.2,
+     "speed": 199
+    }
+   ],
+   "40": [
+    {
+     "where": "96 px before the apex",
+     "offset": 13.6,
+     "speed": 219
+    },
+    {
+     "where": "at the apex",
+     "offset": 22.7,
+     "speed": 115
+    },
+    {
+     "where": "48 px after the apex",
+     "offset": 27.4,
+     "speed": 172
+    }
+   ],
+   "80": [
+    {
+     "where": "96 px before the apex",
+     "offset": 14.4,
+     "speed": 252
+    },
+    {
+     "where": "at the apex",
+     "offset": 27.2,
+     "speed": 143
+    },
+    {
+     "where": "48 px after the apex",
+     "offset": 27.7,
+     "speed": 194
+    }
+   ]
+  }
+ },
+ "seventy": {
+  "gen1": "1-85",
+  "gen80": "80-0",
+  "changed": 62
+ },
+ "family": {
+  "from": "1-85",
+  "to": "80-0",
+  "cars": 80,
+  "elites": 41,
+  "mutated": 38,
+  "lastChange": 62,
+  "gen4": "4-0",
+  "firstLapCarInLine": false,
+  "championsInLine": 54
+ },
+ "seeds": {
+  "1": {
+   "firstLap": null,
+   "bestLapAt": {
+    "1": null,
+    "5": null,
+    "10": null,
+    "20": null,
+    "40": null,
+    "80": null,
+    "100": null
+   },
+   "finishedAt100": 0,
+   "nodeSeconds": 58.8
+  },
+  "2": {
+   "firstLap": {
+    "generation": 8,
+    "steps": 1104,
+    "id": "8-76",
+    "seconds": 18.4
+   },
+   "bestLapAt": {
+    "1": null,
+    "5": null,
+    "10": 16.9,
+    "20": 13.58,
+    "40": 13.2,
+    "80": 12.58,
+    "100": 12.53
+   },
+   "finishedAt100": 39,
+   "nodeSeconds": 268.8
+  },
+  "3": {
+   "firstLap": {
+    "generation": 4,
+    "steps": 2291,
+    "id": "4-78",
+    "seconds": 38.18
+   },
+   "bestLapAt": {
+    "1": null,
+    "5": 30.02,
+    "10": 13.17,
+    "20": 12.65,
+    "40": 12.52,
+    "80": 12.47,
+    "100": 12.43
+   },
+   "finishedAt100": 42,
+   "nodeSeconds": 324.3
+  },
+  "4": {
+   "firstLap": {
+    "generation": 21,
+    "steps": 1636,
+    "id": "21-96",
+    "seconds": 27.27
+   },
+   "bestLapAt": {
+    "1": null,
+    "5": null,
+    "10": null,
+    "20": null,
+    "40": 17.32,
+    "80": 13.28,
+    "100": 13.13
+   },
+   "finishedAt100": 34,
+   "nodeSeconds": 234
+  },
+  "5": {
+   "firstLap": {
+    "generation": 22,
+    "steps": 930,
+    "id": "22-40",
+    "seconds": 15.5
+   },
+   "bestLapAt": {
+    "1": null,
+    "5": null,
+    "10": null,
+    "20": null,
+    "40": 13.22,
+    "80": 12.57,
+    "100": 12.57
+   },
+   "finishedAt100": 49,
+   "nodeSeconds": 292.1
+  }
+ },
+ "champions3": {
+  "1": {
+   "id": "1-85",
+   "lap": null,
+   "progress": 65.1
+  },
+  "5": {
+   "id": "5-41",
+   "lap": 30.02,
+   "progress": 197.4
+  },
+  "10": {
+   "id": "10-60",
+   "lap": 13.17,
+   "progress": 448.5
+  },
+  "20": {
+   "id": "20-27",
+   "lap": 12.65,
+   "progress": 465.7
+  },
+  "40": {
+   "id": "40-69",
+   "lap": 12.53,
+   "progress": 469.2
+  },
+  "80": {
+   "id": "80-0",
+   "lap": 12.47,
+   "progress": 472.7
+  }
+ },
+ "figures": [
+  {
+   "name": "00-four-parts.svg",
+   "about": "The four parts (world, eyes, brain, evolution) and how they connect."
+  },
+  {
+   "name": "01-track.svg",
+   "about": "The real track: walls, the 82 invisible checkpoints, start line and driving direction."
+  },
+  {
+   "name": "01-road-width.svg",
+   "about": "Why the road got wider: the car to scale on a 64 px and a 90 px road, with the crash counts."
+  },
+  {
+   "name": "01-fixed-steps.svg",
+   "about": "Fixed timestep: screens refresh at different rates, the simulation always steps at 1/60 s."
+  },
+  {
+   "name": "02-eyes-hairpin.svg",
+   "about": "A real frame at the hairpin: the 5 rays and the distance each one measures."
+  },
+  {
+   "name": "02-distance-to-input.svg",
+   "about": "How a distance becomes a number between 0 and 1, and the 6 real inputs at the hairpin frame."
+  },
+  {
+   "name": "03-neuron.svg",
+   "about": "One real neuron (h6) worked through: inputs × weights, sum, + bias, squash."
+  },
+  {
+   "name": "03-squash-curves.svg",
+   "about": "The two squash functions, tanh and sigmoid, with the real values from the hairpin frame marked."
+  },
+  {
+   "name": "03-network.svg",
+   "about": "The real 6 → 6 → 4 network of the seed 3 gen 40 champion at the hairpin frame, and the count to 70."
+  },
+  {
+   "name": "03-gen1-chaos.svg",
+   "about": "Generation 1 (random brains), seed 2 at 1.5 s: wrecks and confused cars around the start."
+  },
+  {
+   "name": "04-one-generation.svg",
+   "about": "One real generation (seed 3, gen 4): 100 ranked cars → top 10 parents → 1 elite + 99 children."
+  },
+  {
+   "name": "04-mutation.svg",
+   "about": "Mutation for real: a gen 5 child next to its gen 4 parent, the changed numbers outlined."
+  },
+  {
+   "name": "04-seed3-progress.svg",
+   "about": "Seed 3 over 100 generations: best and average fitness, and the best lap time against mine and the reference laps."
+  },
+  {
+   "name": "04-five-seeds.svg",
+   "about": "Best fitness per generation for all five seeds; seed 1 is the flat line."
+  },
+  {
+   "name": "04-seed1-stuck.svg",
+   "about": "Seed 1, generation 31: every car drives flat out and crashes at the hairpin exit; nobody brakes."
+  },
+  {
+   "name": "05-decision-path.svg",
+   "about": "One decision, start to end: the eye, the input, one hidden neuron, and the LEFT key."
+  },
+  {
+   "name": "05-inside-line.svg",
+   "about": "Nobody taught it: how the seed 3 champions drive the hairpin, gen 1 vs gen 40 vs gen 80, with the offsets."
+  },
+  {
+   "name": "05-seventy-numbers.svg",
+   "about": "The 70 numbers of the gen 1 and gen 80 champions (seed 3) side by side; the unchanged ones outlined."
+  },
+  {
+   "name": "05-family-line.svg",
+   "about": "The unbroken family line of the gen 80 champion, back to car 1-85: mutated children and unchanged elite copies."
+  }
+ ]
+}

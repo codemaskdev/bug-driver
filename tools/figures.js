@@ -1,0 +1,658 @@
+// Generates every figure of the beginner guide (HOW-IT-WORKS.md) from the real simulation:
+// real frames, real weights, real generation stats. Nothing is drawn by hand.
+// It also writes docs/img/figure-data.json with every number the guide quotes.
+// Run with: node tools/figures.js   (about half a minute)
+
+import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
+import { TRACKS, buildTrack } from '../src/sim/track.js';
+import { CAR } from '../src/sim/car.js';
+import { SENSOR_ANGLES, SENSOR_LABELS, SENSOR_RANGE, eyePosition } from '../src/sim/sensors.js';
+import { explainThink, OUTPUT_LABELS, BRAIN_SIZE, INPUTS, HIDDEN, OUTPUTS, tanh, sigmoid } from '../src/sim/brain.js';
+import { createGeneration, stepGeneration, fitness } from '../src/sim/generation.js';
+import { createEvolution, runEvolution, finishGeneration, nextGeneration } from '../src/sim/evolution.js';
+import { STEPS_PER_SECOND } from '../src/sim/constants.js';
+
+const root = new URL('../', import.meta.url);
+const OUT = new URL('docs/img/', root);
+mkdirSync(OUT, { recursive: true });
+const json = (path) => JSON.parse(readFileSync(new URL(path, root)));
+const track = buildTrack(TRACKS[0]);
+const data = {}; // every number the guide quotes, written to figure-data.json
+
+// ---------- style ----------
+const C = {
+  bg: '#0b0d13', road: '#141826', cyan: '#00f0ff', pink: '#ff2e63', magenta: '#ff4dd8',
+  yellow: '#ffd23f', green: '#39ff88', text: '#e6ebf2', dim: '#9fb3c8',
+};
+const FONT = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+const r1 = (v) => Math.round(v * 10) / 10;
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// fixed decimals without "-0.000"
+const fx = (v, d = 3) => { const s = v.toFixed(d); return /^-0\.0*$/.test(s) ? s.slice(1) : s; };
+const sec = (steps) => (steps / STEPS_PER_SECOND).toFixed(2);
+
+function svg(w, h, title, body) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" font-family="${FONT}">
+<title>${esc(title)}</title>
+<defs><filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${C.dim}"/></marker></defs>
+<rect x="0.5" y="0.5" width="${w - 1}" height="${h - 1}" rx="16" fill="${C.bg}" stroke="${C.cyan}" stroke-opacity="0.25"/>
+${body}
+</svg>
+`;
+}
+function text(x, y, s, o = {}) {
+  const { size = 13, color = C.text, anchor = 'start', weight = 'normal', opacity = 1, glow = false } = o;
+  return `<text x="${r1(x)}" y="${r1(y)}" font-size="${size}" fill="${color}" fill-opacity="${opacity}" text-anchor="${anchor}" font-weight="${weight}"${glow ? ' filter="url(#glow)"' : ''}>${esc(s)}</text>`;
+}
+function line(x1, y1, x2, y2, color, width = 1, o = {}) {
+  const { opacity = 1, dash = '', arrow = false, glow = false } = o;
+  return `<line x1="${r1(x1)}" y1="${r1(y1)}" x2="${r1(x2)}" y2="${r1(y2)}" stroke="${color}" stroke-width="${width}" stroke-opacity="${opacity}"${dash ? ` stroke-dasharray="${dash}"` : ''}${arrow ? ' marker-end="url(#arrow)"' : ''}${glow ? ' filter="url(#glow)"' : ''}/>`;
+}
+function poly(points, o = {}) {
+  const { stroke = 'none', width = 1, fill = 'none', opacity = 1, fillOpacity = 1, closed = false, dash = '', glow = false, rule = '' } = o;
+  const d = points.map((p, i) => `${i ? 'L' : 'M'}${r1(p.x)},${r1(p.y)}`).join('') + (closed ? 'Z' : '');
+  return `<path d="${d}" stroke="${stroke}" stroke-width="${width}" stroke-opacity="${opacity}" fill="${fill}" fill-opacity="${fillOpacity}"${rule ? ` fill-rule="${rule}"` : ''}${dash ? ` stroke-dasharray="${dash}"` : ''} stroke-linejoin="round"${glow ? ' filter="url(#glow)"' : ''}/>`;
+}
+function rect(x, y, w, h, o = {}) {
+  const { fill = 'none', stroke = 'none', width = 1, opacity = 1, rx = 6, strokeOpacity = 1 } = o;
+  return `<rect x="${r1(x)}" y="${r1(y)}" width="${r1(w)}" height="${r1(h)}" rx="${rx}" fill="${fill}" fill-opacity="${opacity}" stroke="${stroke}" stroke-width="${width}" stroke-opacity="${strokeOpacity}"/>`;
+}
+function circle(cx, cy, rad, o = {}) {
+  const { fill = 'none', stroke = 'none', width = 1, opacity = 1, glow = false } = o;
+  return `<circle cx="${r1(cx)}" cy="${r1(cy)}" r="${r1(rad)}" fill="${fill}" fill-opacity="${opacity}" stroke="${stroke}" stroke-width="${width}"${glow ? ' filter="url(#glow)"' : ''}/>`;
+}
+// A rounded box with a title and lines of text (for the concept diagrams)
+function box(x, y, w, h, title, lines, color = C.cyan) {
+  let s = rect(x, y, w, h, { fill: C.road, stroke: color, strokeOpacity: 0.7, rx: 10 });
+  s += text(x + w / 2, y + 24, title, { anchor: 'middle', size: 15, weight: 'bold', color, glow: true });
+  lines.forEach((l, i) => { s += text(x + w / 2, y + 46 + i * 17, l, { anchor: 'middle', size: 11.5, color: C.text, opacity: 0.85 }); });
+  return s;
+}
+function save(name, content, about) {
+  writeFileSync(new URL(name, OUT), content);
+  figures.push({ name, about });
+}
+const figures = [];
+
+// ---------- drawing the track and the car ----------
+// view = {x0, y0, scale, ox, oy}: world point -> figure point
+const at = (v, p) => ({ x: v.ox + (p.x - v.x0) * v.scale, y: v.oy + (p.y - v.y0) * v.scale });
+function drawTrack(v, o = {}) {
+  const { checkpoints = false, centerline = false, clip = null } = o;
+  const outer = track.outer.map((p) => at(v, p)), inner = track.inner.map((p) => at(v, p));
+  const d = (pts) => pts.map((p, i) => `${i ? 'L' : 'M'}${r1(p.x)},${r1(p.y)}`).join('') + 'Z';
+  let s = `<path d="${d(outer)}${d(inner)}" fill="${C.road}" fill-rule="evenodd"/>`;
+  if (centerline) s += poly(track.center.map((p) => at(v, p)), { stroke: C.text, opacity: 0.25, width: 1, closed: true, dash: '6 8' });
+  if (checkpoints) {
+    track.checkpoints.forEach((cp, i) => {
+      const a = at(v, { x: cp.ax, y: cp.ay }), b = at(v, { x: cp.bx, y: cp.by });
+      s += line(a.x, a.y, b.x, b.y, i === 0 ? C.text : C.cyan, i === 0 ? 3 : 1, { opacity: i === 0 ? 1 : 0.35 });
+    });
+  }
+  s += poly(outer, { stroke: C.magenta, width: 2, closed: true, glow: true });
+  s += poly(inner, { stroke: C.magenta, width: 2, closed: true, glow: true });
+  if (clip) s = `<clipPath id="map"><rect x="0" y="0" width="${clip.w}" height="${clip.h}"/></clipPath><g clip-path="url(#map)">${s}</g>`;
+  return s;
+}
+// The ladybug from above: a round shell with a center line and dots, a small head. Same size as the hitbox.
+function drawBug(v, pose, o = {}) {
+  const { opacity = 1, color = C.cyan, scale = 1 } = o;
+  const p = at(v, pose), k = v.scale * scale, deg = (pose.angle * 180) / Math.PI;
+  return `<g transform="translate(${r1(p.x)},${r1(p.y)}) rotate(${r1(deg)}) scale(${k})" opacity="${opacity}">
+<ellipse cx="0" cy="0" rx="15" ry="13" fill="#0aa3b5" stroke="${color}" stroke-width="${2 / k}"/>
+<circle cx="18" cy="0" r="4.5" fill="#0d0e12" stroke="${color}" stroke-width="${1.5 / k}"/>
+<line x1="-14" y1="0" x2="13" y2="0" stroke="#03262c" stroke-width="1.6"/>
+<circle cx="-5" cy="-6" r="2" fill="#03262c"/><circle cx="5" cy="-7" r="2" fill="#03262c"/><circle cx="-5" cy="6" r="2" fill="#03262c"/><circle cx="5" cy="7" r="2" fill="#03262c"/>
+</g>`;
+}
+// cyan when far, pink-red when close, like in the game
+function rayColor(d) {
+  const k = 1 - d / SENSOR_RANGE, a = [0, 240, 255], b = [255, 46, 99];
+  return `rgb(${a.map((c, i) => Math.round(c + (b[i] - c) * k)).join(',')})`;
+}
+function drawRays(v, pose, view, labels = true) {
+  let s = '';
+  view.forEach((d, i) => {
+    const e = eyePosition(pose, i), ang = pose.angle + SENSOR_ANGLES[i];
+    const hit = { x: e.x + Math.cos(ang) * d, y: e.y + Math.sin(ang) * d };
+    const a = at(v, e), b = at(v, hit);
+    s += line(a.x, a.y, b.x, b.y, rayColor(d), 2, { glow: true });
+    if (d < SENSOR_RANGE) s += circle(b.x, b.y, 4, { fill: rayColor(d) });
+    if (labels) {
+      const lx = b.x + Math.cos(ang) * 22, ly = b.y + Math.sin(ang) * 16;
+      s += rect(lx - 26, ly - 11, 52, 18, { fill: C.bg, opacity: 0.85, rx: 4 });
+      s += text(lx, ly + 3, `${d.toFixed(0)} px`, { anchor: 'middle', size: 12, color: rayColor(d), weight: 'bold' });
+    }
+  });
+  return s;
+}
+
+// ---------- the real data ----------
+const runs = Object.fromEntries([1, 2, 3, 4, 5].map((s) => [s, json(`runs/seed-${s}.json`)]));
+const champs = Object.fromEntries([1, 2, 3, 4, 5].map((s) => [s, json(`champions/seed-${s}.json`).champions]));
+
+// One saved champion alone on the track; calls onStep(car record, generation) after every step.
+function solo(brain, onStep, maxSteps = 3600) {
+  const gen = createGeneration(track, [brain]);
+  while (!gen.over && gen.step < maxSteps) { stepGeneration(gen); onStep(gen.cars[0], gen); }
+  return gen;
+}
+
+// The hairpin frame: the seed 3 generation 40 champion, step 368 of its solo run.
+const FRAME = { seed: 3, generation: 40, step: 368 };
+let frame = null;
+solo(champs[3]['40'].brain, (c, gen) => {
+  if (gen.step === FRAME.step) {
+    const car = c.world.car;
+    frame = { pose: { x: car.prevX, y: car.prevY, angle: car.prevAngle }, view: c.view.slice(), inputs: c.inputs.slice(), keys: c.keys, ex: explainThink(c.brain, c.inputs) };
+  }
+}, FRAME.step);
+const LEFT = 2;
+const hBig = frame.ex.output[LEFT].terms.reduce((b, t, h, all) => (Math.abs(t.product) > Math.abs(all[b].product) ? h : b), 0);
+data.frame = {
+  ...FRAME, view: frame.view, inputs: frame.inputs, speed: frame.inputs[5] * CAR.maxSpeed, keys: frame.keys,
+  hidden: frame.ex.hidden.map((n) => ({ terms: n.terms, sum: n.sum, bias: n.bias, total: n.total, value: n.value })),
+  output: frame.ex.output.map((n) => ({ terms: n.terms, sum: n.sum, bias: n.bias, total: n.total, value: n.value })),
+  strongestHiddenForLeft: hBig + 1,
+};
+
+// ===================================================================
+// Chapter 0
+// ===================================================================
+save('00-four-parts.svg', svg(900, 380, 'The four parts of Bug Driver', [
+  box(30, 40, 190, 120, 'WORLD', ['the track and its walls', 'car physics', 'checkpoints, lap timer']),
+  box(250, 40, 190, 120, 'EYES', ['5 rays look for walls', '→ 6 numbers'], C.cyan),
+  box(470, 40, 190, 120, 'BRAIN', ['70 numbers', '6 → 6 → 4 neurons'], C.yellow),
+  box(690, 40, 180, 120, 'KEYS', ['gas · brake', 'left · right', '(the same 4 as mine)'], C.pink),
+  line(220, 100, 248, 100, C.dim, 2, { arrow: true }), line(440, 100, 468, 100, C.dim, 2, { arrow: true }), line(660, 100, 688, 100, C.dim, 2, { arrow: true }),
+  poly([{ x: 780, y: 160 }, { x: 780, y: 190 }, { x: 125, y: 190 }, { x: 125, y: 162 }], { stroke: C.dim, width: 2 }).replace('/>', ' marker-end="url(#arrow)"/>'),
+  text(340, 184, 'the keys move the car · 60 times a second', { anchor: 'middle', size: 11, color: C.dim }),
+  box(170, 225, 560, 105, 'EVOLUTION', ['100 cars try · the best 10 are kept', 'their numbers are copied with small random changes', '→ the next 100 cars'], C.green),
+  poly([{ x: 565, y: 225 }, { x: 565, y: 162 }], { stroke: C.green, width: 2 }).replace('/>', ' marker-end="url(#arrow)"/>'),
+  text(575, 205, 'better numbers', { size: 11, color: C.green }),
+  text(450, 360, 'No AI knowledge needed: each part is a few short, plain functions.', { anchor: 'middle', size: 13, color: C.text, opacity: 0.8 }),
+].join('\n')), 'The four parts (world, eyes, brain, evolution) and how they connect.');
+
+// ===================================================================
+// Chapter 1: the world
+// ===================================================================
+{
+  const v = { x0: 80, y0: 40, scale: 0.62, ox: 20, oy: 40 };
+  const parts = [drawTrack(v, { checkpoints: true })];
+  // chevrons past the start line, like in the game
+  for (const dist of [60, 92, 124]) {
+    const i = Math.round(dist / (track.length / track.center.length));
+    const p = at(v, track.center[i]), t = track.tangents[i];
+    parts.push(poly([{ x: p.x - t.x * 5 - t.y * 8, y: p.y - t.y * 5 + t.x * 8 }, { x: p.x + t.x * 5, y: p.y + t.y * 5 }, { x: p.x - t.x * 5 + t.y * 8, y: p.y - t.y * 5 - t.x * 8 }], { stroke: C.cyan, width: 2.5, opacity: 0.8 }));
+  }
+  parts.push(drawBug(v, track.spawn));
+  const lbl = (x, y, s, o) => parts.push(text(v.ox + (x - v.x0) * v.scale, v.oy + (y - v.y0) * v.scale, s, o));
+  lbl(560, 712, 'start / finish', { anchor: 'middle', size: 12, color: C.text });
+  lbl(150, 175, 'hairpin', { anchor: 'middle', size: 12, color: C.yellow });
+  lbl(905, 300, 'U-turn', { anchor: 'middle', size: 12, color: C.yellow });
+  lbl(1010, 470, '82 checkpoints', { anchor: 'middle', size: 12, color: C.cyan });
+  lbl(1010, 492, '(thin lines, every 48 px)', { anchor: 'middle', size: 11, color: C.cyan, opacity: 0.7 });
+  parts.push(text(430, 470, `Neon Loop: road ${TRACKS[0].width} px wide, ${track.length.toFixed(0)} px around. Driving direction: the chevrons.`, { anchor: 'middle', size: 12, color: C.dim }));
+  save('01-track.svg', svg(860, 490, 'The track with its checkpoints', parts.join('\n')), 'The real track: walls, the 82 invisible checkpoints, start line and driving direction.');
+  data.track = { width: TRACKS[0].width, length: +track.length.toFixed(0), checkpoints: track.checkpoints.length, checkpointEvery: 48 };
+}
+{
+  // road cross-sections at 64 and 90 px, the car to scale (26 px wide)
+  const parts = [];
+  const k = 3.2;
+  [[64, 806, 13.0, 17.2], [90, 543, 12.68, 17.25]].forEach(([w, crashes, fastest, careful], n) => {
+    const cx = 220 + n * 420, top = 50, len = 150;
+    const half = (w / 2) * k;
+    parts.push(rect(cx - half, top, half * 2, len, { fill: C.road, rx: 0 }));
+    parts.push(line(cx - half, top, cx - half, top + len, C.magenta, 3, { glow: true }), line(cx + half, top, cx + half, top + len, C.magenta, 3, { glow: true }));
+    parts.push(drawBug({ x0: 0, y0: 0, scale: k, ox: cx, oy: top + len / 2 }, { x: 0, y: 0, angle: -Math.PI / 2 }));
+    const room = (w - CAR.width) / 2;
+    parts.push(line(cx - half, top + len + 14, cx - (CAR.width / 2) * k, top + len + 14, C.yellow, 1.5));
+    parts.push(text(cx - half - 6, top + len + 34, `${room} px of room on each side`, { size: 12, color: C.yellow }));
+    parts.push(text(cx, top - 14, `road ${w} px · car ${CAR.width} px wide`, { anchor: 'middle', size: 14, weight: 'bold', color: w === 90 ? C.cyan : C.dim }));
+    parts.push(text(cx, top + len + 60, `scripted test driver, 980 settings: ${crashes} crashed`, { anchor: 'middle', size: 12, color: C.text }));
+    parts.push(text(cx, top + len + 78, `careful lap ${careful.toFixed(2)} s · fastest ${fastest.toFixed(2)} s`, { anchor: 'middle', size: 12, color: C.dim }));
+  });
+  save('01-road-width.svg', svg(860, 320, 'Road width 64 px vs 90 px', parts.join('\n')), 'Why the road got wider: the car to scale on a 64 px and a 90 px road, with the crash counts.');
+  data.roadWidth = { before: { width: 64, crashed: 806, careful: 17.2, fastest: 13.0 }, after: { width: 90, crashed: 543, careful: 17.25, fastest: 12.68 }, roomBefore: (64 - CAR.width) / 2, roomAfter: (90 - CAR.width) / 2 };
+}
+{
+  // fixed timestep: screens tick at different rates, the simulation always at 1/60 s
+  const parts = [];
+  const x0 = 170, w = 640, ms = 100; // a 100 ms window
+  const rows = [['60 Hz screen', 1000 / 60, C.dim], ['144 Hz screen', 1000 / 144, C.dim], ['30 Hz screen', 1000 / 30, C.dim], ['simulation', 1000 / 60, C.cyan]];
+  rows.forEach(([label, every, color], n) => {
+    const y = 50 + n * 50;
+    parts.push(text(20, y + 5, label, { size: 13, color: n === 3 ? C.cyan : C.text, weight: n === 3 ? 'bold' : 'normal' }));
+    parts.push(line(x0, y, x0 + w, y, C.dim, 1, { opacity: 0.4 }));
+    for (let t = 0; t <= ms + 0.01; t += every) parts.push(line(x0 + (t / ms) * w, y - 10, x0 + (t / ms) * w, y + 10, color, n === 3 ? 3 : 2, { glow: n === 3 }));
+  });
+  parts.push(line(20, 210, 840, 210, C.dim, 1, { opacity: 0.25 }));
+  parts.push(text(x0, 250, '0 ms', { size: 11, color: C.dim }), text(x0 + w, 250, '100 ms', { size: 11, color: C.dim, anchor: 'end' }));
+  parts.push(text(430, 280, 'Screens draw as often as they can. The simulation always moves in steps of exactly 1/60 s,', { anchor: 'middle', size: 12, color: C.text }));
+  parts.push(text(430, 298, 'so the same keys give the same lap on every computer.', { anchor: 'middle', size: 12, color: C.text }));
+  save('01-fixed-steps.svg', svg(860, 320, 'Fixed timestep', parts.join('\n')), 'Fixed timestep: screens refresh at different rates, the simulation always steps at 1/60 s.');
+}
+
+// ===================================================================
+// Chapter 2: eyes
+// ===================================================================
+const hairpinView = { x0: 190, y0: 52, scale: 1.9, ox: 20, oy: 20 };
+const HAIRPIN_CLIP = { clip: { w: 800, h: 556 } };
+{
+  const v = hairpinView, parts = [drawTrack(v, HAIRPIN_CLIP)];
+  parts.push(drawRays(v, frame.pose, frame.view));
+  parts.push(drawBug(v, frame.pose));
+  const legend = SENSOR_LABELS.map((l, i) => `${l}: ${frame.view[i].toFixed(1)} px`);
+  legend.forEach((l, i) => parts.push(text(30 + (i % 3) * 250, 580 + Math.floor(i / 3) * 22, l, { size: 13, color: rayColor(frame.view[i]) })));
+  parts.push(text(530, 602, `speed: ${data.frame.speed.toFixed(0)} px/s`, { size: 13, color: C.yellow }));
+  parts.push(text(30, 640, `Seed 3, generation 40 champion, alone on the track, step ${FRAME.step}: the moment it decided.`, { size: 11, color: C.dim }));
+  save('02-eyes-hairpin.svg', svg(800, 660, 'The five eyes at the hairpin', parts.join('\n')), 'A real frame at the hairpin: the 5 rays and the distance each one measures.');
+}
+{
+  const parts = [];
+  // the ruler: distance -> number
+  const x0 = 40, w = 330, y = 70;
+  parts.push(text(x0, 40, 'distance to the wall → the number the brain gets', { size: 13, weight: 'bold', color: C.cyan }));
+  parts.push(line(x0, y, x0 + w, y, C.dim, 2));
+  for (const d of [0, 50, 100, 150, 200]) {
+    const x = x0 + (d / 200) * w;
+    parts.push(line(x, y - 8, x, y + 8, C.dim, 2));
+    parts.push(text(x, y - 14, `${d} px`, { anchor: 'middle', size: 11, color: C.dim }));
+    parts.push(text(x, y + 26, (1 - d / 200).toFixed(2), { anchor: 'middle', size: 13, color: rayColor(d), weight: 'bold' }));
+  }
+  parts.push(text(x0, y + 54, 'touching = 1 · nothing within 200 px = 0', { size: 12, color: C.text }));
+  // the 6 real inputs at the hairpin frame
+  const bx = 430, by = 30;
+  parts.push(text(bx, by + 10, `the 6 inputs at step ${FRAME.step}`, { size: 13, weight: 'bold', color: C.yellow }));
+  frame.inputs.forEach((val, i) => {
+    const yy = by + 34 + i * 26;
+    const src = i < 5 ? `${frame.view[i].toFixed(0)} px` : `${data.frame.speed.toFixed(0)} px/s`;
+    parts.push(text(bx, yy + 11, `${(i < 5 ? SENSOR_LABELS[i] : 'speed').padEnd(9)} ${src.padStart(8)}`, { size: 12, color: C.text }));
+    parts.push(rect(bx + 190, yy, 150, 14, { fill: C.road, rx: 3 }));
+    parts.push(rect(bx + 190, yy, 150 * val, 14, { fill: i < 5 ? rayColor((1 - val) * 200) : C.yellow, rx: 3 }));
+    parts.push(text(bx + 350, yy + 11, val.toFixed(3), { size: 12, color: C.text }));
+  });
+  parts.push(text(bx, by + 200, 'speed: 330 px/s (flat out) = 1, standing still = 0', { size: 11, color: C.dim }));
+  save('02-distance-to-input.svg', svg(860, 260, 'From distances to the 6 inputs', parts.join('\n')), 'How a distance becomes a number between 0 and 1, and the 6 real inputs at the hairpin frame.');
+}
+
+// ===================================================================
+// Chapter 3: brain
+// ===================================================================
+{
+  const n = frame.ex.hidden[hBig], parts = [];
+  const labels = [...SENSOR_LABELS, 'speed'];
+  parts.push(text(20, 30, `one neuron, really: hidden neuron h${hBig + 1}, seed 3 gen 40 champion, step ${FRAME.step}`, { size: 13, weight: 'bold', color: C.cyan }));
+  parts.push(text(20, 56, 'input', { size: 11, color: C.dim }), text(230, 56, '×  weight', { size: 11, color: C.dim }), text(350, 56, '=', { size: 11, color: C.dim }));
+  n.terms.forEach((t, i) => {
+    const y = 82 + i * 30;
+    parts.push(text(20, y, labels[i], { size: 12, color: C.text }));
+    parts.push(text(160, y, fx(t.input), { size: 13, color: C.cyan }));
+    parts.push(text(230, y, `×  ${fx(t.weight)}`, { size: 13, color: t.weight >= 0 ? C.cyan : C.pink }));
+    parts.push(text(350, y, `=  ${fx(t.product)}`, { size: 13, color: C.text }));
+    parts.push(line(450, y - 4, 560, 175, C.dim, 1, { opacity: 0.5 }));
+  });
+  parts.push(circle(600, 175, 40, { fill: C.road, stroke: C.cyan, width: 2, glow: true }));
+  parts.push(text(600, 170, 'add up', { anchor: 'middle', size: 11, color: C.text }), text(600, 186, fx(n.sum), { anchor: 'middle', size: 13, color: C.cyan, weight: 'bold' }));
+  parts.push(text(600, 245, `+ bias ${fx(n.bias)}`, { anchor: 'middle', size: 12, color: C.text }));
+  parts.push(text(600, 265, `= ${fx(n.total)}`, { anchor: 'middle', size: 12, color: C.text }));
+  parts.push(line(642, 175, 700, 175, C.dim, 2, { arrow: true }));
+  parts.push(rect(705, 150, 70, 50, { fill: C.road, stroke: C.yellow, rx: 8 }), text(740, 172, 'squash', { anchor: 'middle', size: 11, color: C.yellow }), text(740, 188, '(tanh)', { anchor: 'middle', size: 11, color: C.yellow }));
+  parts.push(line(775, 175, 800, 175, C.dim, 2, { arrow: true }));
+  parts.push(text(830, 180, fx(n.value), { anchor: 'middle', size: 16, color: C.pink, weight: 'bold', glow: true }));
+  parts.push(text(430, 300, 'Multiply each input by its weight, add them up, add the bias, squash. That is all a neuron does.', { anchor: 'middle', size: 12, color: C.text, opacity: 0.85 }));
+  save('03-neuron.svg', svg(870, 320, 'One neuron with real numbers', parts.join('\n')), `One real neuron (h${hBig + 1}) worked through: inputs × weights, sum, + bias, squash.`);
+}
+{
+  const parts = [];
+  const plot = (x0, y0, w, h, f, xr, yr, title, points, mid) => {
+    let s = text(x0, y0 - 12, title, { size: 13, weight: 'bold', color: C.cyan });
+    s += rect(x0, y0, w, h, { fill: C.road, rx: 6 });
+    const X = (v) => x0 + ((v - xr[0]) / (xr[1] - xr[0])) * w, Y = (v) => y0 + h - ((v - yr[0]) / (yr[1] - yr[0])) * h;
+    s += line(X(0), y0, X(0), y0 + h, C.dim, 1, { opacity: 0.4 }) + line(x0, Y(mid), x0 + w, Y(mid), C.dim, 1, { opacity: 0.4, dash: '4 4' });
+    for (const yv of [yr[0], mid, yr[1]]) s += text(x0 - 6, Y(yv) + 4, String(yv), { anchor: 'end', size: 11, color: C.dim });
+    for (const xv of [xr[0], 0, xr[1]]) s += text(X(xv), y0 + h + 16, String(xv), { anchor: 'middle', size: 11, color: C.dim });
+    const pts = Array.from({ length: 121 }, (_, i) => { const xv = xr[0] + ((xr[1] - xr[0]) * i) / 120; return { x: X(xv), y: Y(f(xv)) }; });
+    s += poly(pts, { stroke: C.cyan, width: 2.5, glow: true });
+    for (const [px, label, color] of points) {
+      s += circle(X(px), Y(f(px)), 5, { fill: color, glow: true });
+      s += text(X(px) + 10, Y(f(px)) + (f(px) > mid ? 18 : -10), label, { size: 11, color });
+    }
+    return s;
+  };
+  const hn = frame.ex.hidden[hBig], out = frame.ex.output[LEFT];
+  parts.push(plot(50, 50, 330, 200, tanh, [-4, 4], [-1, 1], 'tanh: for the 6 hidden neurons', [[hn.total, `h${hBig + 1}: ${fx(hn.total)} → ${fx(hn.value)}`, C.pink]], 0));
+  parts.push(plot(480, 50, 330, 200, sigmoid, [-6, 6], [0, 1], 'sigmoid: for the 4 keys', [[out.total, `LEFT: ${fx(out.total)} → ${fx(out.value)}`, C.yellow]], 0.5));
+  parts.push(text(645, 275, 'above the dashed line (0.5) = key pressed', { anchor: 'middle', size: 11, color: C.dim }));
+  parts.push(text(430, 300, 'Any number goes in, a tidy number comes out: big stays big, small stays small, but nothing runs off to infinity.', { anchor: 'middle', size: 11.5, color: C.text, opacity: 0.85 }));
+  save('03-squash-curves.svg', svg(870, 320, 'The two squash curves', parts.join('\n')), 'The two squash functions, tanh and sigmoid, with the real values from the hairpin frame marked.');
+}
+{
+  // the whole network of the gen 40 champion, with the values of the hairpin frame
+  const parts = [], ex = frame.ex;
+  const inX = 210, hidX = 450, outX = 690;
+  const inY = (i) => 60 + i * 48, hidY = (h) => 60 + h * 48, outY = (k) => 96 + k * 60;
+  const conn = (x1, y1, x2, y2, w) => {
+    const size = Math.min(1, Math.abs(w) / 2);
+    return line(x1, y1, x2, y2, w >= 0 ? C.cyan : C.pink, 0.6 + 3 * size, { opacity: 0.15 + 0.65 * size });
+  };
+  ex.hidden.forEach((n, h) => n.terms.forEach((t, i) => parts.push(conn(inX, inY(i), hidX, hidY(h), t.weight))));
+  ex.output.forEach((n, k) => n.terms.forEach((t, h) => parts.push(conn(hidX, hidY(h), outX, outY(k), t.weight))));
+  const labels = [...SENSOR_LABELS, 'speed'];
+  ex.inputs.forEach((v, i) => {
+    parts.push(circle(inX, inY(i), 13, { fill: C.cyan, opacity: 0.1 + 0.9 * v, stroke: C.text, width: 1 }));
+    parts.push(text(inX - 22, inY(i) + 4, `${labels[i]} ${v.toFixed(2)}`, { anchor: 'end', size: 12, color: C.text }));
+  });
+  ex.hidden.forEach((n, h) => {
+    parts.push(circle(hidX, hidY(h), 13, { fill: n.value >= 0 ? C.cyan : C.pink, opacity: 0.1 + 0.9 * Math.abs(n.value), stroke: C.text, width: 1 }));
+    parts.push(text(hidX + 20, hidY(h) - 12, `h${h + 1} ${n.value.toFixed(2)}`, { size: 11, color: C.dim }));
+  });
+  ex.output.forEach((n, k) => {
+    const on = n.value > 0.5;
+    parts.push(circle(outX, outY(k), 14, { fill: C.yellow, opacity: on ? 1 : 0.1 + 0.5 * n.value, stroke: C.text, width: 1, glow: on }));
+    parts.push(text(outX + 24, outY(k) + 4, `${OUTPUT_LABELS[k].toUpperCase()} ${n.value.toFixed(3)}${on ? '  pressed' : ''}`, { size: 12, color: on ? C.yellow : C.dim, weight: on ? 'bold' : 'normal' }));
+  });
+  parts.push(text(inX, 22, '6 inputs', { anchor: 'middle', size: 12, color: C.cyan, weight: 'bold' }), text(hidX, 22, '6 hidden neurons', { anchor: 'middle', size: 12, color: C.cyan, weight: 'bold' }), text(outX, 22, '4 outputs = 4 keys', { anchor: 'middle', size: 12, color: C.yellow, weight: 'bold' }));
+  const hiddenCount = HIDDEN * (INPUTS + 1), outCount = OUTPUTS * (HIDDEN + 1);
+  parts.push(text(450, 360, `hidden layer: 6 neurons × (6 weights + 1 bias) = ${hiddenCount} numbers`, { anchor: 'middle', size: 12, color: C.text }));
+  parts.push(text(450, 380, `output layer: 4 neurons × (6 weights + 1 bias) = ${outCount} numbers`, { anchor: 'middle', size: 12, color: C.text }));
+  parts.push(text(450, 404, `${hiddenCount} + ${outCount} = ${BRAIN_SIZE}: the whole brain is ${BRAIN_SIZE} numbers`, { anchor: 'middle', size: 14, color: C.yellow, weight: 'bold', glow: true }));
+  parts.push(text(450, 424, 'line thickness = size of the weight · cyan = positive · pink = negative', { anchor: 'middle', size: 11, color: C.dim }));
+  save('03-network.svg', svg(900, 440, 'The whole network', parts.join('\n')), 'The real 6 → 6 → 4 network of the seed 3 gen 40 champion at the hairpin frame, and the count to 70.');
+  data.brainCount = { hidden: hiddenCount, output: outCount, total: BRAIN_SIZE };
+}
+{
+  // generation 1 chaos: seed 2 at 1.5 s
+  const evo = createEvolution(track, 2);
+  for (let s = 0; s < 90; s++) stepGeneration(evo.gen);
+  const v = { x0: 80, y0: 40, scale: 0.62, ox: 20, oy: 30 }, parts = [drawTrack(v)];
+  const out = evo.gen.cars.filter((c) => c.out), alive = evo.gen.cars.filter((c) => !c.out);
+  for (const c of out) parts.push(drawBug(v, c.world.car, { opacity: 0.35, color: C.pink }));
+  for (const c of alive) parts.push(drawBug(v, c.world.car, { opacity: 0.8 }));
+  parts.push(text(430, 470, `Seed 2, generation 1, 1.5 s in: ${out.length} of 100 already out (pink), ${alive.length} still driving.`, { anchor: 'middle', size: 12, color: C.text }));
+  save('03-gen1-chaos.svg', svg(860, 490, 'Generation 1 chaos', parts.join('\n')), 'Generation 1 (random brains), seed 2 at 1.5 s: wrecks and confused cars around the start.');
+  data.gen1Chaos = { seed: 2, step: 90, out: out.length, alive: alive.length };
+}
+
+// ===================================================================
+// Chapter 4: evolution
+// ===================================================================
+let gen4 = null, gen5 = null;
+{
+  // one generation, really: seed 3, generation 4 (the first lap ever) -> generation 5
+  const evo = runEvolution(createEvolution(track, 3), 3);
+  while (!evo.gen.over) stepGeneration(evo.gen);
+  gen4 = evo.gen;
+  const ranked = [...gen4.cars].sort((a, b) => fitness(b) - fitness(a)); // the same ranking selection() makes
+  finishGeneration(evo);
+  gen5 = nextGeneration(evo);
+  const parents = ranked.slice(0, 10);
+  const kids = parents.map((p) => gen5.cars.filter((c, i) => i > 0 && c.parentId === p.id).length);
+  const parts = [];
+  parts.push(text(20, 30, 'generation 4 (seed 3): all 100 cars, ranked by fitness', { size: 13, weight: 'bold', color: C.cyan }));
+  const maxF = fitness(ranked[0]);
+  ranked.forEach((c, i) => {
+    const h = Math.max(1, (fitness(c) / maxF) * 120);
+    parts.push(rect(20 + i * 8.4, 170 - h, 6.4, h, { fill: i < 10 ? C.yellow : C.cyan, opacity: i < 10 ? 1 : 0.45, rx: 1 }));
+  });
+  parts.push(text(20, 192, `best ${fitness(ranked[0]).toFixed(1)} (car ${ranked[0].id}: the first lap ever)`, { size: 11, color: C.yellow }));
+  parts.push(text(860, 192, `worst ${fitness(ranked[99]).toFixed(1)}`, { anchor: 'end', size: 11, color: C.dim }));
+  parts.push(line(450, 200, 450, 228, C.dim, 2, { arrow: true }));
+  parts.push(text(460, 220, 'keep the top 10 as parents', { size: 11, color: C.dim }));
+  parents.forEach((p, i) => {
+    const x = 20 + i * 86;
+    parts.push(rect(x, 236, 78, 56, { fill: C.road, stroke: C.yellow, rx: 6 }));
+    parts.push(text(x + 39, 254, `#${i + 1} ${p.id}`, { anchor: 'middle', size: 11, color: C.yellow }));
+    parts.push(text(x + 39, 270, fitness(p).toFixed(1), { anchor: 'middle', size: 11, color: C.text }));
+    parts.push(text(x + 39, 285, `${kids[i]} children`, { anchor: 'middle', size: 10, color: C.dim }));
+  });
+  parts.push(line(450, 298, 450, 326, C.dim, 2, { arrow: true }));
+  parts.push(rect(20, 334, 160, 46, { fill: C.road, stroke: C.green, rx: 6 }), text(100, 352, '1 elite', { anchor: 'middle', size: 12, color: C.green, weight: 'bold' }), text(100, 370, `copy of ${parents[0].id}, unchanged`, { anchor: 'middle', size: 10, color: C.text }));
+  parts.push(rect(200, 334, 660, 46, { fill: C.road, stroke: C.cyan, rx: 6 }), text(530, 352, '99 children', { anchor: 'middle', size: 12, color: C.cyan, weight: 'bold' }), text(530, 370, 'each: a copy of one parent (better ranks picked more often), with about 10% of its 70 numbers nudged', { anchor: 'middle', size: 10, color: C.text }));
+  parts.push(text(450, 404, '= generation 5: 100 new cars', { anchor: 'middle', size: 12, color: C.text }));
+  save('04-one-generation.svg', svg(880, 420, 'One generation becomes the next', parts.join('\n')), 'One real generation (seed 3, gen 4): 100 ranked cars → top 10 parents → 1 elite + 99 children.');
+  data.oneGeneration = { seed: 3, generation: 4, best: { id: ranked[0].id, fitness: fitness(ranked[0]) }, top10: parents.map((p, i) => ({ id: p.id, fitness: fitness(p), children: kids[i] })), worst: fitness(ranked[99]) };
+}
+{
+  // mutation, really: a typical child of generation 5 next to its parent from generation 4
+  const parentOf = (c) => gen4.cars.find((p) => p.id === c.parentId);
+  const counts = gen5.cars.slice(1).map((c) => c.brain.filter((w, i) => w !== parentOf(c).brain[i]).length);
+  const mean = counts.reduce((a, b) => a + b, 0) / counts.length;
+  const typical = gen5.cars.slice(1).find((c, i) => counts[i] === Math.round(mean)); // the first child with the usual number of changes
+  const child = typical, parent = parentOf(child);
+  const changed = child.brain.map((w, i) => w !== parent.brain[i]);
+  const parts = [];
+  const grid = (x0, brain, title) => {
+    let s = text(x0, 36, title, { size: 12, weight: 'bold', color: C.cyan });
+    brain.forEach((w, i) => {
+      const col = i % 7, row = Math.floor(i / 7), x = x0 + col * 52, y = 50 + row * 22 + (row >= 6 ? 8 : 0);
+      const size = Math.min(1, Math.abs(w) / 2);
+      s += rect(x, y, 48, 18, { fill: w >= 0 ? C.cyan : C.pink, opacity: 0.12 + 0.6 * size, rx: 3, stroke: changed[i] ? C.yellow : 'none', width: 2 });
+      s += text(x + 24, y + 13, w.toFixed(2), { anchor: 'middle', size: 10, color: C.text });
+    });
+    return s;
+  };
+  parts.push(grid(20, parent.brain, `parent ${parent.id}`));
+  parts.push(grid(450, child.brain, `child ${child.id}`));
+  const n = changed.filter(Boolean).length;
+  parts.push(text(430, 300, `${n} of 70 numbers changed (yellow outline); the other ${70 - n} are exact copies.`, { anchor: 'middle', size: 12, color: C.yellow }));
+  const ex = changed.findIndex(Boolean);
+  parts.push(text(430, 318, `for example number ${ex + 1}: ${fx(parent.brain[ex])} → ${fx(child.brain[ex])} · all 99 children of gen 5: ${Math.min(...counts)} to ${Math.max(...counts)} changes, ${mean.toFixed(2)} on average`, { anchor: 'middle', size: 11, color: C.dim }));
+  save('04-mutation.svg', svg(840, 334, 'Mutation', parts.join('\n')), 'Mutation for real: a gen 5 child next to its gen 4 parent, the changed numbers outlined.');
+  data.mutation = { child: child.id, parent: parent.id, changed: n, example: { index: ex + 1, from: parent.brain[ex], to: child.brain[ex] }, allChildren: { min: Math.min(...counts), max: Math.max(...counts), mean } };
+}
+// A line chart: series = [{values: [...per generation or null], color, label}]
+function chart(x0, y0, w, h, series, yMax, yMin = 0, o = {}) {
+  const { yLabel = '', refs = [], marks = [], gens = 100, yTicks = [] } = o;
+  let s = rect(x0, y0, w, h, { fill: C.road, rx: 6 });
+  const X = (g) => x0 + ((g - 1) / (gens - 1)) * w, Y = (v) => y0 + h - ((v - yMin) / (yMax - yMin)) * h;
+  for (const t of yTicks) s += line(x0, Y(t), x0 + w, Y(t), C.dim, 1, { opacity: 0.12 }) + text(x0 - 6, Y(t) + 4, String(t), { anchor: 'end', size: 10, color: C.dim });
+  for (const g of [1, 20, 40, 60, 80, 100]) s += text(X(g), y0 + h + 15, `gen ${g}`, { anchor: 'middle', size: 10, color: C.dim });
+  for (const [v, label, color, lx = 1] of refs) s += line(x0, Y(v), x0 + w, Y(v), color, 1, { opacity: 0.8, dash: '5 4' }) + text(x0 + w * lx - 4, Y(v) - 4, label, { anchor: 'end', size: 10, color });
+  const ends = [];
+  for (const { values, color, label, width = 2 } of series) {
+    let seg = [];
+    const flush = () => { if (seg.length) s += poly(seg, { stroke: color, width, glow: true }); seg = []; };
+    values.forEach((v, i) => { if (v == null) flush(); else seg.push({ x: X(i + 1), y: Y(v) }); });
+    flush();
+    if (label) { const last = values.length - 1 - [...values].reverse().findIndex((v) => v != null); ends.push({ x: X(last + 1) + 6, y: Y(values[last]) + 4, label, color }); }
+  }
+  // end labels, nudged apart so they don't sit on top of each other
+  ends.sort((a, b) => a.y - b.y).forEach((e, i, all) => { if (i && e.y - all[i - 1].y < 12) e.y = all[i - 1].y + 12; s += text(e.x, e.y, e.label, { size: 10, color: e.color }); });
+  for (const [g, v, label, color] of marks) s += circle(X(g), Y(v), 5, { fill: color, glow: true }) + text(X(g) + 10, Y(v) + 14, label, { size: 11, color });
+  if (yLabel) s += text(x0, y0 - 8, yLabel, { size: 12, weight: 'bold', color: C.cyan });
+  return s;
+}
+{
+  const h = runs[3].history, parts = [];
+  parts.push(chart(70, 40, 690, 150, [
+    { values: h.map((r) => r.averageFitness), color: C.yellow, label: 'average' },
+    { values: h.map((r) => r.bestFitness), color: C.cyan, label: 'best' },
+  ], 900, 0, { yLabel: 'seed 3: fitness per generation', yTicks: [0, 300, 600, 900] }));
+  const laps = h.map((r) => (r.bestLapSteps == null ? null : r.bestLapSteps / STEPS_PER_SECOND));
+  parts.push(chart(70, 250, 690, 170, [{ values: laps, color: C.cyan, label: '' }], 40, 10, {
+    yLabel: 'seed 3: best lap per generation (seconds, lower is better)', yTicks: [10, 20, 30, 40],
+    refs: [[26.4, 'my best lap 26.40', C.pink], [17.25, 'careful script 17.25', C.dim], [12.68, 'fastest script 12.68', C.dim, 0.62], [11.93, 'floor 11.93', C.dim, 0.3]],
+    marks: [[4, h[3].bestLapSteps / STEPS_PER_SECOND, `first lap: gen 4, ${sec(h[3].bestLapSteps)} s`, C.yellow]],
+  }));
+  save('04-seed3-progress.svg', svg(860, 450, 'Seed 3 learning', parts.join('\n')), 'Seed 3 over 100 generations: best and average fitness, and the best lap time against mine and the reference laps.');
+}
+{
+  const parts = [], colors = { 1: C.pink, 2: C.yellow, 3: C.cyan, 4: C.green, 5: C.magenta };
+  parts.push(chart(70, 40, 660, 230, [1, 2, 4, 5, 3].map((s) => ({ values: runs[s].history.map((r) => r.bestFitness), color: colors[s], label: `seed ${s}`, width: s === 3 ? 3 : 2 })),
+    900, 0, { yLabel: 'best fitness per generation, all 5 seeds', yTicks: [0, 300, 600, 900] }));
+  parts.push(text(400, 315, 'seed 1 (pink, bottom): 43.0 from generation 6 to 100, never a lap', { anchor: 'middle', size: 12, color: C.pink }));
+  save('04-five-seeds.svg', svg(860, 330, 'Five seeds', parts.join('\n')), 'Best fitness per generation for all five seeds; seed 1 is the flat line.');
+}
+{
+  // seed 1, generation 31: everyone flat out, everyone crashing at the hairpin exit
+  const evo = runEvolution(createEvolution(track, 1), 30);
+  const gen = evo.gen, paths = gen.cars.map(() => []), braked = gen.cars.map(() => 0), speeds = gen.cars.map(() => []);
+  while (!gen.over) {
+    const before = gen.cars.map((c) => c.world.car.speed);
+    stepGeneration(gen);
+    gen.cars.forEach((c, i) => {
+      if (c.outStep === 0 || c.outStep === gen.step) {
+        paths[i].push({ x: c.world.car.x, y: c.world.car.y });
+        speeds[i].push(before[i]); // the speed it had going into this step (a crash sets it to 0)
+        if (c.keys & 2) braked[i]++;
+      }
+    });
+  }
+  const ranked = [...gen.cars].sort((a, b) => fitness(b) - fitness(a));
+  const best = ranked[0], bi = gen.cars.indexOf(best);
+  const v = hairpinView, parts = [drawTrack(v, HAIRPIN_CLIP)];
+  parts.push(poly(paths[bi].filter((p) => p.x < 560 && p.y < 330).map((p) => at(v, p)), { stroke: C.yellow, width: 2, glow: true }));
+  for (const c of gen.cars) {
+    if (c.out !== 'crash' || c.world.car.x > 560 || c.world.car.y > 330) continue;
+    const p = at(v, c.world.car);
+    parts.push(line(p.x - 5, p.y - 5, p.x + 5, p.y + 5, C.pink, 2), line(p.x - 5, p.y + 5, p.x + 5, p.y - 5, C.pink, 2));
+  }
+  parts.push(drawBug(v, best.world.car, { color: C.yellow }));
+  const sameSpot = gen.cars.filter((c) => c.out === 'crash' && Math.hypot(c.world.car.x - best.world.car.x, c.world.car.y - best.world.car.y) < 6).length;
+  { const p = at(v, best.world.car); parts.push(text(p.x + 40, p.y + 8, `${sameSpot} cars crashed right here`, { size: 12, color: C.yellow, weight: 'bold' })); }
+  const top10 = ranked.slice(0, 10);
+  const nearestWall = (pt) => {
+    const d = (pts) => Math.min(...pts.map((q) => Math.hypot(q.x - pt.x, q.y - pt.y)));
+    return d(track.inner) < d(track.outer) ? 'inner' : 'outer';
+  };
+  const crashedCars = gen.cars.filter((c) => c.out === 'crash');
+  const hitInner = crashedCars.filter((c) => nearestWall(c.world.car.crash) === 'inner').length;
+  const nearBest = top10.filter((c) => fitness(c) === fitness(best)).length;
+  const everBraked = braked.filter((b) => b > 0).length;
+  const bestSpeed = Math.max(...speeds[bi]);
+  [[`seed 1, generation ${gen.number} · × = where a car crashed · yellow = the best car's path`, C.text, 'normal'],
+    [`the best car never brakes: it hits the outer wall at ${speeds[bi].at(-1).toFixed(0)} px/s (top speed ${bestSpeed.toFixed(0)})`, C.yellow, 'normal'],
+    [`${nearBest} of the top 10 end with exactly the same fitness, ${fitness(best).toFixed(1)} (51.8% of a lap)`, C.text, 'normal'],
+    [`of the ${crashedCars.length} crashes, ${hitInner} hit the inner wall (turning in too early), ${crashedCars.length - hitInner} the outer wall`, C.text, 'normal'],
+    [`cars that pressed BRAKE even once in this generation: ${everBraked} of 100`, C.pink, 'bold']].forEach(([l, color, weight], i) =>
+    parts.push(text(30, 580 + i * 20, l, { size: 12, color, weight })));
+  save('04-seed1-stuck.svg', svg(800, 690, 'Seed 1 stuck at the hairpin', parts.join('\n')), 'Seed 1, generation 31: every car drives flat out and crashes at the hairpin exit; nobody brakes.');
+  data.seed1 = { sameSpot, hitInner, hitOuter: crashedCars.length - hitInner, generation: gen.number, bestFitness: fitness(best), topTenAtBest: nearBest, everBraked, bestId: best.id, bestCrashSpeed: speeds[bi].at(-1), bestTopSpeed: Math.max(...speeds[bi]), crashPoint: best.world.car.crash, crashed: gen.cars.filter((c) => c.out === 'crash').length,
+    stuckFrom: runs[1].history.findIndex((r) => r.bestFitness === runs[1].history[99].bestFitness) + 1, childrenTried: (100 - (runs[1].history.findIndex((r) => r.bestFitness === runs[1].history[99].bestFitness) + 1)) * 99 };
+}
+
+// ===================================================================
+// Chapter 5: reading a brain
+// ===================================================================
+{
+  const ex = frame.ex, hn = ex.hidden[hBig], out = ex.output[LEFT], parts = [];
+  const t0 = hn.terms.reduce((b, t, i, all) => (Math.abs(t.product) > Math.abs(all[b].product) ? i : b), 0);
+  const cols = [
+    ['1. THE EYE', [`${SENSOR_LABELS[t0]} sees`, `the inner wall at`, `${frame.view[t0].toFixed(0)} px`], C.cyan],
+    ['2. THE INPUT', [`close wall →`, `a big number:`, `${fx(frame.inputs[t0])}`], C.cyan],
+    [`3. NEURON h${hBig + 1}`, [`${fx(frame.inputs[t0])} × ${fx(hn.terms[t0].weight)} = ${fx(hn.terms[t0].product)}`, `(its biggest term)`, `total ${fx(hn.total)} → ${fx(hn.value)}`], C.pink],
+    ['4. KEY LEFT', [`h${hBig + 1}: ${fx(hn.value)} × ${fx(out.terms[hBig].weight)} = ${fx(out.terms[hBig].product)}`, `(its biggest push)`, `total ${fx(out.total)} → ${fx(out.value)}`], C.yellow],
+  ];
+  cols.forEach(([title, lines, color], i) => {
+    const x = 20 + i * 215;
+    parts.push(box(x, 40, 195, 120, title, lines, color));
+    if (i < 3) parts.push(line(x + 195, 100, x + 213, 100, C.dim, 2, { arrow: true }));
+  });
+  parts.push(text(440, 200, `${fx(out.value)} is more than 0.5 → LEFT PRESSED`, { anchor: 'middle', size: 16, color: C.yellow, weight: 'bold', glow: true }));
+  parts.push(text(440, 226, `(BRAKE is pressed too: ${fx(ex.output[1].value)}. GAS ${fx(ex.output[0].value)} and RIGHT ${fx(ex.output[3].value)} are not.)`, { anchor: 'middle', size: 12, color: C.text }));
+  parts.push(text(440, 254, `Seed 3, generation 40 champion, alone on the track, step ${FRAME.step}. Every number is what think() computed.`, { anchor: 'middle', size: 11, color: C.dim }));
+  save('05-decision-path.svg', svg(880, 274, 'From a wall at 23 px to pressing LEFT', parts.join('\n')), 'One decision, start to end: the eye, the input, one hidden neuron, and the LEFT key.');
+  data.decisionPath = { eye: SENSOR_LABELS[t0], distance: frame.view[t0], strongestTermInHidden: t0 + 1 };
+}
+{
+  // the inside line through the hairpin: how the champions of seed 3 drive it, generation by generation
+  const apex = track.center.reduce((b, p, i) => ((p.x - 260) ** 2 + (p.y - 182) ** 2 < (track.center[b].x - 260) ** 2 + (track.center[b].y - 182) ** 2 ? i : b), 0);
+  const lineOf = (brain) => {
+    const pts = [];
+    solo(brain, (c) => { const car = c.world.car; pts.push({ x: car.x, y: car.y, speed: car.speed }); }, 2400);
+    return pts;
+  };
+  // where the car passed this centerline sample (its closest point), and how far toward the inner wall
+  const offsetAt = (pts, sample) => {
+    const c = track.center[sample], inn = track.inner[sample];
+    const ux = (inn.x - c.x) / (TRACKS[0].width / 2), uy = (inn.y - c.y) / (TRACKS[0].width / 2);
+    let best = null, bd = Infinity;
+    for (const p of pts) { const d = (p.x - c.x) ** 2 + (p.y - c.y) ** 2; if (d < bd) { bd = d; best = p; } }
+    return { offset: (best.x - c.x) * ux + (best.y - c.y) * uy, speed: best.speed, x: best.x, y: best.y };
+  };
+  const gens = ['1', '5', '10', '20', '40', '80'];
+  const lines = Object.fromEntries(gens.map((g) => [g, lineOf(champs[3][g].brain)]));
+  const spots = [[-12, '96 px before the apex'], [0, 'at the apex'], [6, '48 px after the apex']];
+  const table = Object.fromEntries(gens.map((g) => [g, spots.map(([k]) => offsetAt(lines[g], apex + k))]));
+  const v = hairpinView, parts = [drawTrack(v, { centerline: true, ...HAIRPIN_CLIP })];
+  // only the first pass through the hairpin
+  const firstPass = (pts) => { const out = []; for (const p of pts) { if (p.x < 560 && p.y < 330 && p.y > 40) out.push(p); else if (out.length > 40) break; } return out; };
+  parts.push(poly(firstPass(lines['1']).map((p) => at(v, p)), { stroke: C.pink, width: 2, opacity: 0.9 }));
+  parts.push(poly(firstPass(lines['80']).map((p) => at(v, p)), { stroke: C.yellow, width: 2, opacity: 0.9 }));
+  parts.push(poly(firstPass(lines['40']).map((p) => at(v, p)), { stroke: C.cyan, width: 3, glow: true }));
+  table['40'].forEach((o) => { const p = at(v, o); parts.push(circle(p.x, p.y, 5, { fill: C.cyan, glow: true })); });
+  parts.push(text(30, 578, 'pink = gen 1 champion · cyan = gen 40 · yellow = gen 80 · dashed = middle of the road', { size: 12, color: C.text }));
+  parts.push(text(30, 600, 'px toward the inner wall (0 = middle, 32 = shell touching the wall) and speed, at:', { size: 11, color: C.dim }));
+  spots.forEach(([, name], i) => parts.push(text(250 + i * 180, 620, name, { size: 11, color: C.dim })));
+  gens.forEach((g, j) => {
+    const y = 640 + j * 17;
+    parts.push(text(30, y, `gen ${g}`, { size: 11, color: g === '40' ? C.cyan : g === '80' ? C.yellow : g === '1' ? C.pink : C.text }));
+    table[g].forEach((o, i) => parts.push(text(250 + i * 180, y, `${o.offset.toFixed(1)} px · ${o.speed.toFixed(0)} px/s`, { size: 11, color: C.text })));
+  });
+  save('05-inside-line.svg', svg(800, 750, 'The inside line', parts.join('\n')), 'Nobody taught it: how the seed 3 champions drive the hairpin, gen 1 vs gen 40 vs gen 80, with the offsets.');
+  data.insideLine = { apexSample: apex, maxOffset: TRACKS[0].width / 2 - CAR.width / 2,
+    table: Object.fromEntries(gens.map((g) => [g, table[g].map((o, i) => ({ where: spots[i][1], offset: +o.offset.toFixed(1), speed: +o.speed.toFixed(0) }))])) };
+}
+{
+  const a = champs[3]['1'], b = champs[3]['80'];
+  const same = a.brain.map((w, i) => w === b.brain[i]);
+  const parts = [];
+  const grid = (x0, brain, title) => {
+    let s = text(x0, 36, title, { size: 12, weight: 'bold', color: C.cyan });
+    brain.forEach((w, i) => {
+      const col = i % 7, row = Math.floor(i / 7), x = x0 + col * 52, y = 50 + row * 22 + (row >= 6 ? 8 : 0);
+      const size = Math.min(1, Math.abs(w) / 2);
+      s += rect(x, y, 48, 18, { fill: w >= 0 ? C.cyan : C.pink, opacity: 0.12 + 0.6 * size, rx: 3, stroke: same[i] ? C.green : 'none', width: 2 });
+      s += text(x + 24, y + 13, w.toFixed(2), { anchor: 'middle', size: 10, color: C.text });
+    });
+    return s;
+  };
+  parts.push(grid(20, a.brain, `generation 1 champion, car ${a.id}`));
+  parts.push(grid(450, b.brain, `generation 80 champion, car ${b.id}`));
+  const changed = same.filter((s) => !s).length;
+  parts.push(text(430, 300, `Same shape, different numbers: ${changed} of 70 changed. The ${70 - changed} green-outlined ones are still exactly the same.`, { anchor: 'middle', size: 12, color: C.text }));
+  parts.push(text(430, 318, 'rows: hidden neurons h1–h6, then gas, brake, left, right · columns: their 6 weights and the bias', { anchor: 'middle', size: 11, color: C.dim }));
+  save('05-seventy-numbers.svg', svg(840, 334, 'Gen 1 vs gen 80: the 70 numbers', parts.join('\n')), 'The 70 numbers of the gen 1 and gen 80 champions (seed 3) side by side; the unchanged ones outlined.');
+  data.seventy = { gen1: a.id, gen80: b.id, changed };
+}
+{
+  // the family line from car 1-85 to the gen 80 champion
+  const champ = champs[3]['80'], h = runs[3].history;
+  const lineIds = [champ.id, ...champ.ancestors].reverse();
+  const parts = [];
+  parts.push(text(20, 30, `the gen 80 champion's family line: ${lineIds.length} cars, one per generation, each the parent of the next`, { size: 13, weight: 'bold', color: C.cyan }));
+  const pos = (g) => ({ x: 40 + ((g - 1) % 40) * 20.5, y: 90 + Math.floor((g - 1) / 40) * 90 });
+  lineIds.forEach((id, i) => {
+    const g = i + 1, p = pos(g), elite = id.endsWith('-0') && g > 1;
+    if (g < lineIds.length && g % 40 !== 0) { const q = pos(g + 1); parts.push(line(p.x, p.y, q.x, q.y, C.dim, 1, { opacity: 0.5 })); }
+    parts.push(circle(p.x, p.y, 6, elite ? { stroke: C.cyan, width: 1.5 } : { fill: g === 1 ? C.text : C.yellow, glow: g !== 1 }));
+  });
+  for (const g of [1, 5, 10, 20, 40, 80]) {
+    const p = pos(g), id = lineIds[g - 1], c = champs[3][String(g)];
+    const lap = c && c.id === id && c.lapSteps ? `${sec(c.lapSteps)} s` : '';
+    parts.push(text(p.x, p.y + 24, `${g}: ${id}`, { anchor: 'middle', size: 10, color: C.text }));
+    if (lap) parts.push(text(p.x, p.y + 38, lap, { anchor: 'middle', size: 10, color: C.cyan }));
+  }
+  const elites = lineIds.filter((id, i) => i > 0 && id.endsWith('-0')).length;
+  const lastChange = lineIds.reduce((last, id, i) => (i > 0 && !id.endsWith('-0') ? i + 1 : last), 0);
+  parts.push(circle(40, 300, 6, { fill: C.yellow }), text(52, 304, `mutated child (${lineIds.length - 1 - elites})`, { size: 11, color: C.text }));
+  parts.push(circle(260, 300, 6, { stroke: C.cyan, width: 1.5 }), text(272, 304, `unchanged elite copy (${elites})`, { size: 11, color: C.text }));
+  parts.push(text(520, 304, `last change: generation ${lastChange}`, { size: 11, color: C.text }));
+  parts.push(text(20, 330, `Car 4-78, which drove the very first lap, is not in this line: the line went through 4-0, an unchanged copy of 3-28.`, { size: 11, color: C.dim }));
+  save('05-family-line.svg', svg(880, 350, 'The family line', parts.join('\n')), 'The unbroken family line of the gen 80 champion, back to car 1-85: mutated children and unchanged elite copies.');
+  data.family = { from: lineIds[0], to: lineIds.at(-1), cars: lineIds.length, elites, mutated: lineIds.length - 1 - elites, lastChange, gen4: lineIds[3], firstLapCarInLine: lineIds.includes('4-78'),
+    championsInLine: lineIds.filter((id, i) => h[i].championId === id).length };
+}
+
+// ---------- tables the guide quotes ----------
+data.seeds = Object.fromEntries([1, 2, 3, 4, 5].map((s) => [s, {
+  firstLap: runs[s].firstLap, bestLapAt: runs[s].bestLapAt, finishedAt100: runs[s].finishedLapAt['100'], nodeSeconds: runs[s].nodeSeconds,
+}]));
+data.champions3 = Object.fromEntries(Object.entries(champs[3]).map(([g, c]) => [g, { id: c.id, lap: c.lapSteps && +sec(c.lapSteps), progress: +(c.progress * 100).toFixed(1) }]));
+data.figures = figures;
+writeFileSync(new URL('figure-data.json', OUT), JSON.stringify(data, null, 1) + '\n');
+for (const f of figures) console.log(`${f.name.padEnd(26)} ${f.about}`);
+console.log(`\n${figures.length} figures and figure-data.json written to docs/img/`);
