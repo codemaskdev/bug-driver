@@ -701,7 +701,62 @@
    "aiSteps": 830,
    "aiProgress": null
   },
-  "gen80StopSeconds": 5.6
+  "gen80StopSeconds": 5.6,
+  "step7c": {
+   "race": {
+    "champion": "3-multi4-100",
+    "link": "index.html?race=exam&champion=3-multi4-100",
+    "winner": "ai",
+    "by": 18.77,
+    "meSteps": 1921,
+    "aiSteps": 795,
+    "aiProgress": null
+   },
+   "best": [
+    {
+     "generation": 1,
+     "exam": null,
+     "out": "crash",
+     "outSeconds": 2.53
+    },
+    {
+     "generation": 5,
+     "exam": 22.95,
+     "out": "time",
+     "outSeconds": 60
+    },
+    {
+     "generation": 10,
+     "exam": 16.42,
+     "out": "time",
+     "outSeconds": 60
+    },
+    {
+     "generation": 20,
+     "exam": 14.72,
+     "out": "crash",
+     "outSeconds": 35.65
+    },
+    {
+     "generation": 40,
+     "exam": 13.72,
+     "out": "stall",
+     "outSeconds": 22.35
+    },
+    {
+     "generation": 80,
+     "exam": 13.33,
+     "out": "time",
+     "outSeconds": 60
+    },
+    {
+     "generation": 100,
+     "exam": 13.25,
+     "out": "time",
+     "outSeconds": 60
+    }
+   ]
+  }
  },
  "paperclip": {
   "link": "1DcBkCgCgCgIwDcJsQkJsRgIwRgH-QaG4G4G4FsGgFUFoFsEwG4EYQaEYRgDSRgCgQkBkIwBk",
@@ -1069,7 +1124,11 @@
   },
   {
    "name": "simple-7-exam.svg",
-   "about": "Simple guide, ch 7: on Exam, gen 20 drives a clean lap, gen 80 stops dead in the right-hand hairpin and reverses, the three-track champions crash."
+   "about": "Simple guide, ch 7: on Exam, the one-track gen 80 champion reverses in the right-hand hairpin, the three-track champions crash, the four-track gen 100 champion drives a clean lap."
+  },
+  {
+   "name": "07-exam-7c.svg",
+   "about": "Step 7c: the four-track champions on their four training tracks and on Exam."
   },
   {
    "name": "07-exam-map.svg",

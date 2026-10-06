@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="358" viewBox="0 0 900 358" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+<title>Step 7c</title>
+<defs><filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="900" height="358"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9fb3c8"/></marker></defs>
+<rect x="0.5" y="0.5" width="899" height="357" rx="16" fill="#0b0d13" stroke="#00f0ff" stroke-opacity="0.25"/>
+<text x="20" y="34" font-size="14" fill="#00f0ff" fill-opacity="1" text-anchor="start" font-weight="bold">Step 7c: trained on 4 tracks (Mirrored added), then tested once on Exam</text>
+<text x="190" y="66" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">Neon Loop</text>
+<text x="340" y="66" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">Mirrored</text>
+<text x="490" y="66" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">Zigzag</text>
+<text x="640" y="66" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">Wide Sweepers</text>
+<text x="790" y="66" font-size="12" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold">EXAM</text>
+<text x="20" y="96" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 1</text>
+<rect x="124" y="80" width="132" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="190" y="96" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash 65%</text>
+<rect x="274" y="80" width="132" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="340" y="96" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash 11%</text>
+<rect x="424" y="80" width="132" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="490" y="96" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">stall 0%</text>
+<rect x="574" y="80" width="132" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="640" y="96" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash 60%</text>
+<rect x="724" y="80" width="132" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="790" y="96" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash 13%</text>
+<text x="20" y="128" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 5</text>
+<rect x="124" y="112" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="190" y="128" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">20.48 s</text>
+<rect x="274" y="112" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="340" y="128" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">22.25 s</text>
+<rect x="424" y="112" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="490" y="128" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.22 s</text>
+<rect x="574" y="112" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="640" y="128" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.08 s</text>
+<rect x="724" y="112" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="790" y="128" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">22.95 s</text>
+<text x="20" y="160" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 10</text>
+<rect x="124" y="144" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="190" y="160" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">14.75 s</text>
+<rect x="274" y="144" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="340" y="160" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">16.08 s</text>
+<rect x="424" y="144" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="490" y="160" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">10.58 s</text>
+<rect x="574" y="144" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="640" y="160" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">9.72 s</text>
+<rect x="724" y="144" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="790" y="160" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">16.42 s</text>
+<text x="20" y="192" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 20</text>
+<rect x="124" y="176" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="190" y="192" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.53 s</text>
+<rect x="274" y="176" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="340" y="192" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.80 s</text>
+<rect x="424" y="176" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="490" y="192" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">9.92 s</text>
+<rect x="574" y="176" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="640" y="192" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.67 s</text>
+<rect x="724" y="176" width="132" height="24" rx="5" fill="#ffd23f" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="790" y="192" font-size="12" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold">14.72 s</text>
+<text x="20" y="224" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 40</text>
+<rect x="124" y="208" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="190" y="224" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.15 s</text>
+<rect x="274" y="208" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="340" y="224" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">12.85 s</text>
+<rect x="424" y="208" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="490" y="224" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.35 s</text>
+<rect x="574" y="208" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="640" y="224" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.15 s</text>
+<rect x="724" y="208" width="132" height="24" rx="5" fill="#ffd23f" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="790" y="224" font-size="12" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold">13.72 s</text>
+<text x="20" y="256" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 80</text>
+<rect x="124" y="240" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="190" y="256" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">12.87 s</text>
+<rect x="274" y="240" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="340" y="256" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">12.67 s</text>
+<rect x="424" y="240" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="490" y="256" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.22 s</text>
+<rect x="574" y="240" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="640" y="256" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.13 s</text>
+<rect x="724" y="240" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="790" y="256" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.33 s</text>
+<text x="20" y="288" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 100</text>
+<rect x="124" y="272" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="190" y="288" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">12.63 s</text>
+<rect x="274" y="272" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="340" y="288" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">12.68 s</text>
+<rect x="424" y="272" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="490" y="288" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.20 s</text>
+<rect x="574" y="272" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="640" y="288" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">8.13 s</text>
+<rect x="724" y="272" width="132" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="790" y="288" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.25 s</text>
+<text x="20" y="322" font-size="11" fill="#9fb3c8" fill-opacity="1" text-anchor="start" font-weight="normal">cyan = best lap, still driving at 60 s · yellow = finished a lap, then went out later · pink = no lap: how it got out, how far</text>
+<text x="20" y="340" font-size="11" fill="#9fb3c8" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · Exam is never trained on; this was its second use as a test · my Exam lap: 32.02 s</text>
+</svg>

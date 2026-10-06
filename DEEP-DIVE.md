@@ -892,6 +892,39 @@ The exam: the one-track champions of generations 10, 20 and 80, and the three-tr
 
 *Reproduce it: `node tools/exam-report.js` (writes `runs/exam.json`; `tests/exam.test.js` checks every result and the race).*
 
+### Step 7c: one more try, decided after the exam
+**Said openly: this step was not in the plan.** It exists because of the exam result above, and it was pre-registered before any training (DEVLOG.md, "Step 7c pre-registration", commit 41039bd).
+- **The change:** train on 4 tracks: Neon Loop, Neon Loop Mirrored, Zigzag, Wide Sweepers. Mirrored is added because it has a hairpin that turns right.
+- **Everything else unchanged:** seed 3 from scratch, 100 generations, fitness = the sum of the 4 single-track scores, 100 cars, top 10, 1 elite, mutation 10% with sigma 0.3. It took 1073 s in Node.
+- **The test:** the 7 saved champions on Exam, once, after training. No retries, no tuning. Exam is still never trained on.
+
+![Step 7c](docs/img/07-exam-7c.svg)
+
+*The four-track champions on their four training tracks and, once, on Exam. Cyan: best lap, still driving at 60 s. Yellow: finished a lap, then went out later. Pink: no lap.*
+
+**Real numbers**
+- **The headline, the same generations as the exam above (10, 20, 80, 100): 4 of 4 finish a lap on Exam.** The three-track champions managed 0 of 4, and the one-track ones (10, 20, 80) 2 of 3.
+- **Exam best laps:**
+  - generations 5, 10, 20, 40, 80 and 100: 22.95, 16.42, 14.72, 13.72, 13.33 and 13.25 s;
+  - generation 1, a random brain, crashes at 13.3%;
+  - generation 100's 13.25 s is the fastest Exam lap of any champion so far (the one-track best was 13.83 s).
+- **Not perfect:**
+  - Generation 20 drives two laps, then crashes in the hairpin on lap 3, at 35.65 s.
+  - Generation 40 drives one lap, then on lap 2 stops dead in the hairpin at 19.87 s and stalls at 22.35 s. It doesn't reverse this time; it just stands there.
+  - Generations 5, 10, 80 and 100 drive the full 60 s.
+- **The cost at home:**
+  - On Neon Loop, generation 100 drives 12.63 s: between the one-track champion (12.47 s) and the three-track one (13.17 s).
+  - On Mirrored, which is now a training track, it drives 12.68 s.
+
+**The race.** My Exam lap (32.02 s) against the best of them on Exam, the four-track generation 100 champion (13.25 s), best lap against best lap: **the AI wins by 18.77 s.** Watch it: `index.html?race=exam&champion=3-multi4-100`.
+
+**What it means, and what it doesn't.**
+- It fits our best explanation: once a right-hand hairpin was in the training, the cars learned to drive one, including Exam's, which they had never seen.
+- But we chose this fix after seeing the exam. Exam is no longer an untouched test: this was its second use, and the change was picked because of the first. So the pass counts for less than a first pass would have. It's also one seed, and two of the champions still failed the hairpin on a later lap.
+- Mirrored is now a training track, so its results here are training results, not a test.
+
+*Reproduce it: `node tools/multi-train.js multi4` (champions/seed-3-multi4.json, runs/seed-3-multi4.json), then `node tools/exam-7c-report.js` (runs/exam-7c.json). `tests/step7c.test.js` checks the training rules, every recorded lap, every Exam result and the race.*
+
 > **Now in the game:** pick any champion and any track, and watch it try. See chapter 8.
 
 **What actually happened**
@@ -899,7 +932,7 @@ The exam: the one-track champions of generations 10, 20 and 80, and the three-tr
 - **After registering**, nothing changed. The results are as they came out.
 - **The prediction was wrong in an interesting way.** We expected the best car to crash "in the first corner of a track it has never seen". It never did. It handled the first corners of every new track; it was the mirrored hairpin that broke it.
 
-**The prompt:** [entry 14: did it learn, or memorize?](PROMPTS.md#14-step-7a-did-it-learn-or-memorize), [entry 15: my Exam lap, Step 7b, and the exam](PROMPTS.md#15-my-exam-lap-step-7b-and-the-exam) and [entry 18: my Exam ghost](PROMPTS.md#18-my-exam-ghost).
+**The prompt:** [entry 14: did it learn, or memorize?](PROMPTS.md#14-step-7a-did-it-learn-or-memorize), [entry 15: my Exam lap, Step 7b, and the exam](PROMPTS.md#15-my-exam-lap-step-7b-and-the-exam), [entry 18: my Exam ghost](PROMPTS.md#18-my-exam-ghost) and [entry 19: Step 7c](PROMPTS.md#19-step-7c-one-more-try-decided-after-the-exam).
 
 **In the code**
 - `trackDef()` in `src/sim/track.js`: a track's data by its id (Neon Loop, Mirrored, Zigzag, Wide Sweepers, Exam).
@@ -909,6 +942,7 @@ The exam: the one-track champions of generations 10, 20 and 80, and the three-tr
 - `createMultiEvolution()` and `multiTrackFitness()` in `src/sim/multi-evolution.js`: Step 7b, training on three tracks with the summed fitness.
 - `unlockExam()` and `refuseTraining()` in `src/sim/held-out.js`: Exam opens for testing champions only after my lap is checked, and never for training.
 - `tools/exam-report.js`: the exam and the race.
+- `tools/multi-train.js multi4` and `tools/exam-7c-report.js`: Step 7c, training on four tracks and its one Exam test.
 
 
 **The full code**

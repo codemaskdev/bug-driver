@@ -956,12 +956,26 @@ scoreboardFigure('simple-6-scoreboard.svg', true);
   const g20 = trace(names.find((r) => r.name === '3-20'));
   const g80 = trace(names.find((r) => r.name === '3-80'));
   const multis = names.filter((r) => r.multi).map((r) => ({ r, t: trace(r) }));
+  // Step 7c: the four-track champion of generation 100 (Mirrored added to training)
+  const multi4 = json('champions/seed-3-multi4.json').champions;
+  const report7c = json('runs/exam-7c.json');
+  const g4 = (() => {
+    const gen = createGeneration(exam, [multi4['100'].brain]);
+    const pts = [], laps = [];
+    while (!gen.over) {
+      for (const e of stepGeneration(gen)) if (e.type === 'lap') laps.push(gen.step);
+      const c = gen.cars[0].world.car;
+      pts.push({ x: c.x, y: c.y, step: gen.step });
+    }
+    return { pts, laps };
+  })();
   const draw = (big) => {
     const v = { x0: 100, y0: 40, scale: big ? 0.68 : 0.62, ox: 20, oy: big ? 20 : 54 };
     const parts = [drawAnyTrack(exam, v)];
-    parts.push(poly(g20.pts.filter((p) => p.step <= g20.laps[0]).map((p) => at(v, p)), { stroke: C.cyan, width: big ? 4 : 3, opacity: 0.85, glow: true }));
+    if (big) parts.push(poly(g4.pts.filter((p) => p.step <= g4.laps[0]).map((p) => at(v, p)), { stroke: C.green, width: 4, opacity: 0.9, glow: true }));
+    else parts.push(poly(g20.pts.filter((p) => p.step <= g20.laps[0]).map((p) => at(v, p)), { stroke: C.cyan, width: 3, opacity: 0.85, glow: true }));
     const stop = g80.pts.find((p) => p.step > 120 && p.speed <= 0);
-    parts.push(poly(g80.pts.filter((p) => p.step <= stop.step).map((p) => at(v, p)), { stroke: C.yellow, width: big ? 5 : 4, glow: true }));
+    parts.push(poly(g80.pts.filter((p) => p.step <= stop.step).map((p) => at(v, p)), { stroke: big ? C.pink : C.yellow, width: big ? 4 : 4, opacity: big ? 0.6 : 1, glow: true }));
     parts.push(poly(g80.pts.filter((p) => p.step >= stop.step).map((p) => at(v, p)), { stroke: C.pink, width: big ? 7 : 5, glow: true }));
     parts.push(drawBug(v, g80.pts[g80.pts.length - 1], { color: C.pink, scale: big ? 1.4 : 1.2 }));
     for (const { t } of multis) {
@@ -973,9 +987,9 @@ scoreboardFigure('simple-6-scoreboard.svg', true);
       // the hairpin that turns right, named where it is
       const pin = at(v, { x: 640, y: 300 });
       parts.push(text(pin.x, pin.y, 'the hairpin turns right', { size: 17, color: C.text, weight: 'bold', anchor: 'middle' }));
-      [['gen 20: a clean lap, 18 s faster than me', C.cyan],
-        ['gen 80: stops dead in the hairpin, reverses into the wall', C.pink],
-        ['✕ the cars trained on 3 tracks: every one crashed', C.magenta]].forEach(([l, color], i) => parts.push(text(30, 500 + i * 30, l, { size: 18, color, weight: 'bold', glow: true })));
+      [['trained on 1 track: stops dead in the hairpin, reverses into the wall', C.pink],
+        ['✕ trained on 3 tracks: every one crashed', C.magenta],
+        ['trained on 4, one with a hairpin like this: clean laps', C.green]].forEach(([l, color], i) => parts.push(text(30, 500 + i * 30, l, { size: 18, color, weight: 'bold', glow: true })));
     } else {
       parts.push(text(20, 30, 'Exam: three of the champions, from the start', { size: 14, weight: 'bold', color: C.cyan }));
       const crashes = multis.map(({ r }) => `gen ${r.generation} at ${r.outSeconds.toFixed(2)} s`).join(', ');
@@ -986,9 +1000,30 @@ scoreboardFigure('simple-6-scoreboard.svg', true);
     }
     return svg(big ? 920 : 900, big ? 600 : 638, 'The exam', parts.join('\n'));
   };
-  save('simple-7-exam.svg', draw(true), 'Simple guide, ch 7: on Exam, gen 20 drives a clean lap, gen 80 stops dead in the right-hand hairpin and reverses, the three-track champions crash.');
+  save('simple-7-exam.svg', draw(true), 'Simple guide, ch 7: on Exam, the one-track gen 80 champion reverses in the right-hand hairpin, the three-track champions crash, the four-track gen 100 champion drives a clean lap.');
+
+  // Step 7c: the four-track champions on their training tracks and, once, on Exam
+  const cols = [['neon-loop', 'Neon Loop'], ['neon-loop-mirrored', 'Mirrored'], ['zigzag', 'Zigzag'], ['wide-sweepers', 'Wide Sweepers'], ['exam', 'EXAM']];
+  const t7 = [text(20, 34, 'Step 7c: trained on 4 tracks (Mirrored added), then tested once on Exam', { size: 14, weight: 'bold', color: C.cyan })];
+  cols.forEach(([, label], j) => t7.push(text(190 + j * 150, 66, label, { anchor: 'middle', size: 12, color: label === 'EXAM' ? C.yellow : C.dim, weight: 'bold' })));
+  report7c.rows.forEach((row, i) => {
+    const y = 96 + i * 32;
+    t7.push(text(20, y, `gen ${row.generation}`, { size: 12, color: C.text }));
+    cols.forEach(([id], j) => {
+      const x = id === 'exam' ? row.exam : row.training[id];
+      const ok = x.lapSeconds !== null;
+      const label = ok ? `${x.lapSeconds.toFixed(2)} s` : `${x.out} ${Math.round(x.progress)}%`;
+      const clean = ok && x.out === 'time';
+      t7.push(rect(190 + j * 150 - 66, y - 16, 132, 24, { fill: !ok ? C.pink : clean ? C.cyan : C.yellow, opacity: 0.16, rx: 5 }));
+      t7.push(text(190 + j * 150, y, label, { anchor: 'middle', size: 12, color: !ok ? C.pink : clean ? C.cyan : C.yellow, weight: 'bold' }));
+    });
+  });
+  const y7 = 96 + report7c.rows.length * 32 + 2;
+  t7.push(text(20, y7, 'cyan = best lap, still driving at 60 s · yellow = finished a lap, then went out later · pink = no lap: how it got out, how far', { size: 11, color: C.dim }));
+  t7.push(text(20, y7 + 18, `seed 3 · Exam is never trained on; this was its second use as a test · my Exam lap: ${report7c.me.seconds.toFixed(2)} s`, { size: 11, color: C.dim }));
+  save('07-exam-7c.svg', svg(900, y7 + 36, 'Step 7c', t7.join('\n')), 'Step 7c: the four-track champions on their four training tracks and on Exam.');
   save('07-exam-map.svg', draw(false), 'Exam: gen 20 lap, gen 80 stops and reverses in the right-hand hairpin, where the three-track champions crashed.');
-  data.exam = { me: report.me, race: report.race, gen80StopSeconds: stop80(g80) };
+  data.exam = { me: report.me, race: report.race, gen80StopSeconds: stop80(g80), step7c: { race: report7c.race, best: report7c.rows.map((x) => ({ generation: x.generation, exam: x.exam.lapSeconds, out: x.exam.out, outSeconds: x.exam.outSeconds })) } };
   function stop80(t) { return t.pts.find((p) => p.step > 120 && p.speed <= 0).step / 60; }
 }
 
