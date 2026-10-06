@@ -419,3 +419,78 @@ Commits b16d35e (readability pass) and 87083da (intro chapter, code boxes, deep-
 - The deep dive wrote "÷", which goes against the guide's no-maths-symbols rule; it now says "divided by".
 
 Checked in Chrome at 390 px and 1100 px: 13 boxes, 8 of 8 images, no sideways scroll.
+
+## 2026-10-06 — Step 8: things for viewers
+Commits 693bff8 (guide fixes), 66c3a8b (Exam rule), 4dba24e (track check, share links), 82fd0c4 (track menu, editor, any track), f34f7c7 (replay check), 846ceed (guide chapter 8), a3c3eb2 (CLAUDE.md).
+
+**Guide fixes first** (693bff8):
+- `export` is now in the symbols list.
+- The neuron box says what squash means.
+- The mutate box gives the usual nudge (about 0.3 or less).
+- "Roll a die".
+
+**The Exam rule, in one place** (66c3a8b).
+- Every AI car in the game, the tools and the tests is created by `createGeneration()`. It now refuses Exam, and any track with exactly Exam's points in another order, before a single car exists.
+- So the races, the champion viewer and live training can't put an AI car on Exam, even by mistake.
+- Exam never opens in the editor and never goes in a share link, in either direction (tested). The one test that touches it passes no brains at all.
+- ghosts/me-exam.json still doesn't exist. When it does, Step 7b's exam has to lift this guard on purpose.
+
+**The track check** (4dba24e), with a plain message and a spot to circle for each problem:
+- at least 4 points and at most 60;
+- the walls stay 10 px inside the screen;
+- the tightest bend of the road's middle line is at least 45 px in radius (half the road), or the inside wall folds over itself;
+- parts of the road more than 180 px apart along it are at least 100 px apart on screen.
+
+The car itself could turn tighter (a radius of about 19.5 px at walking pace), so the road's shape is the real limit. All four drivable built-in tracks pass; their tightest bends are Zigzag 46.2 px, Neon Loop 53.4 px and Wide Sweepers 55.2 px.
+
+**Share links** (4dba24e): `?t=` + "1" + 4 URL-safe letters per point (2 letters = 0..4095).
+- Paperclip, 18 points: 73 letters.
+- Decoding checks the version, the length, the letters and the whole track check, and gives a plain message otherwise. 2000 random strings and 12 broken links: no crash.
+- Every drivable built-in track round-trips to identical walls, checkpoints and start.
+
+**In the game** (82fd0c4):
+- T opens a track menu: the built-in tracks (Exam marked drive-only), "My track", the track from a link, "Edit / new track", "Copy link", and with a champion running "Copy link: this track + champion".
+- The editor: click to add points, drag to move, right-click to delete, Backspace to undo; the check runs live, and "Drive it" / "Let the AI train on it" stay off until the track is valid.
+- Drive, test any of the 37 saved champions (30 one-track, 7 multi-track), or train from scratch with a seed box, on any track except Exam.
+- This landed as one commit, not three: the editor, the links and "any track" are the same changes to main.js, and they couldn't be split cleanly without interactive staging.
+- Checked in Chrome:
+  - the editor (drawing, dragging, deleting, the messages);
+  - a broken link opens Neon Loop with its message;
+  - Tab on Exam is refused with a message;
+  - "Copy link" copies;
+  - the Paperclip link with &champion=3-80 gives lap 850 steps and a crash at step 1380, the same as in Node;
+  - training seed 3 on Paperclip gives the same generations 1 and 2 in the browser and in Node, to the last digit.
+- Not checked by hand: a full lap of my own on a custom track. Driving uses the same code as on the built-in tracks.
+
+**The replay check** (f34f7c7): six scenarios, compared with tools/replay-golden.json, in about 2 s, also inside `npm test` (61 tests pass).
+- The scenarios: my Neon Loop ghost (1584 steps), champion seed 3 gen 20 (best 759 steps), gen 80 (748), multi-track gen 100 (790), seed 3 generations 1–3 (identical to the first 3 rows of runs/seed-3.json), and Paperclip from its link.
+- **What broke:** the first version compared only my ghost's lap time. In a throwaway copy we changed the car's turn rate by 0.0000001. Five scenarios flagged it, but my ghost still finished in exactly 1584 steps, so it passed. Its path fingerprint was added; now all 6 of 6 flag that change.
+
+**🎬 Paperclip** (`?t=1DcBkCgCgCgIwDcJsQkJsRgIwRgH-QaG4G4G4FsGgFUFoFsEwG4EYQaEYRgDSRgCgQkBkIwBk&champion=3-80`).
+- A loop with a notch that ends in a hairpin turning right.
+- The seed 3 gen 80 champion drives lap 1 in 14.17 s, slowing to 7 px/s in the hairpin, almost a stop, and creeping round.
+- On lap 2 it stops dead in the same hairpin at 22.48 s, keeps holding BRAKE (reverse from a standstill), and backs into the wall at 23.00 s.
+
+How it was found, logged in full: three champions (gen 20, gen 80, multi-track gen 100) on 12 drawn tracks.
+- An oval, a small circle and a rounded square, each both ways round: all three drove all six for 60 s.
+- Paperclip shapes with a left-hand hairpin: all fine.
+- Right-hand hairpin: one was too tight to be valid. Of the other three, gen 20 got round all of them, gen 80 failed on two, and multi-100 failed on all three.
+
+Every saved seed 3 champion on Paperclip:
+| champion | result |
+| --- | --- |
+| gen 1 | no lap: stall at 3.00 s |
+| gen 5 | no lap: crash at 19.88 s |
+| gen 10 | 4 laps, best 14.32 s |
+| gen 20 | 4 laps, best 14.08 s |
+| gen 40 | no lap: stops in the hairpin, stall at 11.20 s |
+| gen 80 | 1 lap (14.17 s), then crash at 23.00 s |
+| multi-track gen 10 | 4 laps, best 14.38 s |
+| multi-track gen 20 / 80 / 100 | no lap: crash in the hairpin at 8.57 / 8.58 / 8.48 s |
+
+Not pre-registered: it's a track drawn for fun, chosen because it broke the champion. Our best explanation is the same as for Mirrored: neither Neon Loop nor the three Step 7b training tracks has a right-hand hairpin. This is not the exam; no AI has driven Exam.
+
+**Other things that broke, all fixed before committing:**
+- R on a multi-track champion restarted the one-track champion of the same generation. This bug has been there since 9250e2a.
+- On a crowded track the fitness chart landed on the start line. It now goes where it covers the least road, and stays in Neon Loop's infield there.
+- The editor's buttons covered the start point; they moved to the top right.
