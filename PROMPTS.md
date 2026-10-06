@@ -146,3 +146,36 @@ Check, headless: run generation 1 for seeds 1–5 and report for each: how many 
 
 Built: src/sim/brain.js, a 6→6→4 network whose whole brain is one array of 70 numbers, with neuron(), layer(), outputs() and think(). src/sim/generation.js runs 100 cars with fitness(), stalls, and the 60 s limit. AI mode on Tab, speeds x1/x10/max, autoplay, E for the leader with inputs and outputs. tools/generation-report.js reports generation 1: the best car reached 14.5% to 65.1% of a lap across seeds 1–5.
 What broke: stalled cars all parked on the same spot stacked their transparency until they looked like a live car, so identical wrecks are now drawn once. An output of 0.4998 showed as "0.500", which looked like a pressed key, so values right at 0.5 now show 5 decimals. The panels were moved off a wall.
+
+## 7. Export my ghost, then Step 4: evolution
+
+````text
+Step 4: evolution.
+
+How a new generation is made (each step its own clearly named function with a one-line plain-English comment):
+- fitness(): how far the car got along the track (checkpoints in order + fraction to the next). If it completed a lap, add a bonus that's bigger the faster the lap. In plain English: "go as far as you can; if you finish, finish fast."
+- selection(): rank all 100 by fitness and keep the top 10 as parents.
+- elitism: the single best car's brain goes to the next generation unchanged, so the best can never get worse.
+- mutate(): every child is a copy of one parent's 70 numbers (parents picked weighted by rank), where each number has a 10% chance to be nudged by a small seeded random amount (gaussian, sigma 0.3). No crossover. Keep it simple enough to explain in one sentence.
+- nextGeneration(): puts it together: 1 elite + 99 mutated children.
+- Everything uses the one seeded RNG: same seed = the exact same evolution, generation by generation.
+
+Tracking (for the video and the guide):
+- Per generation: best fitness, average fitness, how many cars finished a lap, best lap time. Show a small live chart in the corner (best and average over generations) and "GEN 12 · ALIVE 37/100 · BEST LAP 15.42" in the HUD.
+- Every car remembers its parent's id, so we can later draw the champion's family tree.
+- Save the champion's 70 numbers at generations 1, 5, 10, 20, 40 and 80 into a champions JSON file (and localStorage in the browser). We'll race these against my ghost later. Use the generation number only, never pick "nice-looking" ones.
+- When the leader finishes its first ever lap, flash "FIRST LAP — GEN N" (🎬 moment).
+
+Check, headless, and don't tune anything based on it:
+- Run seeds 1–5 for 100 generations each. For every seed report: the generation of the first completed lap, the best lap time at generations 1, 5, 10, 20, 40, 80, 100, and how long the run took in Node.
+- Compare with the reference laps (cautious 17.25 s, fastest scripted 12.68 s, theoretical floor 11.93 s).
+- If a seed has no completed lap by generation 100, say so plainly: per our rules that's the story, not something to fix quietly.
+- Tell me which seed you'd suggest as the "official" one for the video and why, using only these numbers.
+
+Update PROMPTS.md and DEVLOG.md, 🎬-mark the first-lap moment for the official seed.
+
+Before anything else: export my current best lap (the ghost: start state + all inputs + lap time) from localStorage into a file in the repo, ghosts/me-v3.json, and commit it. From now on the scoreboard uses this file, not localStorage. Verify by replaying it headless and confirming it reproduces the same lap time to the step.
+````
+
+Built: ghosts/me-v3.json, my 26.40 s lap, which replays headless to exactly 1584 steps. Then evolution in src/sim/evolution.js: fitness with a lap bonus, selection(), elitism, mutate(), nextGeneration(). Also a live chart, the new HUD, a first-lap flash, family ids, and champions saved at the fixed generations. 100 generations for seeds 1–5: seeds 2–5 learned to lap (best 12.43–13.13 s at gen 100), seed 1 never finished a lap.
+What broke: nothing in the code. Seed 1 is stuck at 51.8% of a lap (the hairpin) from generation 6 to 100. That is reported as is, not tuned.

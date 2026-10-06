@@ -125,3 +125,43 @@ The page sent the stored text to a local file byte for byte: 1731 bytes, and the
 Headless replay (`src/sim/ghost.js`, `tests/ghost.test.js`): the ghost finishes the lap in exactly 1584 steps, on its very last recorded input. CLAUDE.md now says the scoreboard uses this file, never localStorage.
 For scale: my 26.40 s is 9.15 s slower than the careful scripted driver (17.25 s) and 13.72 s slower than the fastest one (12.68 s). The same localStorage also still held an old 42.92 s lap from physics 1 (64 px road, old hitbox); it is invalid under the frozen rules and was not exported.
 Nothing broke.
+
+## 2026-10-06 — Step 4: evolution
+Commit 5ce52d5. How a new generation is made (src/sim/evolution.js, every step its own function):
+- fitness(): how far along the track (checkpoints in order + fraction to the next), plus, for a finished lap, 6000 ÷ lap time in seconds. "Go as far as you can; if you finish, finish fast." A finisher always outranks a non-finisher.
+- selection(): rank all 100, keep the top 10.
+- Elitism: the best brain goes through unchanged. The simulation is deterministic, so it drives the exact same run again, and the best fitness can never go down (tested).
+- mutate(): copy a parent's 70 numbers; each has a 10% chance of a gaussian nudge, sigma 0.3. Parents are picked weighted by rank (10:9:…:1).
+- nextGeneration(): 1 elite + 99 mutated children. Everything comes from the one seeded RNG.
+Every car has an id ("gen-index") and its parent's id. Champions (the best by fitness) of generations 1, 5, 10, 20, 40 and 80 are saved with their 70 numbers and their full ancestor line, to champions/seed-N.json and to localStorage. Per-generation stats go to runs/seed-N.json. The HUD shows "GEN · ALIVE · BEST LAP", plus a live best/average fitness chart and a "FIRST LAP — GEN N" flash. Max speed now runs generation after generation, without drawing the track.
+
+100 generations per seed (`node tools/evolution-report.js <seed>`). Lap times are the fastest lap of any car in that generation, in seconds.
+
+| seed | first lap | gen 1 | gen 5 | gen 10 | gen 20 | gen 40 | gen 80 | gen 100 | Node time |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | **never** | — | — | — | — | — | — | — | 58.8 s |
+| 2 | gen 8 (18.40 s) | — | — | 16.90 | 13.58 | 13.20 | 12.58 | 12.53 | 268.8 s |
+| 3 | gen 4 (38.18 s) | — | 30.02 | 13.17 | 12.65 | 12.52 | 12.47 | 12.43 | 324.3 s |
+| 4 | gen 21 (27.27 s) | — | — | — | — | 17.32 | 13.28 | 13.13 | 234.0 s |
+| 5 | gen 22 (15.50 s) | — | — | — | — | 13.22 | 12.57 | 12.57 | 292.1 s |
+
+The Node times were measured with all 5 seeds running at once, one process each.
+- Cars that finished a lap at gen 100: seed 2: 39, seed 3: 42, seed 4: 34, seed 5: 49 (of 100).
+- Against the reference laps (careful script 17.25 s, fastest script 12.68 s, floor 11.93 s): seeds 2, 3 and 5 beat the fastest hand-tuned script by gen 80, and seed 3 already does at gen 20 (12.65). The best, seed 3 at gen 100 (12.43 s), is 0.50 s off the theoretical floor. Seed 4 ends at 13.13 s, between the two scripts.
+- Against my ghost (26.40 s): every seed that learned to lap is faster than me within a few generations of its first lap. Only seed 3's gen 5 lap (30.02 s) is slower than mine.
+
+**Seed 1 never finished a lap in 100 generations.** Its best fitness climbed to 43.0 (51.8% of a lap) at generation 6 and stayed exactly there until generation 100: 95 generations of no progress. Its champion crashes at the exit of the hairpin, at (261, 245), 6.57 s in. Per the rules, that's the story, and nothing was tuned.
+
+Champion vs fastest lap: the champion is the best by fitness, not by lap time, so it isn't always the fastest lapper. Seed 3 at gen 40: the fastest lap is 12.52 s, the champion's is 12.53 s. The races against my ghost will use the champions' own laps.
+
+In Chrome: the first 10 generations of seed 1 at max speed (3.3 s of wall time) match the headless history exactly, row for row. The champions of gens 1, 5 and 10 landed in localStorage. Seed 3 flashed "FIRST LAP — GEN 4" at the same lap (car 4-78, 2291 steps) as headless. 30 tests pass.
+
+Suggested official seed, from these numbers only: **seed 3**.
+- It has the earliest first lap (gen 4).
+- It is the only seed where the scoreboard has a real AI lap that is still slower than mine (gen 5: 30.02 vs 26.40). So the "AI vs me" thread gets a genuine "I'm still winning" moment before the AI passes me at gen 10 (13.17).
+- It is faster at every fixed generation from 10 on than any other seed at the same generation, and it has the fastest final lap (12.43 s).
+- Its gen 1 already had the 65.1% "beginner's luck" car.
+Honest caveat: picking a seed after seeing the results is a choice. The video should say that 5 seeds were run and that seed 1 never learned to finish.
+
+🎬 Official seed 3, generation 4: car 4-78 completes the first lap ever, in 38.18 s, slower than my 26.40. "FIRST LAP — GEN 4" flashes over a track full of generation-4 wrecks. Six generations later the best lap is 13.17 s.
+🎬 Seed 1's flat line: best fitness 43.0 for 95 generations straight, all stuck at the same hairpin.
