@@ -86,9 +86,9 @@ export function drawRaceHud(r) {
 
   ctx.textAlign = 'right';
   glow(r.speed === 1 ? 'x1' : `x${r.speed}`, VIEW_W - 16, 12, YELLOW, 'bold 18px monospace', 8);
-  ctx.textAlign = 'left';
-  glow(`ME  ${r.meTime == null ? '--' : formatSteps(r.meTime)}`, VIEW_W - 170, 40, CYAN, '13px monospace', 0);
-  glow(`${r.aiName}  ${r.aiTime == null ? (r.aiOut ? 'out' : '--') : formatSteps(r.aiTime)}`, VIEW_W - 170, 58, YELLOW, '13px monospace', 0);
+  // right-aligned, so a long name ("GEN 100 ×4 TRACKS") stays on screen
+  glow(`ME  ${r.meTime == null ? '--' : formatSteps(r.meTime)}`, VIEW_W - 16, 40, CYAN, '13px monospace', 0);
+  glow(`${r.aiName}  ${r.aiTime == null ? (r.aiOut ? 'out' : '--') : formatSteps(r.aiTime)}`, VIEW_W - 16, 58, YELLOW, '13px monospace', 0);
 
   ctx.textAlign = 'left';
   glow('SPACE start / again     1 2 speed     S scoreboard     ESC back', 16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
