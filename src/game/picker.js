@@ -18,7 +18,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-const MULTI_SEEDS = [3]; // Step 7b trained seed 3 on three tracks
+const MULTI_SEEDS = [3]; // Step 7b trained seed 3 on three tracks, Step 7c on four
 
 const box = document.createElement('div');
 box.id = 'picker';
@@ -31,13 +31,14 @@ const compare = document.createElement('select');
 const champions = [
   ...CHAMPION_SEEDS.flatMap((s) => CHAMPION_GENERATIONS.map((g) => ({ name: `${s}-${g}`, label: `seed ${s} · gen ${g}` }))),
   ...MULTI_SEEDS.flatMap((s) => MULTI_CHAMPION_GENERATIONS.map((g) => ({ name: `${s}-multi-${g}`, label: `seed ${s} · 3 tracks · gen ${g}` }))),
+  ...MULTI_SEEDS.flatMap((s) => MULTI_CHAMPION_GENERATIONS.map((g) => ({ name: `${s}-multi4-${g}`, label: `seed ${s} · 4 tracks · gen ${g}` }))),
 ];
 run.append(new Option('train from scratch', ''), ...champions.map((c) => new Option(`champion ${c.label}`, c.name)));
 compare.append(new Option('no comparison', ''), ...champions.map((c) => new Option(c.label, c.name)));
 box.append('seed', seed, 'run', run, 'N compare', compare);
 document.body.appendChild(box);
 
-// "3-multi-100" -> "seed 3 · 3 tracks · gen 100"
+// "3-multi-100" -> "seed 3 · 3 tracks · gen 100", "3-multi4-100" -> "seed 3 · 4 tracks · gen 100"
 export function championLabel(name) {
   return champions.find((c) => c.name === name)?.label ?? name;
 }

@@ -1,19 +1,23 @@
 // Saved champions: champions/seed-N.json (tools/evolution-report.js, trained on Neon Loop)
-// and champions/seed-N-multi.json (tools/multi-train.js, trained on three tracks, Step 7b).
-// A champion is named "seed-generation", e.g. "3-40", or "seed-multi-generation", e.g. "3-multi-100".
+// champions/seed-N-multi.json (tools/multi-train.js, trained on three tracks, Step 7b)
+// and champions/seed-N-multi4.json (tools/multi-train.js multi4, trained on four tracks, Step 7c).
+// A champion is named "seed-generation", e.g. "3-40", or "seed-multi-generation", e.g. "3-multi-100" or "3-multi4-100".
 
 export const CHAMPION_SEEDS = [1, 2, 3, 4, 5];
 const files = new Map();
 
-// "3-40" -> {seed: 3, generation: 40}; "3-multi-100" -> {seed: 3, generation: 100, multi: true}; else null.
+// "3-40" -> {seed: 3, generation: 40, multi: false}; "3-multi-100" -> {..., multi: 'multi'}; "3-multi4-100" -> {..., multi: 'multi4'}; else null.
 export function parseChampionName(text) {
-  const m = /^(\d+)(-multi)?-(\d+)$/.exec(text ?? '');
-  return m ? { seed: Number(m[1]), generation: Number(m[3]), multi: Boolean(m[2]) } : null;
+  const m = /^(\d+)(?:-(multi4?))?-(\d+)$/.exec(text ?? '');
+  return m ? { seed: Number(m[1]), generation: Number(m[3]), multi: m[2] ?? false } : null;
 }
 
-// The whole champions/seed-N.json (or seed-N-multi.json) file, or null.
+// How many tracks a champion trained on: 1, 3 (Step 7b) or 4 (Step 7c)
+export const trainingTracks = (multi) => ({ multi: 3, multi4: 4 })[multi] ?? 1;
+
+// The whole champions/seed-N.json (or seed-N-multi.json, seed-N-multi4.json) file, or null.
 export function loadChampionsFile(seed, multi = false) {
-  const name = `champions/seed-${seed}${multi ? '-multi' : ''}.json`;
+  const name = `champions/seed-${seed}${multi ? `-${multi}` : ''}.json`;
   if (!files.has(name)) {
     files.set(name, fetch(name).then((r) => (r.ok ? r.json() : null)).catch(() => null));
   }

@@ -42,7 +42,7 @@ import { drawWeightsGrid, GRID_BLOCK_W } from './render/weights-grid.js';
 import { readInput, takePress, clearPresses } from './game/keyboard.js';
 import { loadBestLap, saveBestLap } from './game/best-lap.js';
 import { AUTOPLAY, SEED, CHAMPION, COMPARE, RACE, SCOREBOARD, TRACK, TRACK_LINK } from './game/params.js';
-import { loadChampion, loadChampionsFile, loadGhost, loadGhostFor, parseChampionName } from './game/champions.js';
+import { loadChampion, loadChampionsFile, loadGhost, loadGhostFor, parseChampionName, trainingTracks } from './game/champions.js';
 import { createRace, stepRace, raceGap, raceResult, progressShare } from './sim/race.js';
 import { buildScoreboard } from './sim/scoreboard.js';
 import { drawRaceHud, drawScoreboard, drawTag, drawOutMark } from './render/race-view.js';
@@ -443,7 +443,7 @@ async function startTrackRace(trackId, championName, autostart) {
   if (!ghost || !record) { console.warn(`no race: ${!ghost ? `no ghost lap of mine on ${trackId}` : `no champion ${championName}`}`); mode = 'ai'; return; }
   const v = view(trackId);
   try {
-    versus.race = createRace(v.track, ghost, { generation: which.generation, brain: record.brain, name: `GEN ${which.generation}${which.multi ? ' ×3 TRACKS' : ''}` });
+    versus.race = createRace(v.track, ghost, { generation: which.generation, brain: record.brain, name: `GEN ${which.generation}${which.multi ? ` ×${trainingTracks(which.multi)} TRACKS` : ''}` });
   } catch (err) {
     say(err.message, 8); // e.g. Exam is held out
     mode = 'ai';
