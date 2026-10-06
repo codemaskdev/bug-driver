@@ -7,6 +7,7 @@ import { STEPS_PER_SECOND } from './constants.js';
 import { createWorld, stepWorld } from './world.js';
 import { readSensors, inputsFromView } from './sensors.js';
 import { think, randomBrain } from './brain.js';
+import { refuseHeldOut } from './held-out.js';
 
 export const POPULATION = 100;
 export const STALL_STEPS = 3 * STEPS_PER_SECOND;        // out after 3 s without a new checkpoint
@@ -19,7 +20,9 @@ export function randomBrains(rand, count = POPULATION) {
 }
 
 // `family[i]` = {parentId, elite} for car i (generation 1 has no parents).
+// Every AI car starts here, so this is where the held-out Exam track is refused.
 export function createGeneration(track, brains, number = 1, family = []) {
+  refuseHeldOut(track);
   return {
     number,
     track,
