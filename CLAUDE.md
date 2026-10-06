@@ -39,6 +39,23 @@ material for the video and the guides.
 - My official ghost lap is ghosts/me-v3.json (26.40 s). The scoreboard and
   every race against me use this file, never localStorage.
   tests/ghost.test.js must keep replaying it to the exact step.
+- Exam is held out: nobody trains on it, ever. Until ghosts/me-exam.json
+  exists, no AI car drives it at all (createGeneration() refuses it, see
+  src/sim/held-out.js), and it never appears in the track editor, in a share
+  link, or in any test that runs a brain on it.
+
+## Replay check
+- `node tools/replay-check.js` (also part of `npm test`) runs fixed scenarios
+  headless: my Neon Loop ghost, three champion laps, 3 generations of seed 3,
+  and a custom track from a share link. It compares every car's step-by-step
+  path with tools/replay-golden.json. Every step must keep it green.
+- `--update` only for a change we mean, and the DEVLOG entry says why.
+
+## Custom tracks
+- A custom track is only its points (sim/track-check.js checks it; the road
+  is always 90 px, the start line is at the first point). Share links carry
+  the points (sim/share-link.js, `?t=`); changing the link format means a new
+  LINK_VERSION, and old links must still open or fail with a plain message.
 
 ## Simulation vs rendering
 - The simulation and the rendering are separate. Simulation code never
