@@ -277,3 +277,57 @@ Commit the guide and figures (docs: commits), then send me the full text of chap
 
 Built: the guide rules in CLAUDE.md; tools/figures.js, which draws 19 SVG figures from the real simulation and writes every quoted number to docs/img/figure-data.json; HOW-IT-WORKS.md with chapters 0–5 and a glossary.
 What broke: the first figures lost every glowing line that was perfectly straight (an SVG filter quirk), the fitness charts were scaled too low, and the mutation example happened to be the one child out of 99 with the most changes (14), so it was swapped for a typical one (7). Checking the claims also changed two of them: seed 1's crashes are about half on the inner wall, and the "racing line" is only partly one (the cars hug the inside but never swing wide first).
+
+## 10. The guide in two levels, then Step 6: me vs the AI
+
+````text
+Two parts: first the guide gets a new structure, then Step 6. Do them in this order.
+
+# Part 1: the guide, in two levels
+
+Change of direction: the guide must be easy for a regular YouTube viewer, not just accurate. Keep everything we have, but split it into two levels.
+
+## 1.1 DEEP-DIVE.md (the full detail)
+Move the current HOW-IT-WORKS.md to DEEP-DIVE.md: all detail, tables, precise numbers, reproduce notes, function names. Keep it as it is, except:
+- Chapter 0 analogy: the dog-learning-a-trick analogy describes one animal learning during its life, but our cars never learn during a run; only the next generation changes. Replace it with an evolution analogy consistent with chapter 4 (e.g. many blindfolded drivers; the ones who get furthest pass their habits to their children, with small copying mistakes).
+- Chapter 4, seed 1: keep the facts (nobody pressed BRAKE in gen 31, 9306 children, flat at 43.0), but introduce the "why" with "Our best explanation:". It's an inference, not a measurement.
+- Keep "=" and minus signs as they are.
+
+## 1.2 HOW-IT-WORKS.md (the simple guide, the main one)
+Write a new HOW-IT-WORKS.md for a regular YouTube viewer who has never coded:
+- Start with an "In 30 seconds" box: 5 bullets that tell the whole story.
+- Each chapter fits on one phone screen. Short sentences, everyday words; a 12-year-old should follow it.
+- One big, clear picture per chapter that makes sense even without its caption. Pick the best figure we have, or generate a simpler version of it with tools/figures.js (still from real data).
+- At most 1–2 numbers per chapter, rounded ("about 23 pixels", "70 numbers", "6 seconds faster than me"). No tables, except the final scoreboard.
+- Only the few terms that matter (neuron, weight, generation, mutation, fitness), each explained in one plain sentence the first time. No "tanh", "sigmoid", "normalize", "local optimum" by name: describe the idea instead ("it gets stuck on a hill that isn't the top").
+- No code and no file names in the text. End each chapter with one line: "For the curious: [Deep dive →](DEEP-DIVE.md#...)".
+- Chapter template, lighter: the one idea → analogy → picture → the one real moment (what actually happened) → deep-dive link.
+- Simpler, never wrong. If simplifying would make something false, keep the true version in simple words.
+- Test: read every chapter as someone on a phone in the metro who never programmed. If a sentence needs reading twice, rewrite it.
+
+## 1.3 Rules
+Update the guide rules in CLAUDE.md: every step adds its chapter to both files: simple in HOW-IT-WORKS.md, full detail in DEEP-DIVE.md. A step isn't done without both.
+
+## 1.4 Web page
+Build docs/guide/index.html: the simple guide as one web page, big pictures, CodeMask neon style, readable on a phone, with links into the deep dive. It becomes the interactive version later; for now just text and figures. Tell me how to open it locally.
+
+Commit Part 1 (docs: commits) before starting Part 2.
+
+# Part 2: Step 6, me vs the AI
+
+- Race mode: my ghost (ghosts/me-v3.json, 26.40 s) and one saved champion drive their best laps at the same time on the track, each from its own recorded start state. Cars don't collide. Me: cyan ladybug. AI: yellow ladybug. Label both ("ME", "GEN 10").
+- On screen during the race: elapsed time, live gap ("AI +3.2 s ahead"), and a big result at the finish ("AI WINS by 13.23 s" / "ME WINS by 3.62 s").
+- If the champion never completed a lap (e.g. seed 3 gen 1), it drives until it crashes or stalls, and I win by default. Show where it got out.
+- Best lap vs best lap on both sides, and say so in small print in the UI. The gen 40 champion races its 12.53 s lap, not its standing-start first lap.
+- Scoreboard screen (key S, and URL ?scoreboard=3): the 6 fixed generations of seed 3 (1, 5, 10, 20, 40, 80), my time, its time, the winner of each row, and the running total → 4:2 AI. Built only from the saved files, nothing typed in by hand.
+- URLs for recording: ?race=3-10 (seed 3, gen 10 vs me), ?scoreboard=3, plus ?autoplay=1 to start immediately.
+- Tests: each race result equals the recorded lap times; the scoreboard total equals 4:2, computed from the files.
+- Guide chapter 6 "Me vs the AI" in both levels, with generated figures (the scoreboard; one race as a picture, e.g. gen 5 vs me, where I still win).
+- Update PROMPTS.md and DEVLOG.md, 🎬-mark the race where the AI first beats me (gen 10).
+
+# Deliver
+Send me: the full text of the new HOW-IT-WORKS.md (chapters 0–6), how to open the web page, and the Step 6 report.
+````
+
+Built: DEEP-DIVE.md (the full guide, with a new analogy and the seed 1 reason labelled as our best explanation), and a new simple HOW-IT-WORKS.md for chapters 0–6 with seven big-text figures. The web guide is in docs/guide/. Race mode: my ghost against a champion's best lap, with a live gap and the result; the scoreboard is built from the files; ?race and ?scoreboard URLs. All six races match the recorded laps, and the score is 2:4.
+What broke: my first simple draft had three sentences that weren't true or weren't sourced ("the hairpin can't be driven without braking", "most of the rest never left the start", "it was no fun to drive"). They were fixed before the commit. Four of the Part 1 commit messages have the attribution glued onto the subject line. In the race screen, the live gap sat on a wall and two tags overlapped; both were fixed.

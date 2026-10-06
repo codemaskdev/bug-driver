@@ -218,3 +218,49 @@ What broke:
   - The first was fixed before its commit, the second in fbf6b21.
 
 🎬 The inside-line table: generation 1 drives down the middle of the hairpin, and generation 80 passes the apex 5 px from the inner wall. Nobody told it to.
+
+## 2026-10-06 — The guide in two levels
+Commits 73e3221 (rules), 0539f2f (DEEP-DIVE.md), fe0332c (simple HOW-IT-WORKS.md), f773644 (web page). No game code changed.
+- **DEEP-DIVE.md** is the full guide from before, with two edits. Chapter 0 has a new analogy: blindfolded drivers whose children inherit their habits with small copying mistakes. The dog-learning-a-trick analogy implied learning during a run, which never happens here. The seed 1 "why" is now labelled "Our best explanation:".
+- **HOW-IT-WORKS.md** is new and simple. It starts with an "In 30 seconds" box, and each chapter has one idea, one picture and one real moment. Six new big-text figures (simple-*.svg) are drawn from the same real data.
+- **docs/guide/** is built by `node tools/guide-page.js` from the two Markdown files: index.html (simple) and deep-dive.html. It is checked at phone width (390 px): no sideways scrolling, no broken images, and all 6 deep-dive links land on real headings.
+
+What broke:
+- **Three sentences in my first simple draft weren't true or weren't sourced.** All were fixed before the commit:
+  - "The hairpin can't be driven without braking": letting go of the gas also slows the car. The true version is that it can't be taken flat out.
+  - "Most of the rest never left the start": the real number is "almost half barely moved".
+  - "It was no fun to drive": nobody said that.
+- **The same "without braking" slip was in DEEP-DIVE.md** and was fixed too ("slow down: brake, or at least let go of the gas").
+- **Four commit messages are malformed.** In the four Part 1 commits, my script put only one newline before the Co-Authored-By/Claude-Session lines, so they are glued onto the subject line (visible in `git log --oneline`). History isn't rewritten; later commits are fine.
+- **Labels on top of things.** Several simple figures had labels sitting on walls or on each other; they were moved into free space.
+
+## 2026-10-06 — Step 6: me vs the AI
+Commits dcc99b3 (race mode and scoreboard) and 3ff5439 (guide chapter 6, both levels).
+- **The race.** My ghost (ghosts/me-v3.json, 26.40 s, cyan) and a champion (yellow) drive at the same time without colliding. Each starts its best lap exactly where that lap really began: championBestLap() drives the champion alone for 60 s and keeps its fastest lap and its start state.
+- **No lap, no contest.** A champion with no lap starts from the normal spot and drives until it crashes or stalls; I win by default, and the screen marks where it got out.
+- **Live gap:** when did the leader pass the spot where the other car is now.
+- **The scoreboard** is buildScoreboard() over my ghost file and champions/seed-3.json; nothing is typed in.
+- **Opening it:** in the game, S from AI mode (S is brake while I drive). ↑↓ pick a row, Enter races it. For recording: `?race=3-10`, `?scoreboard=3`, `&autoplay=1`.
+
+All six races (headless, and the same in Chrome):
+
+| gen | me | AI | result |
+| --- | --- | --- | --- |
+| 1 | 1584 steps, 26.40 s | crashes at 65% of a lap | ME WINS (by default) |
+| 5 | 26.40 s | 1801 steps, 30.02 s | ME WINS by 3.62 s |
+| 10 | 26.40 s | 790 steps, 13.17 s | AI WINS by 13.23 s |
+| 20 | 26.40 s | 759 steps, 12.65 s | AI WINS by 13.75 s |
+| 40 | 26.40 s | 752 steps, 12.53 s | AI WINS by 13.87 s |
+| 80 | 26.40 s | 748 steps, 12.47 s | AI WINS by 13.93 s |
+
+- Score 2 : 4 to the AI, computed from the files. Each race ends exactly at the recorded lap times, to the step.
+- The gen 40 champion races 752 steps (12.53 s), not its standing-start first lap of 767 steps (12.78 s).
+- Against gen 10 I'm about half as fast everywhere. 0–40% of the lap: 8.28 s vs 4.65 s. 40–65% (top straight, hairpin, the leg after it): 8.12 s vs 3.58 s, the biggest gap. 65–100%: 9.98 s vs 4.92 s.
+- 39 tests pass (5 new).
+
+What broke:
+- The race code matched the recorded laps on the first run.
+- On screen: the live gap sat on the top wall, the ME and GEN 10 tags covered each other at the finish, and "crashed here" hid under the car. All were fixed after the first screenshots.
+- Small and not fixed: two presses of the same key within one frame count once (a scripted test that pressed ↓ twice in a row moved one row). A person pressing keys won't hit this.
+
+🎬 Generation 10, the first time the AI beats me. It leads from the first quarter of a second. When it crosses the line at 13.17 s I'm only 53% of the way round, and it's 6.4 s ahead of me at that moment. Final: AI WINS by 13.23 s (`?race=3-10&autoplay=1`).
