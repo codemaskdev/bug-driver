@@ -179,3 +179,31 @@ Before anything else: export my current best lap (the ghost: start state + all i
 
 Built: ghosts/me-v3.json, my 26.40 s lap, which replays headless to exactly 1584 steps. Then evolution in src/sim/evolution.js: fitness with a lap bonus, selection(), elitism, mutate(), nextGeneration(). Also a live chart, the new HUD, a first-lap flash, family ids, and champions saved at the fixed generations. 100 generations for seeds 1–5: seeds 2–5 learned to lap (best 12.43–13.13 s at gen 100), seed 1 never finished a lap.
 What broke: nothing in the code. Seed 1 is stuck at 51.8% of a lap (the hairpin) from generation 6 to 100. That is reported as is, not tuned.
+
+## 8. Step 5: let us see the brain think
+
+````text
+Step 5: let us see the brain think.
+
+1. Live brain panel (toggle with B), for the leader, or any car I click on:
+   - 6 input nodes on the left with labels and live values (left 60°, left 30°, ahead, right 30°, right 60°, speed), 6 hidden nodes, 4 output nodes on the right labeled GAS, BRAKE, LEFT, RIGHT.
+   - Connections drawn for all weights: thickness = how big the weight is, cyan = positive, pink = negative.
+   - Nodes glow by their current value. An output node lights up fully when its key is pressed (> 0.5).
+   - It's the real network from brain.js, drawn every frame from the real numbers. Nothing faked or smoothed.
+
+2. "Explain one decision" (key F): freezes the simulation and shows, for one output (cycle with ←/→), the full calculation in plain numbers:
+   each input × its weight, the sum, + bias, → squash → final value → "pressed" or "not pressed".
+   Do it for one hidden neuron too (it feeds the output), so the whole path from "the wall is 43 px away" to "press LEFT" is on screen. Unfreeze with F again.
+   Every number shown must equal what think() actually computed in that step. Add a test that checks this for 100 random frames, to 1e-9.
+
+3. The 70 numbers (key N): a compact grid of all 70 weights/biases of the selected brain, colored cyan/pink by sign and brightness by size. Two brains can be shown side by side, e.g. the seed 3 champion of generation 1 vs generation 80, so you can see "same shape, different numbers".
+
+4. Champion viewer: load any saved champion (seed + generation) and run it alone on the track, with rays and brain panel. URL: ?champion=3-40 and a small picker in the UI. Show its lap time when it finishes, and it must match the time recorded during evolution exactly.
+
+5. Official seed: in episodes/02-bug-driver/plan.md (CodeMask repo), record: official seed = 3, chosen after seeing all 5 runs (we'll say that in the video); seed 1 never learned a lap in 100 generations, stuck at 51.8% at the hairpin exit — keep it as a scene; my official ghost = ghosts/me-v3.json, 26.40 s; scoreboard at gens 1/5/10/20/40/80 for seed 3 = me, me, AI, AI, AI, AI → 4:2 AI.
+
+Determinism must stay intact (panels are read-only). Update PROMPTS.md and DEVLOG.md, 🎬-mark the best "explain one decision" frame (ideally the leader at the hairpin deciding to press LEFT).
+````
+
+Built: explainThink() in brain.js; each car now keeps its last view and inputs. B shows the live network (leader or a clicked car), F freezes and explains one decision for one hidden neuron and one output, N shows the 70-number grid (with a second brain to compare). There is a champion viewer (?champion=3-40 and a picker), and the official-seed decisions are in plan.md. A test checks the explanation against think() on 100 random frames, and all 30 saved champions replay their recorded lap and fitness exactly.
+What broke: nothing in the simulation (the recorded seed 3 run still matches row for row). On screen, the champion header ran into the picker, the champion's solo car was called "40-0" instead of its real id "40-69", and the "exact match" line covered the brain panel. All three were fixed before the commit.

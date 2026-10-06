@@ -170,3 +170,27 @@ Addendum to the Step 4 entry (precision; the numbers above are unchanged):
 - When each seed first beat my 26.40 s, outside the fixed scoreboard generations: seed 2 at gen 8 (18.40 s, its very first lap), seed 3 at gen 6 (19.25 s), seed 4 at gen 23 (19.88 s), seed 5 at gen 22 (15.07 s).
 - So seed 4's first lap (27.27 s, gen 21) was also slower than mine, but that is not a scoreboard generation. On the fixed scoreboard, seed 3 still beats me only at gen 5, and first overtakes me at gen 10.
 - "First lap" in the table is the first lap ever completed, not the fastest lap of that generation. For seed 5 at gen 22, the first car over the line did 15.50 s, while the fastest lap of that generation was 15.07 s.
+
+## 2026-10-06 — Step 5: see the brain think
+Commit 4106a20 (game). Plan update in the CodeMask repo: c29dd37.
+- **B, live brain panel:** the real network from brain.js, drawn from explainThink(), for the leader or any clicked car. 6 inputs, 6 hidden neurons, 4 outputs, and all 60 connections: thickness = |weight|, cyan +, pink −. Nodes glow by value, and an output turns solid yellow when its key is pressed.
+- **F, explain one decision:** freezes the simulation and shows one hidden neuron (the one with the biggest say in the chosen key) and that key's output neuron. Every input × weight, the sum, + bias, the total, tanh or sigmoid, then pressed or not. ← → pick the key.
+- **N, the 70 numbers:** a grid of every weight and bias, optionally next to a second brain.
+- **Champion viewer:** `?champion=3-40` (and a picker in the bottom-right corner) runs one saved champion alone, then shows its best lap against the time recorded during evolution.
+- The panels never compute their own version. Each car now keeps the 5 distances and 6 inputs of its last decision, and while you look inside its head it is drawn at the pose where it made that decision (its previous pose), with the rays it actually saw.
+
+Checks (34 tests pass):
+- On 100 random frames of seed 3's evolution, explainThink() matches what the car really did. Its keys equal the keys the car pressed, its outputs equal outputs(), and every product, sum, total and squashed value adds up to within 1e-9. It is the same arithmetic in the same order, so in practice the values are identical.
+- The view and inputs a car keeps are exactly readSensors() and getInputs() at its pose before the move (400 steps of the seed 3 gen 20 champion).
+- All 30 saved champions (5 seeds × 6 generations), run alone, reproduce their recorded best lap to the step and their fitness exactly.
+- Seed 3's first 6 generations still reproduce runs/seed-3.json row for row, so storing the decisions changed nothing.
+- In Chrome, with B, E and N open at x10, seed 3's first 3 generations equal the recorded history. Clicking car 4-1 selects car 4-1. While frozen, the step counter doesn't move.
+- Champion 3-40 alone at max speed drove laps of 12.78, 12.57, 12.55 and 12.53 s. Best 752 steps = 12.53 s, recorded 752: exact match. The first lap is slower because it starts from a standstill 30 px behind the line.
+- Seed 3's gen 80 champion vs gen 1 champion: 62 of the 70 numbers differ, and its family line runs 79 generations straight back to the gen 1 champion, car 1-85. Same shape, mostly different numbers, one family.
+
+What broke: nothing in the simulation. The on-screen problems were all found in screenshots:
+- The champion header ran under the picker, and the picker covered the speed indicator. The picker moved to the bottom-right corner, and FROZEN moved under the speed indicator.
+- The champion's solo car showed id "40-0" (the solo run renumbered it). It now keeps its evolution id "40-69".
+- The "EXACT MATCH" line overlapped the brain panel, so it moved into the empty infield.
+
+🎬 "Explain one decision", the seed 3 gen 40 champion at the hairpin, step 368 of its solo run (the champion viewer, not the live evolution leader). Its left-60° eye sees the inside wall only 23 px away (input 0.883), and ahead is 94 px. Hidden neuron h6: 0.883 × −1.117 = −0.987 is the biggest term; sum −0.380, + bias −1.173 = −1.554, tanh → −0.914. Output LEFT: h6's −0.914 × −0.615 = +0.562 is the biggest push; sum 1.758, + bias −1.086 = 0.672, sigmoid → 0.662 > 0.5 → LEFT PRESSED. It is braking at the same time (BRAKE 0.549). "The wall on my left is 23 px away, so... turn left", because it is hugging the inside of the hairpin.
