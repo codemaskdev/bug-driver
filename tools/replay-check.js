@@ -5,15 +5,15 @@
 //   node tools/replay-check.js --update   run and store the results as the new golden ones
 //                                         (only for an intentional change, and say why in DEVLOG.md)
 //
-// Scenarios: my Neon Loop ghost, three champion laps, the first 3 generations of seed 3's evolution,
+// Scenarios: my Neon Loop ghost, my Exam ghost (only my keys drive it: no brain), three champion laps, the first 3 generations of seed 3's evolution,
 // and one custom track opened from a share link. Every car path is kept as a fingerprint of every
 // step's exact position, heading and speed, so even a tiny difference anywhere shows up.
-// Nothing here ever runs on Exam (it's held out).
+// No AI car drives Exam here; only my own ghost lap does.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { isDeepStrictEqual } from 'node:util';
 import { fileURLToPath } from 'node:url';
-import { TRACKS, buildTrack } from '../src/sim/track.js';
+import { TRACKS, buildTrack, trackDef } from '../src/sim/track.js';
 import { replayGhost, ghostWorld, decodeGhostInputs } from '../src/sim/ghost.js';
 import { stepWorld } from '../src/sim/world.js';
 import { createGeneration, stepGeneration } from '../src/sim/generation.js';
@@ -69,6 +69,7 @@ export function runScenarios() {
   const results = {};
 
   results['my Neon Loop ghost (ghosts/me-v3.json)'] = ghostRun(neon, json('ghosts/me-v3.json'));
+  results['my Exam ghost (ghosts/me-exam.json)'] = ghostRun(buildTrack(trackDef('exam')), json('ghosts/me-exam.json'));
 
   results['champion seed 3 gen 20 on Neon Loop'] = championRun(neon, seed3['20'].brain);
   results['champion seed 3 gen 80 on Neon Loop'] = championRun(neon, seed3['80'].brain);
