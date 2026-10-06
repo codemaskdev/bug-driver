@@ -24,7 +24,62 @@ export const TRACKS = [
       [260, 640], [400, 640],
     ],
   },
+  // Step 7: four new tracks, pre-registered and frozen (tests/tracks.test.js checks their SHA-256).
+  // Same format, same 90 px road, same physics. Nobody trains on Exam, ever.
+  {
+    id: 'neon-loop-mirrored',
+    name: 'Neon Loop Mirrored',
+    width: 90,
+    // Neon Loop driven the other way round (clockwise): the same points in reverse order, same start line
+    points: [
+      [560, 640], [400, 640], [260, 640], [175, 612], [148, 546], [170, 482], [240, 452], [380, 452],
+      [560, 457], [760, 452], [829, 424], [857, 355], [829, 286], [760, 258], [640, 256], [450, 254],
+      [330, 252], [295, 243], [269, 217], [260, 182], [269, 147], [295, 121], [330, 112],
+      [440, 111], [600, 110], [800, 110], [980, 110], [1090, 128], [1160, 200], [1185, 300],
+      [1190, 430], [1170, 540], [1100, 610], [980, 636], [800, 640],
+    ],
+  },
+  {
+    id: 'zigzag',
+    name: 'Zigzag',
+    width: 90,
+    // many quick left-right turns, no hairpin
+    points: [
+      [520, 642], [650, 597], [780, 642], [910, 597], [1040, 632], [1140, 592], [1185, 500], [1180, 380],
+      [1150, 250], [1080, 150], [950, 125], [820, 180], [690, 125], [560, 180], [430, 125], [310, 165],
+      [205, 225], [160, 330], [165, 450], [190, 552], [260, 622], [390, 597],
+    ],
+  },
+  {
+    id: 'wide-sweepers',
+    name: 'Wide Sweepers',
+    width: 90,
+    // long fast curves, one tight corner at the end
+    points: [
+      [560, 640], [800, 638], [1000, 615], [1140, 545], [1195, 420], [1170, 280], [1080, 170], [930, 115],
+      [760, 140], [600, 175], [440, 145], [310, 120], [210, 165], [165, 270], [180, 390], [215, 480],
+      [222, 552], [245, 610], [300, 638], [420, 640],
+    ],
+  },
+  {
+    id: 'exam',
+    name: 'Exam',
+    width: 90,
+    // held out: a mix of everything, including a hairpin that turns right (Neon Loop's turns left)
+    points: [
+      [700, 640], [500, 640], [300, 640], [200, 615], [160, 540], [150, 420], [170, 300], [215, 190],
+      [300, 125], [440, 112], [600, 112], [720, 113], [769, 133], [790, 183], [769, 233], [720, 253],
+      [560, 255], [450, 262], [385, 300], [372, 365], [405, 425], [500, 450], [700, 452], [880, 445],
+      [970, 405], [1000, 320], [1005, 230], [1040, 150], [1110, 118], [1170, 160], [1188, 280], [1185, 420],
+      [1170, 540], [1110, 615], [950, 640], [820, 640],
+    ],
+  },
 ];
+
+// The track with this id (TRACKS[0], Neon Loop, if there is none).
+export function trackDef(id) {
+  return TRACKS.find((t) => t.id === id) ?? TRACKS[0];
+}
 
 const SAMPLE_SPACING = 8;      // px between centerline samples
 const CHECKPOINT_EVERY = 6;    // one checkpoint every 6 samples = every 48 px

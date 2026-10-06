@@ -291,3 +291,35 @@ Commit 0407de0. After 972e5f8 the user reopened the page and the chapter 6 score
   - The strictest case: both HTML files copied alone into an empty folder, with no figures next to them. Chrome loads 7/7 and 22/22, and so does WebKit with read access to the HTML file only.
   - GitHub is unaffected: the Markdown still points at docs/img/, and all of those files are tracked.
 - **What broke, honestly:** the first fix (972e5f8) solved a real Safari problem but not the one the user saw. I declared it done after testing in two engines, without knowing which app actually showed the page.
+
+## 2026-10-06 — Step 7a pre-registration (written before any test is run)
+This entry is in the same commit as the tracks themselves, on purpose: it has to be fixed before any car drives them. (Normally devlog entries get their own commit; this one is the exception the prompt asked for.)
+
+**The four new tracks.** Same format, same 90 px road, same frozen physics and car. Neon Loop is unchanged.
+| track | what it is | length | checkpoints | direction | tightest bend |
+| --- | --- | --- | --- | --- | --- |
+| Neon Loop Mirrored | Neon Loop driven the other way round | 3939 px | 82 | clockwise | 63 px |
+| Zigzag | many quick left-right turns, no hairpin | 2815 px | 59 | counterclockwise | 57 px |
+| Wide Sweepers | long fast curves, one tight corner at the end | 2725 px | 57 | counterclockwise | 66 px |
+| Exam | held out: a mix of everything, with a hairpin that turns right (Neon Loop's turns left) | 4085 px | 86 | clockwise | 55 px |
+
+SHA-256 of the four tracks' data (`node tools/track-hash.js`): **f4fccfefb8b489772df3dfdfe32adfbdcaa68dbf872e67792e43de89036a2d9c**. tests/tracks.test.js fails if the data ever changes. After this commit the tracks never change.
+
+**Checks done before registering.** These are validity checks only: no champion and no AI brain has driven these tracks.
+- Geometry: walls never cross, the road is the full 90 px everywhere, everything fits on screen, and the start spot is clear.
+- Drivability: the hand-written scripted test driver (no AI) completes a lap on each.
+- One change made during design: Zigzag's bottom points were raised 8 px so its wall clears the key hints at the bottom of the screen.
+
+**Roles.**
+- Neon Loop Mirrored: a test track in 7a only.
+- Zigzag + Wide Sweepers: tested now in 7a, and the extra training tracks in Step 7b.
+- Exam: held out. Nobody trains on Exam, ever. No AI result on Exam is computed or shown until my first 3 laps on it are recorded.
+
+**The exact tests (7a), changed by nothing that comes out of them.**
+- Cars: every saved seed 3 champion (gens 1, 5, 10, 20, 40, 80), plus the gen 80 champions of seeds 2, 4 and 5.
+- Tracks: Neon Loop Mirrored, Zigzag, Wide Sweepers. Exam is not run in 7a.
+- How: each car runs alone, from that track's normal start spot, under the same rules as in evolution. It is out on a crash, after 3 s without a new checkpoint (stall), or at 60 s (time).
+- Reported per car and track: its best lap time if it completed a lap; otherwise how far it got (% of a lap, the start line counting as the first checkpoint), how it got out (crash or stall), and where (x, y, and which part of the track).
+- 🎬: the most telling failure, ideally the champion that beat me by 14 s crashing in the first corner of a track it has never seen.
+
+**Me on Exam.** Exam becomes drivable in manual mode (track picker). My first 3 completed laps on it count, and the best of the three is my Exam time. Crashed attempts are not laps. The laps are saved and exported to ghosts/me-exam.json. No AI result on Exam is shown to me before I drive.
