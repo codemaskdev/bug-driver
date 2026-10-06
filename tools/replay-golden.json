@@ -1,0 +1,101 @@
+{
+  "my Neon Loop ghost (ghosts/me-v3.json)": {
+    "finished": true,
+    "steps": 1584,
+    "atInput": 1584,
+    "path": "e42e238a"
+  },
+  "champion seed 3 gen 20 on Neon Loop": {
+    "laps": [
+      769,
+      761,
+      759,
+      759
+    ],
+    "bestLapSteps": 759,
+    "out": "time",
+    "outStep": 3600,
+    "path": "a5ddd9be"
+  },
+  "champion seed 3 gen 80 on Neon Loop": {
+    "laps": [
+      759,
+      748,
+      748,
+      748
+    ],
+    "bestLapSteps": 748,
+    "out": "time",
+    "outStep": 3600,
+    "path": "ef8f21db"
+  },
+  "champion seed 3 multi-track gen 100 on Neon Loop": {
+    "laps": [
+      803,
+      790,
+      790,
+      790
+    ],
+    "bestLapSteps": 790,
+    "out": "time",
+    "outStep": 3600,
+    "path": "c8bd976c"
+  },
+  "seed 3 evolution, generations 1-3": {
+    "history": [
+      {
+        "generation": 1,
+        "bestFitness": 54,
+        "averageFitness": 2.1653275271502563,
+        "finishedLap": 0,
+        "bestLapSteps": null,
+        "bestProgress": 0.6506024096385542,
+        "championId": "1-85",
+        "steps": 684
+      },
+      {
+        "generation": 2,
+        "bestFitness": 54.8861057306624,
+        "averageFitness": 17.027145119648253,
+        "finishedLap": 0,
+        "bestLapSteps": null,
+        "bestProgress": 0.6612783822971373,
+        "championId": "2-14",
+        "steps": 1524
+      },
+      {
+        "generation": 3,
+        "bestFitness": 58.57710910244782,
+        "averageFitness": 34.90772815236084,
+        "finishedLap": 0,
+        "bestLapSteps": null,
+        "bestProgress": 0.7057483024391303,
+        "championId": "3-28",
+        "steps": 2620
+      }
+    ],
+    "champions": {
+      "1": {
+        "id": "1-85",
+        "fitness": 54,
+        "brain": "50bbbbfe"
+      }
+    },
+    "nextBrains": "f1ccbb12"
+  },
+  "custom track from a share link (Paperclip)": {
+    "key": "custom-1hjh5zm",
+    "checkpoints": 89,
+    "length": 4260.372194599692,
+    "walls": "906a8e29",
+    "champion seed 3 gen 80": {
+      "laps": [
+        850
+      ],
+      "bestLapSteps": 850,
+      "out": "crash",
+      "outStep": 1380,
+      "path": "5c7bcbef"
+    }
+  }
+}
