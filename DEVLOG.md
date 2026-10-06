@@ -194,3 +194,27 @@ What broke: nothing in the simulation. The on-screen problems were all found in 
 - The "EXACT MATCH" line overlapped the brain panel, so it moved into the empty infield.
 
 🎬 "Explain one decision", the seed 3 gen 40 champion at the hairpin, step 368 of its solo run (the champion viewer, not the live evolution leader). Its left-60° eye sees the inside wall only 23 px away (input 0.883), and ahead is 94 px. Hidden neuron h6: 0.883 × −1.117 = −0.987 is the biggest term; sum −0.380, + bias −1.173 = −1.554, tanh → −0.914. Output LEFT: h6's −0.914 × −0.615 = +0.562 is the biggest push; sum 1.758, + bias −1.086 = 0.672, sigmoid → 0.662 > 0.5 → LEFT PRESSED. It is braking at the same time (BRAKE 0.549). "The wall on my left is 23 px away, so... turn left", because it is hugging the inside of the hairpin.
+
+## 2026-10-06 — The beginner guide, chapters 0–5
+Commits 7c64ea0 (rules in CLAUDE.md), 84e10d9 (figures), 6713931 (guide), fbf6b21 (a correction). No game code changed.
+- HOW-IT-WORKS.md: chapters 0–5 plus a glossary, each chapter in the fixed template, every number with a "reproduce it" note.
+- tools/figures.js draws all 19 figures from the real simulation in 14 s and writes every number it uses to docs/img/figure-data.json. Running it twice gives byte-identical files.
+
+New facts found while checking the claims (all reproducible with `node tools/figures.js`):
+- **Seed 1's dead end.** In generation 31, 0 of the 100 cars pressed BRAKE even once. The best car (31-0, an unchanged elite copy) drives flat out and hits the outer wall at the hairpin exit at 330 px/s. 9 cars crashed on exactly that spot. 6 of the top 10 have exactly the same fitness, 43.0. Of the 100 crashes, 48 hit the inner wall and 52 the outer wall. Best fitness stayed at 43.0 from gen 6 to 100, and the 9306 children of gens 7–100 never beat it.
+- **The inside line is real, but it isn't a full racing line.** Distance toward the inner wall at the hairpin apex: gen 1 7.4 px, gen 5 19.6, gen 10 2.2 (and −14.6 just after, drifting wide), gen 20 16.4, gen 40 22.7, gen 80 27.2 (about 5 px of air between the shell and the wall, at 143 px/s). None of them swings wide before the turn the way a racing driver does.
+- **The family line.** Seed 3's gen 80 champion (80-0) has an unbroken line of 80 cars back to 1-85: 41 unchanged elite copies and 38 mutated children. The last change was in gen 62, and 54 of the 80 were their generation's champion. The hairpin car 40-69 is in the line. Car 4-78, the very first lap, is not: the line went through 4-0.
+- **Gen 1 vs gen 80:** 62 of the 70 numbers changed.
+- **One generation, really (seed 3 gen 4 → 5):** 4-78 (291.0) got 20 of the 99 children, the 10th parent got 1. Number of changed values per child: 1 to 14, 6.85 on average.
+
+What broke:
+- **Missing glow lines.** Every glowing line that was perfectly vertical or horizontal disappeared from the first SVGs: the simulation-step ticks and the walls in the road-width figure. An SVG filter sized to the shape's own box has nothing to draw on when the box is 0 px wide. The filter now covers the whole picture.
+- **Charts too low.** The fitness charts were capped at 500, but fitness reaches 875 (several laps plus the lap bonus).
+- **Unrepresentative mutation example.** The first example was child 5-1, which happened to have 14 changes, the most of all 99 children. It was swapped for a typical child, 5-13, with 7 changes, and the figure now states the range.
+- **Labels running into each other.** Text overlapped in several figures: the hairpin views' legends sat on the road, and the seed labels piled up at the right edge of a chart. The legends moved below the maps (with the maps clipped), and the end labels are now nudged apart.
+- **Two wrong claims in my first draft:**
+  - "Skipping 63 checkpoints": that was the old 83-checkpoint track; it is 62 of 82 now.
+  - "Rerunning writes exactly the same runs/seed-3.json": the file also stores the run time. The history is identical.
+  - The first was fixed before its commit, the second in fbf6b21.
+
+🎬 The inside-line table: generation 1 drives down the middle of the hairpin, and generation 80 passes the apex 5 px from the inner wall. Nobody told it to.
