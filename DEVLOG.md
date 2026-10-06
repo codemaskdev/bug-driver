@@ -26,3 +26,25 @@ What broke:
 
 ## 2026-10-06 — Stop tracking .DS_Store
 Commit 1be3b4b. Step 1's commit accidentally included src/.DS_Store, because I staged everything with `git add -A`. This commit removes it and adds a .gitignore. No game change, nothing else broke.
+
+## 2026-10-06 — Rule: devlog commits are separate
+Commit 322ddb5. CLAUDE.md now says DEVLOG/PROMPTS updates go in their own `docs: devlog for <hash>` commit. No game change. Nothing broke.
+
+## 2026-10-06 — A bigger ladybug you can actually see
+Commit e5b6bc3. After the first human test drive the car was hard to see. It is now a ladybug drawn from above: a round cyan shell with a dark center line and 5 dots on each wing case, a small dark head with two eyes, antennae, and a glowing cyan outline.
+- On screen: 40×30 px with antennae and wheels, up from 30×18. The shell plus head is 36×26 px, up from 26×18. About 2.2× the area.
+- Hitbox: it was a 24×16 px rectangle. Now it is a 9-point outline that follows the round shell and the head, 36×26 px, sitting just inside the drawn shell. A rectangle that size would stick out past the round shell's corners, so you would crash before visibly touching the wall.
+- The car's center spawns 30 px behind the line (was 20), so its longer nose stays behind the start line.
+- PHYSICS_VERSION is now 2, so best laps saved with the old hitbox are no longer loaded. Their ghosts wouldn't replay the same with the new shape.
+
+Reference laps re-run (`node tools/reference-lap.js`), same track, same driver:
+- Careful settings: 17.20 s (1032 steps), unchanged.
+- Fastest of 980 settings: 13.00 s (780 steps), was 12.88 s (773 steps).
+- 806 of 980 settings crash now, up from 718. The track got tighter for a car that is 26 px wide on a 64 px road.
+- Theoretical floor still 12.00 s.
+- Cars that finished a lap: 1 (scripted). No AI yet.
+All 8 tests pass. In headless Chrome: 2 laps counted, best lap saved under the new physics-2 key, crash and R work, no errors.
+Nothing broke.
+
+## 2026-10-06 — Direction chevrons at the start
+Commit e14a0cb. Three faint cyan chevrons sit on the road 60, 92 and 124 px past the start line, pointing the way to drive. They are drawn once into the track image and have no effect on the simulation. Nothing broke.

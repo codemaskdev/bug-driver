@@ -67,3 +67,18 @@ Before committing: drive it yourself with synthetic inputs, check that a full la
 
 Built: the three rules; the Neon Loop track (33 centerline points, 64 px wide, 83 invisible checkpoints, a hairpin) with a ladybug car, crashes, lap timer, a best lap saved with its per-step inputs, and 8 headless tests. Scripted driver: 17.20 s careful, 12.88 s fastest.
 What broke: two of my own tests were wrong on the first run (the lap logic was fine); the first car sprite looked like a capsule, not a bug, so it was redrawn bigger; I accidentally committed a .DS_Store and removed it in the next commit.
+
+## 3. The car is hard to see
+
+````text
+Feedback from my first test drive: the car is hard to see.
+
+1. Car readability: make the car about 1.5–2× bigger on screen and clearly a ladybug from above: round shell, a center line, dots, a small head, glowing cyan outline. If the hitbox changes, tell me the new size, and re-run the reference laps so the numbers stay honest.
+2. Add a subtle direction arrow or chevrons on the track near the start, so it's obvious which way to drive.
+3. Add to CLAUDE.md: "DEVLOG/PROMPTS updates go in a separate commit: docs: devlog for <hash>."
+
+Update PROMPTS.md and DEVLOG.md as usual.
+````
+
+Built: the car is now a round-shelled cyan ladybug, 40×30 px on screen (it was 30×18). The hitbox is a 9-point outline that follows the shell, 36×26 px (it was a 24×16 rectangle). Three faint chevrons past the start line, plus the new commit rule. Re-run reference laps: 17.20 s careful (unchanged), 13.00 s fastest (was 12.88 s).
+What broke: nothing broke. The bigger car does make the track tighter: 806 of 980 scripted settings now crash, up from 718.
