@@ -68,7 +68,7 @@ export function drawHud(hud) {
   }
 }
 
-// ai = {trackName, generation, alive, total, leaderPercent, seconds, speed, seed, over, best}
+// ai = {trackName, generation, alive, total, leaderPercent, bestLapSteps, seconds, speed, seed, flash}
 export function drawAiHud(ai) {
   ctx.textBaseline = 'top';
 
@@ -77,34 +77,34 @@ export function drawAiHud(ai) {
   glowText(`${ai.trackName.toUpperCase()}  ·  AI DRIVES`, 16, 32, 'rgba(0, 240, 255, 0.35)', '11px monospace', 0);
 
   ctx.textAlign = 'center';
-  glowText(`GEN ${ai.generation}`, VIEW_W / 2, 8, TEXT, 'bold 26px monospace');
-  glowText(`ALIVE ${ai.alive}/${ai.total}    LEADER ${ai.leaderPercent.toFixed(1)}%    ${ai.seconds.toFixed(1)} s`,
-    VIEW_W / 2, 40, DIM, '12px monospace', 0);
+  const bestLap = ai.bestLapSteps == null ? '--' : formatSteps(ai.bestLapSteps);
+  glowText(`GEN ${ai.generation}  ·  ALIVE ${ai.alive}/${ai.total}  ·  BEST LAP ${bestLap}`, VIEW_W / 2, 8, TEXT, 'bold 22px monospace');
+  glowText(`LEADER ${ai.leaderPercent.toFixed(1)}% of a lap    ${ai.seconds.toFixed(1)} s`, VIEW_W / 2, 38, DIM, '12px monospace', 0);
 
   ctx.textAlign = 'right';
   glowText(ai.speed === 'max' ? 'MAX' : `x${ai.speed}`, VIEW_W - 16, 12, YELLOW, 'bold 18px monospace', 8);
   glowText(`seed ${ai.seed}`, VIEW_W - 16, 34, 'rgba(0, 240, 255, 0.35)', '11px monospace', 0);
 
   ctx.textAlign = 'left';
-  glowText('1 2 3  speed x1 / x10 / max     R  restart generation     E  explain     TAB  drive yourself',
+  glowText('1 2 3  speed x1 / x10 / max     R  restart evolution     E  explain     TAB  drive yourself',
     16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
 
-  if (ai.over) {
+  if (ai.flash) {
     ctx.textAlign = 'center';
-    glowText(`GENERATION ${ai.generation} OVER`, VIEW_W / 2, 296, YELLOW, 'bold 30px monospace', 14);
-    glowText(`best car: ${ai.best.percent.toFixed(1)}% of a lap, out by ${ai.best.out} at ${ai.best.seconds.toFixed(2)} s`,
-      VIEW_W / 2, 338, TEXT, '14px monospace', 4);
-    glowText('R  run it again', VIEW_W / 2, 362, 'rgba(230, 235, 242, 0.55)', '12px monospace', 0);
+    glowText(ai.flash, VIEW_W / 2, 196, YELLOW, 'bold 34px monospace', 18);
   }
 }
 
-// Max speed: nothing is drawn while the generation runs, just this line.
-export function drawMaxSpeedScreen(generation, seconds) {
+// Max speed: the track and cars aren't drawn while the simulation races ahead, just these numbers.
+export function drawMaxSpeedScreen(ai) {
   ctx.fillStyle = '#05060a';
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'center';
-  glowText('MAX SPEED', VIEW_W / 2, VIEW_H / 2 - 18, YELLOW, 'bold 26px monospace', 12);
-  glowText(`simulating generation ${generation} without drawing it · ${seconds.toFixed(1)} s simulated`,
-    VIEW_W / 2, VIEW_H / 2 + 16, DIM, '13px monospace', 0);
+  glowText('MAX SPEED', VIEW_W / 2, 200, YELLOW, 'bold 26px monospace', 12);
+  const bestLap = ai.bestLapSteps == null ? 'no lap yet' : `best lap ${formatSteps(ai.bestLapSteps)}`;
+  glowText(`generation ${ai.generation}  ·  ${ai.seconds.toFixed(1)} s simulated  ·  ${bestLap}`,
+    VIEW_W / 2, 236, DIM, '13px monospace', 0);
+  glowText('the track is not drawn at this speed: press 1 or 2 to watch', VIEW_W / 2, 262, 'rgba(230, 235, 242, 0.4)', '12px monospace', 0);
+  if (ai.flash) glowText(ai.flash, VIEW_W / 2, 150, YELLOW, 'bold 30px monospace', 16);
 }

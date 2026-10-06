@@ -1,0 +1,1037 @@
+{
+ "seed": 1,
+ "generations": 100,
+ "nodeSeconds": 58.8,
+ "firstLap": null,
+ "bestLapAt": {
+  "1": null,
+  "5": null,
+  "10": null,
+  "20": null,
+  "40": null,
+  "80": null,
+  "100": null
+ },
+ "bestProgressAt": {
+  "1": 14.5,
+  "5": 47.7,
+  "10": 51.8,
+  "20": 51.8,
+  "40": 51.8,
+  "80": 51.8,
+  "100": 51.8
+ },
+ "finishedLapAt": {
+  "1": 0,
+  "5": 0,
+  "10": 0,
+  "20": 0,
+  "40": 0,
+  "80": 0,
+  "100": 0
+ },
+ "physicsVersion": 3,
+ "track": "neon-loop-6ujqcw",
+ "history": [
+  {
+   "generation": 1,
+   "bestFitness": 12.058546899142556,
+   "averageFitness": 1.4383507624096512,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.1452836975800308,
+   "championId": "1-0",
+   "steps": 307
+  },
+  {
+   "generation": 2,
+   "bestFitness": 13,
+   "averageFitness": 10.768830052747644,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.1566265060240964,
+   "championId": "2-59",
+   "steps": 578
+  },
+  {
+   "generation": 3,
+   "bestFitness": 28.919853288046834,
+   "averageFitness": 8.69947474445181,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.34843196732586545,
+   "championId": "3-42",
+   "steps": 790
+  },
+  {
+   "generation": 4,
+   "bestFitness": 32.447296865960986,
+   "averageFitness": 14.074581893557802,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.39093128754169865,
+   "championId": "4-98",
+   "steps": 840
+  },
+  {
+   "generation": 5,
+   "bestFitness": 39.60678277619419,
+   "averageFitness": 25.671729277349712,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.47719015393005043,
+   "championId": "5-46",
+   "steps": 364
+  },
+  {
+   "generation": 6,
+   "bestFitness": 43,
+   "averageFitness": 27.34198765911529,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "6-55",
+   "steps": 394
+  },
+  {
+   "generation": 7,
+   "bestFitness": 43,
+   "averageFitness": 25.977003541024832,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "7-0",
+   "steps": 394
+  },
+  {
+   "generation": 8,
+   "bestFitness": 43,
+   "averageFitness": 27.88114712541046,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "8-0",
+   "steps": 395
+  },
+  {
+   "generation": 9,
+   "bestFitness": 43,
+   "averageFitness": 29.67102907661782,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "9-0",
+   "steps": 395
+  },
+  {
+   "generation": 10,
+   "bestFitness": 43,
+   "averageFitness": 31.304909514012785,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "10-0",
+   "steps": 395
+  },
+  {
+   "generation": 11,
+   "bestFitness": 43,
+   "averageFitness": 28.99120540218005,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "11-0",
+   "steps": 394
+  },
+  {
+   "generation": 12,
+   "bestFitness": 43,
+   "averageFitness": 30.236262859877453,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "12-0",
+   "steps": 395
+  },
+  {
+   "generation": 13,
+   "bestFitness": 43,
+   "averageFitness": 30.474499161908412,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "13-0",
+   "steps": 395
+  },
+  {
+   "generation": 14,
+   "bestFitness": 43,
+   "averageFitness": 29.20317949712275,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "14-0",
+   "steps": 395
+  },
+  {
+   "generation": 15,
+   "bestFitness": 43,
+   "averageFitness": 31.682916078830917,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "15-0",
+   "steps": 396
+  },
+  {
+   "generation": 16,
+   "bestFitness": 43,
+   "averageFitness": 31.637173005339513,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "16-0",
+   "steps": 395
+  },
+  {
+   "generation": 17,
+   "bestFitness": 43,
+   "averageFitness": 31.23892477646345,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "17-0",
+   "steps": 395
+  },
+  {
+   "generation": 18,
+   "bestFitness": 43,
+   "averageFitness": 31.85481501917557,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "18-0",
+   "steps": 395
+  },
+  {
+   "generation": 19,
+   "bestFitness": 43,
+   "averageFitness": 30.93255007551268,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "19-0",
+   "steps": 395
+  },
+  {
+   "generation": 20,
+   "bestFitness": 43,
+   "averageFitness": 29.16808266841198,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "20-0",
+   "steps": 396
+  },
+  {
+   "generation": 21,
+   "bestFitness": 43,
+   "averageFitness": 30.331873615742715,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "21-0",
+   "steps": 395
+  },
+  {
+   "generation": 22,
+   "bestFitness": 43,
+   "averageFitness": 29.88350180169502,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "22-0",
+   "steps": 396
+  },
+  {
+   "generation": 23,
+   "bestFitness": 43,
+   "averageFitness": 27.994248254406628,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "23-0",
+   "steps": 395
+  },
+  {
+   "generation": 24,
+   "bestFitness": 43,
+   "averageFitness": 30.399474519246482,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "24-0",
+   "steps": 395
+  },
+  {
+   "generation": 25,
+   "bestFitness": 43,
+   "averageFitness": 30.84355243607778,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "25-0",
+   "steps": 395
+  },
+  {
+   "generation": 26,
+   "bestFitness": 43,
+   "averageFitness": 30.585987128741213,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "26-0",
+   "steps": 395
+  },
+  {
+   "generation": 27,
+   "bestFitness": 43,
+   "averageFitness": 31.720686489040148,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "27-0",
+   "steps": 395
+  },
+  {
+   "generation": 28,
+   "bestFitness": 43,
+   "averageFitness": 29.098714577763023,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "28-0",
+   "steps": 395
+  },
+  {
+   "generation": 29,
+   "bestFitness": 43,
+   "averageFitness": 28.312802248652506,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "29-0",
+   "steps": 395
+  },
+  {
+   "generation": 30,
+   "bestFitness": 43,
+   "averageFitness": 31.332976263601154,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "30-0",
+   "steps": 395
+  },
+  {
+   "generation": 31,
+   "bestFitness": 43,
+   "averageFitness": 29.160534581637627,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "31-0",
+   "steps": 395
+  },
+  {
+   "generation": 32,
+   "bestFitness": 43,
+   "averageFitness": 32.63686158443504,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "32-0",
+   "steps": 395
+  },
+  {
+   "generation": 33,
+   "bestFitness": 43,
+   "averageFitness": 31.14345243451162,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "33-0",
+   "steps": 395
+  },
+  {
+   "generation": 34,
+   "bestFitness": 43,
+   "averageFitness": 31.52780914575577,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "34-0",
+   "steps": 395
+  },
+  {
+   "generation": 35,
+   "bestFitness": 43,
+   "averageFitness": 27.44851846458802,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "35-0",
+   "steps": 395
+  },
+  {
+   "generation": 36,
+   "bestFitness": 43,
+   "averageFitness": 30.23658304094718,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "36-0",
+   "steps": 394
+  },
+  {
+   "generation": 37,
+   "bestFitness": 43,
+   "averageFitness": 30.011640553274344,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "37-0",
+   "steps": 395
+  },
+  {
+   "generation": 38,
+   "bestFitness": 43,
+   "averageFitness": 29.602320248644396,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "38-0",
+   "steps": 394
+  },
+  {
+   "generation": 39,
+   "bestFitness": 43,
+   "averageFitness": 28.21585399543358,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "39-0",
+   "steps": 394
+  },
+  {
+   "generation": 40,
+   "bestFitness": 43,
+   "averageFitness": 31.134965694680936,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "40-0",
+   "steps": 395
+  },
+  {
+   "generation": 41,
+   "bestFitness": 43,
+   "averageFitness": 31.838064651509256,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "41-0",
+   "steps": 395
+  },
+  {
+   "generation": 42,
+   "bestFitness": 43,
+   "averageFitness": 30.833574923274714,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "42-0",
+   "steps": 395
+  },
+  {
+   "generation": 43,
+   "bestFitness": 43,
+   "averageFitness": 29.288179053813433,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "43-0",
+   "steps": 394
+  },
+  {
+   "generation": 44,
+   "bestFitness": 43,
+   "averageFitness": 32.599936286898654,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "44-0",
+   "steps": 395
+  },
+  {
+   "generation": 45,
+   "bestFitness": 43,
+   "averageFitness": 33.15758063903248,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "45-0",
+   "steps": 397
+  },
+  {
+   "generation": 46,
+   "bestFitness": 43,
+   "averageFitness": 29.142174621277782,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "46-0",
+   "steps": 394
+  },
+  {
+   "generation": 47,
+   "bestFitness": 43,
+   "averageFitness": 30.384518862713776,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "47-0",
+   "steps": 394
+  },
+  {
+   "generation": 48,
+   "bestFitness": 43,
+   "averageFitness": 32.514639068434555,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "48-0",
+   "steps": 394
+  },
+  {
+   "generation": 49,
+   "bestFitness": 43,
+   "averageFitness": 29.725034241248746,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "49-0",
+   "steps": 395
+  },
+  {
+   "generation": 50,
+   "bestFitness": 43,
+   "averageFitness": 30.29953265643088,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "50-0",
+   "steps": 394
+  },
+  {
+   "generation": 51,
+   "bestFitness": 43,
+   "averageFitness": 31.506305834216516,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "51-0",
+   "steps": 395
+  },
+  {
+   "generation": 52,
+   "bestFitness": 43,
+   "averageFitness": 28.888486771742837,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "52-0",
+   "steps": 395
+  },
+  {
+   "generation": 53,
+   "bestFitness": 43,
+   "averageFitness": 26.68905839556736,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "53-0",
+   "steps": 395
+  },
+  {
+   "generation": 54,
+   "bestFitness": 43,
+   "averageFitness": 30.318177356397303,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "54-0",
+   "steps": 396
+  },
+  {
+   "generation": 55,
+   "bestFitness": 43,
+   "averageFitness": 29.528090324845966,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "55-0",
+   "steps": 395
+  },
+  {
+   "generation": 56,
+   "bestFitness": 43,
+   "averageFitness": 28.717785565263267,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "56-0",
+   "steps": 395
+  },
+  {
+   "generation": 57,
+   "bestFitness": 43,
+   "averageFitness": 30.221206630733494,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "57-0",
+   "steps": 395
+  },
+  {
+   "generation": 58,
+   "bestFitness": 43,
+   "averageFitness": 28.790780812513734,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "58-0",
+   "steps": 395
+  },
+  {
+   "generation": 59,
+   "bestFitness": 43,
+   "averageFitness": 28.005772077449247,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "59-0",
+   "steps": 394
+  },
+  {
+   "generation": 60,
+   "bestFitness": 43,
+   "averageFitness": 32.09327205273708,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "60-0",
+   "steps": 395
+  },
+  {
+   "generation": 61,
+   "bestFitness": 43,
+   "averageFitness": 30.25723727705549,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "61-0",
+   "steps": 394
+  },
+  {
+   "generation": 62,
+   "bestFitness": 43,
+   "averageFitness": 30.327503186567995,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "62-0",
+   "steps": 394
+  },
+  {
+   "generation": 63,
+   "bestFitness": 43,
+   "averageFitness": 28.901380910683706,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "63-0",
+   "steps": 395
+  },
+  {
+   "generation": 64,
+   "bestFitness": 43,
+   "averageFitness": 33.43213767578473,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "64-0",
+   "steps": 395
+  },
+  {
+   "generation": 65,
+   "bestFitness": 43,
+   "averageFitness": 27.68288958172038,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "65-0",
+   "steps": 394
+  },
+  {
+   "generation": 66,
+   "bestFitness": 43,
+   "averageFitness": 30.14414921922349,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "66-0",
+   "steps": 394
+  },
+  {
+   "generation": 67,
+   "bestFitness": 43,
+   "averageFitness": 31.867527442901174,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "67-0",
+   "steps": 397
+  },
+  {
+   "generation": 68,
+   "bestFitness": 43,
+   "averageFitness": 28.007563417599105,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "68-0",
+   "steps": 394
+  },
+  {
+   "generation": 69,
+   "bestFitness": 43,
+   "averageFitness": 31.639763384193895,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "69-0",
+   "steps": 395
+  },
+  {
+   "generation": 70,
+   "bestFitness": 43,
+   "averageFitness": 30.47778754956713,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "70-0",
+   "steps": 396
+  },
+  {
+   "generation": 71,
+   "bestFitness": 43,
+   "averageFitness": 30.357901920831928,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "71-0",
+   "steps": 395
+  },
+  {
+   "generation": 72,
+   "bestFitness": 43,
+   "averageFitness": 29.242824693172082,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "72-0",
+   "steps": 395
+  },
+  {
+   "generation": 73,
+   "bestFitness": 43,
+   "averageFitness": 28.97764765578964,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "73-0",
+   "steps": 395
+  },
+  {
+   "generation": 74,
+   "bestFitness": 43,
+   "averageFitness": 31.881082888354396,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "74-0",
+   "steps": 394
+  },
+  {
+   "generation": 75,
+   "bestFitness": 43,
+   "averageFitness": 30.555297680684816,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "75-0",
+   "steps": 395
+  },
+  {
+   "generation": 76,
+   "bestFitness": 43,
+   "averageFitness": 26.410840136369558,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "76-0",
+   "steps": 395
+  },
+  {
+   "generation": 77,
+   "bestFitness": 43,
+   "averageFitness": 32.075142183496354,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "77-0",
+   "steps": 395
+  },
+  {
+   "generation": 78,
+   "bestFitness": 43,
+   "averageFitness": 28.86684564251175,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "78-0",
+   "steps": 394
+  },
+  {
+   "generation": 79,
+   "bestFitness": 43,
+   "averageFitness": 31.12583027808917,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "79-0",
+   "steps": 395
+  },
+  {
+   "generation": 80,
+   "bestFitness": 43,
+   "averageFitness": 28.90253603812648,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "80-0",
+   "steps": 394
+  },
+  {
+   "generation": 81,
+   "bestFitness": 43,
+   "averageFitness": 31.099159645580972,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "81-0",
+   "steps": 395
+  },
+  {
+   "generation": 82,
+   "bestFitness": 43,
+   "averageFitness": 29.676037846200817,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "82-0",
+   "steps": 395
+  },
+  {
+   "generation": 83,
+   "bestFitness": 43,
+   "averageFitness": 27.032278673259412,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "83-0",
+   "steps": 395
+  },
+  {
+   "generation": 84,
+   "bestFitness": 43,
+   "averageFitness": 28.079227102717844,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "84-0",
+   "steps": 394
+  },
+  {
+   "generation": 85,
+   "bestFitness": 43,
+   "averageFitness": 31.336940791867008,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "85-0",
+   "steps": 395
+  },
+  {
+   "generation": 86,
+   "bestFitness": 43,
+   "averageFitness": 30.384232274843114,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "86-0",
+   "steps": 395
+  },
+  {
+   "generation": 87,
+   "bestFitness": 43,
+   "averageFitness": 34.16720106259323,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "87-0",
+   "steps": 395
+  },
+  {
+   "generation": 88,
+   "bestFitness": 43,
+   "averageFitness": 31.719369680063597,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "88-0",
+   "steps": 395
+  },
+  {
+   "generation": 89,
+   "bestFitness": 43,
+   "averageFitness": 29.25542806276616,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "89-0",
+   "steps": 394
+  },
+  {
+   "generation": 90,
+   "bestFitness": 43,
+   "averageFitness": 29.332842082370206,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "90-0",
+   "steps": 395
+  },
+  {
+   "generation": 91,
+   "bestFitness": 43,
+   "averageFitness": 29.489885882435892,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "91-0",
+   "steps": 394
+  },
+  {
+   "generation": 92,
+   "bestFitness": 43,
+   "averageFitness": 31.375585070390162,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "92-0",
+   "steps": 397
+  },
+  {
+   "generation": 93,
+   "bestFitness": 43,
+   "averageFitness": 31.386452324882402,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "93-0",
+   "steps": 395
+  },
+  {
+   "generation": 94,
+   "bestFitness": 43,
+   "averageFitness": 28.744292961898978,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "94-0",
+   "steps": 470
+  },
+  {
+   "generation": 95,
+   "bestFitness": 43,
+   "averageFitness": 28.607166058115418,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "95-0",
+   "steps": 395
+  },
+  {
+   "generation": 96,
+   "bestFitness": 43,
+   "averageFitness": 31.07445040299097,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "96-0",
+   "steps": 395
+  },
+  {
+   "generation": 97,
+   "bestFitness": 43,
+   "averageFitness": 28.284682857182446,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "97-0",
+   "steps": 395
+  },
+  {
+   "generation": 98,
+   "bestFitness": 43,
+   "averageFitness": 28.305931571142704,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "98-0",
+   "steps": 394
+  },
+  {
+   "generation": 99,
+   "bestFitness": 43,
+   "averageFitness": 28.895218303228262,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "99-0",
+   "steps": 394
+  },
+  {
+   "generation": 100,
+   "bestFitness": 43,
+   "averageFitness": 32.56706840785953,
+   "finishedLap": 0,
+   "bestLapSteps": null,
+   "bestProgress": 0.5180722891566265,
+   "championId": "100-0",
+   "steps": 400
+  }
+ ]
+}

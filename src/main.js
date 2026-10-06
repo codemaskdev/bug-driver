@@ -8,17 +8,16 @@
 //   game/    browser glue: keyboard, URL options, saving the best lap
 //
 // Two modes, switched with Tab: "I drive" (arrows, lap timer, ghost recording)
-// and "AI drives" (100 cars with neural-network brains).
+// and "AI drives" (100 cars with neural-network brains that evolve generation by generation).
 
 import { STEP } from './sim/constants.js';
 import { TRACKS, buildTrack } from './sim/track.js';
 import { createWorld, stepWorld, restartWorld } from './sim/world.js';
 import { readSensors, getInputs } from './sim/sensors.js';
 import { outputs } from './sim/brain.js';
-import { makeRng } from './sim/rng.js';
-import {
-  createGeneration, randomBrains, stepGeneration, aliveCount, leaderOf, progressPercent,
-} from './sim/generation.js';
+import { aliveCount, leaderOf, progressPercent } from './sim/generation.js';
+import { createEvolution, stepEvolution, CHAMPION_GENERATIONS } from './sim/evolution.js';
+import { PHYSICS_VERSION } from './sim/constants.js';
 import { ctx } from './render/canvas.js';
 import { renderTrack } from './render/track-view.js';
 import { drawCar, smoothPose } from './render/car-sprite.js';
@@ -26,6 +25,7 @@ import { drawRays } from './render/rays.js';
 import { drawExplainPanel, drawOutputsPanel } from './render/explain-panel.js';
 import { burstSparks, clearSparks, drawSparks } from './render/sparks.js';
 import { drawHud, drawAiHud, drawMaxSpeedScreen } from './render/hud.js';
+import { drawChart } from './render/chart.js';
 import { readInput, takePress, clearPresses } from './game/keyboard.js';
 import { loadBestLap, saveBestLap } from './game/best-lap.js';
 import { AUTOPLAY, SEED } from './game/params.js';
@@ -58,26 +58,46 @@ function handleDriveEvents(events) {
 
 // ---------- AI drives ----------
 const SPEEDS = { Digit1: 1, Digit2: 10, Digit3: 'max' };
-const MAX_FRAME_MS = 12;          // at max speed, simulate this long per frame, then let the page breathe
-const AUTOPLAY_PAUSE = 4;         // autoplay: seconds to show the result before running again
-const ai = { gen: null, speed: 1, overFor: 0 };
+const MAX_FRAME_MS = 14;          // at max speed, simulate this long per frame, then let the page breathe
+const FLASH_SECONDS = 3;
+const ai = { evo: null, speed: 1, flash: null, flashFor: 0 };
 
-// Generation 1: 100 random brains from the seeded random generator. Same seed, same 100 brains.
-function startGeneration1() {
-  ai.gen = createGeneration(track, randomBrains(makeRng(SEED)), 1);
-  ai.overFor = 0;
+// A fresh evolution from generation 1. Same seed, same 100 starting brains, same evolution.
+function startEvolution() {
+  ai.evo = createEvolution(track, SEED);
+  ai.flash = null;
   clearSparks();
 }
-startGeneration1();
+startEvolution();
 
 function stepAi() {
-  for (const e of stepGeneration(ai.gen)) {
-    if (e.type === 'crash' && ai.speed !== 'max') burstSparks(e.x, e.y, ai.gen.step * 1000 + e.index);
+  const { events, firstLap, finished } = stepEvolution(ai.evo);
+  for (const e of events) {
+    if (e.type === 'crash' && ai.speed !== 'max') burstSparks(e.x, e.y, ai.evo.gen.step * 1000 + e.index);
+  }
+  if (firstLap) { ai.flash = `FIRST LAP — GEN ${firstLap.generation}`; ai.flashFor = FLASH_SECONDS; }
+  if (finished && CHAMPION_GENERATIONS.includes(finished.generation)) saveChampions();
+}
+
+// The champions of the fixed generations, kept in this browser too (the official ones come from tools/evolution-report.js).
+function saveChampions() {
+  try {
+    localStorage.setItem(`bug-driver:champions:seed-${SEED}:physics-${PHYSICS_VERSION}`,
+      JSON.stringify({ seed: SEED, track: track.key, champions: ai.evo.champions }));
+  } catch {
+    // no storage: fine, the run is reproducible from the seed anyway
   }
 }
 
+// Fastest lap of the whole evolution so far, finished generations and the one running now.
+function bestLapSoFar() {
+  const laps = ai.evo.history.map((r) => r.bestLapSteps).filter((s) => s !== null);
+  for (const c of ai.evo.gen.cars) if (c.bestLapSteps !== null) laps.push(c.bestLapSteps);
+  return laps.length ? Math.min(...laps) : null;
+}
+
 function drawAi(alpha) {
-  const gen = ai.gen;
+  const gen = ai.evo.gen;
   const leader = leaderOf(gen);
   const at = (c) => smoothPose(c.world.car, explain ? 1 : alpha);
   // wrecks first, then the cars still driving, then the leader on top.
@@ -103,21 +123,20 @@ function drawAi(alpha) {
   }
 }
 
-function drawAiHudNow() {
-  const gen = ai.gen;
-  const leader = leaderOf(gen);
-  drawAiHud({
+function aiHudState() {
+  const gen = ai.evo.gen;
+  return {
     trackName: track.name,
     generation: gen.number,
     alive: aliveCount(gen),
     total: gen.cars.length,
-    leaderPercent: progressPercent(leader.world),
+    leaderPercent: progressPercent(leaderOf(gen).world),
+    bestLapSteps: bestLapSoFar(),
     seconds: gen.step * STEP,
     speed: ai.speed,
     seed: SEED,
-    over: gen.over,
-    best: { percent: progressPercent(leader.world), out: leader.out, seconds: leader.outStep * STEP },
-  });
+    flash: ai.flashFor > 0 ? ai.flash : null,
+  };
 }
 
 // ---------- the loop ----------
@@ -171,27 +190,25 @@ function frame(now) {
     });
   } else {
     for (const code in SPEEDS) if (takePress(code)) { ai.speed = SPEEDS[code]; acc = 0; }
-    if (takePress('KeyR')) startGeneration1();
-    if (ai.gen.over) {
-      ai.overFor += dt;
-      if (AUTOPLAY && ai.overFor > AUTOPLAY_PAUSE) startGeneration1();
-    }
+    if (takePress('KeyR')) startEvolution();
+    ai.flashFor = Math.max(0, ai.flashFor - dt);
 
-    if (ai.speed === 'max' && !ai.gen.over) {
-      // No drawing until the generation ends: just simulate as much as fits in this frame
+    if (ai.speed === 'max') {
+      // No track or cars drawn: just simulate as much as fits in this frame, generation after generation
       const until = performance.now() + MAX_FRAME_MS;
-      while (!ai.gen.over && performance.now() < until) stepAi();
-      drawMaxSpeedScreen(ai.gen.number, ai.gen.step * STEP);
+      while (performance.now() < until) stepAi();
+      drawMaxSpeedScreen(aiHudState());
+      drawChart(ai.evo.history);
     } else {
       // the arrow keys do nothing while the AI drives
       acc += dt * ai.speed;
       let steps = 0;
-      while (acc >= STEP && !ai.gen.over && steps < 20 * ai.speed) { stepAi(); acc -= STEP; steps++; }
-      if (ai.gen.over) acc = 0;
+      while (acc >= STEP && steps < 20 * ai.speed) { stepAi(); acc -= STEP; steps++; }
       drawTrack();
       drawAi(Math.min(1, acc / STEP));
       drawSparks(dt);
-      drawAiHudNow();
+      drawChart(ai.evo.history);
+      drawAiHud(aiHudState());
     }
   }
   requestAnimationFrame(frame);

@@ -9,7 +9,7 @@ import { UP, DOWN, LEFT, RIGHT } from '../src/sim/car.js';
 import { BRAIN_SIZE, INPUTS, HIDDEN, randomBrain, neuron, layer, outputs, think, sigmoid } from '../src/sim/brain.js';
 import {
   POPULATION, STALL_STEPS, GENERATION_STEPS,
-  createGeneration, randomBrains, stepGeneration, runGeneration, fitness, progressPercent, leaderOf,
+  createGeneration, randomBrains, stepGeneration, runGeneration, trackProgress, progressPercent, leaderOf,
 } from '../src/sim/generation.js';
 
 const track = buildTrack(TRACKS[0]);
@@ -66,7 +66,7 @@ test('generation 1: 100 cars, ends when all are out or at 60 s, same seed gives 
   assert.equal(a.cars.length, POPULATION);
   assert.ok(a.step <= GENERATION_STEPS);
   for (const car of a.cars) assert.ok(['crash', 'stall', 'time'].includes(car.out));
-  assert.deepEqual(a.cars.map((x) => [x.out, x.outStep, fitness(x.world)]), b.cars.map((x) => [x.out, x.outStep, fitness(x.world)]));
+  assert.deepEqual(a.cars.map((x) => [x.out, x.outStep, trackProgress(x.world)]), b.cars.map((x) => [x.out, x.outStep, trackProgress(x.world)]));
   assert.notDeepEqual(a.cars.map((x) => x.outStep), c.cars.map((x) => x.outStep));
 });
 
@@ -76,10 +76,10 @@ test('fitness grows as a car drives the right way, and the leader is the fittest
   for (const k of [1, 2, 3]) gasOnly[OUTPUT_START + k * (HIDDEN + 1) + HIDDEN] = -5;
   const zero = new Array(BRAIN_SIZE).fill(0);
   const gen = createGeneration(track, [zero, gasOnly]);
-  let last = fitness(gen.cars[1].world);
+  let last = trackProgress(gen.cars[1].world);
   for (let s = 0; s < 60; s++) {
     stepGeneration(gen);
-    const f = fitness(gen.cars[1].world);
+    const f = trackProgress(gen.cars[1].world);
     assert.ok(f >= last, `fitness went down: ${last} -> ${f}`);
     last = f;
   }

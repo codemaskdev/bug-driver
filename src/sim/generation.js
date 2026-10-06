@@ -11,20 +11,26 @@ import { think, randomBrain } from './brain.js';
 export const POPULATION = 100;
 export const STALL_STEPS = 3 * STEPS_PER_SECOND;        // out after 3 s without a new checkpoint
 export const GENERATION_STEPS = 60 * STEPS_PER_SECOND;  // a generation lasts at most 60 s
+export const LAP_BONUS = 6000;                          // a finished lap adds 6000 / (lap time in seconds) to fitness
 
 // Generation 1: 100 brains made of seeded random numbers.
 export function randomBrains(rand, count = POPULATION) {
   return Array.from({ length: count }, () => randomBrain(rand));
 }
 
-export function createGeneration(track, brains, number = 1) {
+// `family[i]` = {parentId, elite} for car i (generation 1 has no parents).
+export function createGeneration(track, brains, number = 1, family = []) {
   return {
     number,
     track,
     step: 0,
     over: false,
-    cars: brains.map((brain) => ({
+    cars: brains.map((brain, i) => ({
+      id: `${number}-${i}`,      // "generation-index", e.g. "12-0"
+      parentId: family[i]?.parentId ?? null,
+      elite: family[i]?.elite ?? false,
       brain,
+      bestLapSteps: null,        // its fastest completed lap, in steps
       world: createWorld(track), // each car drives in its own world: no car-to-car collisions
       out: null,                 // null while driving, then 'crash', 'stall' or 'time'
       outStep: 0,
@@ -35,8 +41,8 @@ export function createGeneration(track, brains, number = 1) {
   };
 }
 
-// How far a car got: checkpoints passed in the right order, plus the fraction of the way to the next one.
-export function fitness(world) {
+// How far a car got along the track: checkpoints passed in the right order, plus the fraction of the way to the next one.
+export function trackProgress(world) {
   const { car, laps, track } = world;
   const cps = track.checkpoints;
   const next = cps[laps.nextCheckpoint];
@@ -50,9 +56,15 @@ export function fitness(world) {
   return laps.checkpointsPassed + fraction;
 }
 
+// How good a car was: go as far as you can; if you finish a lap, finish fast (a bonus that grows as the lap time shrinks).
+export function fitness(c) {
+  const lapBonus = c.bestLapSteps ? LAP_BONUS / (c.bestLapSteps / STEPS_PER_SECOND) : 0;
+  return trackProgress(c.world) + lapBonus;
+}
+
 // Fitness as a share of one lap. A full lap is the start line plus every checkpoint plus the start line again.
 export function progressPercent(world) {
-  return (fitness(world) / (world.track.checkpoints.length + 1)) * 100;
+  return (trackProgress(world) / (world.track.checkpoints.length + 1)) * 100;
 }
 
 // Advances every car that's still driving by one step: look, think, press keys, move.
@@ -64,7 +76,10 @@ export function stepGeneration(gen) {
   gen.cars.forEach((c, index) => {
     if (c.out) return;
     c.keys = think(c.brain, getInputs(c.world.car, gen.track.walls));
-    for (const e of stepWorld(c.world, c.keys)) events.push({ ...e, index });
+    for (const e of stepWorld(c.world, c.keys)) {
+      if (e.type === 'lap' && (c.bestLapSteps === null || e.steps < c.bestLapSteps)) c.bestLapSteps = e.steps;
+      events.push({ ...e, index });
+    }
 
     if (c.world.laps.checkpointsPassed > c.progressSeen) {
       c.progressSeen = c.world.laps.checkpointsPassed;
@@ -90,7 +105,7 @@ export function leaderOf(gen) {
   const anyAlive = gen.cars.some((c) => !c.out);
   for (const c of gen.cars) {
     if (anyAlive && c.out) continue;
-    const f = fitness(c.world);
+    const f = fitness(c);
     if (f > bestFit) { bestFit = f; best = c; }
   }
   return best;
