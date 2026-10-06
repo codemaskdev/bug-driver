@@ -682,6 +682,27 @@
   },
   "minSpeed": -90
  },
+ "exam": {
+  "me": {
+   "steps": 1921,
+   "seconds": 32.02,
+   "countedLaps": [
+    3242,
+    2658,
+    1921
+   ]
+  },
+  "race": {
+   "champion": "3-20",
+   "link": "index.html?race=exam&champion=3-20",
+   "winner": "ai",
+   "by": 18.18,
+   "meSteps": 1921,
+   "aiSteps": 830,
+   "aiProgress": null
+  },
+  "gen80StopSeconds": 5.6
+ },
  "paperclip": {
   "link": "1DcBkCgCgCgIwDcJsQkJsRgIwRgH-QaG4G4G4FsGgFUFoFsEwG4EYQaEYRgDSRgCgQkBkIwBk",
   "points": 18,
@@ -1041,6 +1062,18 @@
   {
    "name": "simple-7-mirror-crash.svg",
    "about": "Simple guide, ch 7: the champion that beat me stops dead in the mirrored hairpin and reverses into the wall."
+  },
+  {
+   "name": "07-exam-results.svg",
+   "about": "The exam: every tested champion on Exam and on Neon Loop Mirrored."
+  },
+  {
+   "name": "simple-7-exam.svg",
+   "about": "Simple guide, ch 7: on Exam, gen 20 drives a clean lap, gen 80 stops dead in the right-hand hairpin and reverses, the three-track champions crash."
+  },
+  {
+   "name": "07-exam-map.svg",
+   "about": "Exam: gen 20 lap, gen 80 stops and reverses in the right-hand hairpin, where the three-track champions crashed."
   },
   {
    "name": "simple-8-paperclip.svg",

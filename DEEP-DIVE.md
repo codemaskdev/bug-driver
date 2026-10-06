@@ -861,22 +861,54 @@ The test: each champion drives alone, from the track's normal start, under the s
 - But Neon Loop has one hairpin, and it always turns left. The champions that trained longest seem to have tuned their 70 numbers to that one corner, in a way that falls apart when the corner turns the other way.
 - We only tested one seed at every generation, and three more seeds at generation 80. So "longer training means more specialized" is a pattern in this data, not a proof.
 
-**Exam is still untouched.** No AI has driven it. I drive it first, and my first 3 completed laps count. Then the champions get their turn.
+### The exam (Step 7b)
+**My lap first.** No AI drove Exam before I did. My first 3 completed laps there took 54.03 s, 44.30 s and 32.02 s; the best, 32.02 s (1921 steps), is my official Exam time, saved as `ghosts/me-exam.json`. It is the best of exactly those 3 laps, and it replays headless to the step (`tests/exam-ghost.test.js`). (An earlier message said 21.37 s. That lap was on Zigzag, not Exam; see DEVLOG.md.) Only then was Exam opened for the saved champions: `unlockExam()` checks the ghost first. Training on Exam is still refused, always.
 
-> **Interactive later:** pick any champion and any track, and watch it try.
+**Step 7b, as pre-registered.** Seed 3 trained from scratch for 100 generations on three tracks at once: Neon Loop, Zigzag and Wide Sweepers. Every car drove all three, and its fitness was the sum of its three single-track fitness scores. Everything else was unchanged: 100 cars, top 10 parents, 1 elite, mutation 10% with sigma 0.3. At home the three-track champion of generation 100 drives Neon Loop in 13.17 s, slower than the one-track generation 80 champion (12.47 s), and Zigzag and Wide Sweepers in 8.15 s and 8.17 s.
+
+The exam: the one-track champions of generations 10, 20 and 80, and the three-track champions of generations 10, 20, 80 and 100, each alone on Exam and on Neon Loop Mirrored, under the evolution rules.
+
+![The exam results](docs/img/07-exam-results.svg)
+
+*Every tested champion on Exam and on Neon Loop Mirrored. Cyan: its best lap. Pink: it never finished a lap; the cell says how it got out, how far it got and when.*
+
+**Real numbers**
+- **One-track generations 10 and 20 pass.** Exam: 4 laps each, best 13.87 s and 13.83 s. Mirrored: 13.33 s and 13.20 s.
+- **One-track generation 80 fails both, the same way.** On Exam it brakes to a dead stop in the hairpin that turns right at 5.60 s, keeps holding BRAKE, which from a standstill means reverse, and backs into the wall at 6.17 s, 38.4% of a lap. On Mirrored: a dead stop at 7.10 s and the wall at 7.63 s.
+- **The three-track champions fail both, all four of them.**
+  - On Exam, generations 10, 20 and 80 crash in the hairpin at 5.80–5.95 s (38.9–40.2% of a lap). They never slow below 173–195 px/s: they go in too fast, with no dead stop.
+  - Generation 100 gets round the hairpin, then crashes in the right-hand corner at the top right at 11.60 s (75.8%).
+  - On Mirrored, generations 10, 20 and 80 crash in the hairpin at 7.52–7.62 s. Generation 100 crashes in the very first corner, at 2.27 s (12.3%).
+
+![Exam: three of the champions](docs/img/07-exam-map.svg)
+
+*Exam from the start. Cyan: the one-track generation 20 champion's first lap. Yellow, then pink: the one-track generation 80 champion stops dead in the hairpin and reverses into the wall. ✕: where the four three-track champions crashed.*
+
+**The race.** My Exam lap (32.02 s) against the best of them on Exam, the one-track generation 20 champion (13.83 s), best lap against best lap as in every race: **the AI wins by 18.18 s.** Watch it: `index.html?race=exam&champion=3-20`.
+
+**Did training on three tracks help? No.** On Exam none of the four three-track champions finished a lap, and two of the three one-track champions did.
+
+**Our best explanation** (an inference, not a measurement): none of the three training tracks has a hairpin that turns right. Neon Loop's only hairpin turns left, and Zigzag and Wide Sweepers have none. Training on more tracks taught the cars to go faster through the turns they already knew, not to handle a turn none of them had. We saw this risk after Step 7a and wrote it down before running the exam (DEVLOG.md, the Step 7b entry), but kept the pre-registered plan. So this result is the plan's honest outcome. It's one seed, so it's a pattern, not a proof. Chapter 8's Paperclip, a drawn track with a right-hand hairpin, shows the same thing.
+
+*Reproduce it: `node tools/exam-report.js` (writes `runs/exam.json`; `tests/exam.test.js` checks every result and the race).*
+
+> **Now in the game:** pick any champion and any track, and watch it try. See chapter 8.
 
 **What actually happened**
 - **While designing the tracks**, before registering them: Wide Sweepers' tight corner was so tight that its inner wall crossed itself, so the corner was opened up a little. Zigzag was raised 8 px so its wall clears the key hints at the bottom of the screen.
 - **After registering**, nothing changed. The results are as they came out.
 - **The prediction was wrong in an interesting way.** We expected the best car to crash "in the first corner of a track it has never seen". It never did. It handled the first corners of every new track; it was the mirrored hairpin that broke it.
 
-**The prompt:** [entry 14: did it learn, or memorize?](PROMPTS.md#14-step-7a-did-it-learn-or-memorize).
+**The prompt:** [entry 14: did it learn, or memorize?](PROMPTS.md#14-step-7a-did-it-learn-or-memorize), [entry 15: my Exam lap, Step 7b, and the exam](PROMPTS.md#15-my-exam-lap-step-7b-and-the-exam) and [entry 18: my Exam ghost](PROMPTS.md#18-my-exam-ghost).
 
 **In the code**
 - `trackDef()` in `src/sim/track.js`: a track's data by its id (Neon Loop, Mirrored, Zigzag, Wide Sweepers, Exam).
 - `trackData()` and `sha256()` in `tools/track-hash.js`: the frozen tracks' fingerprint.
 - `trialRun()` in `tools/generalization-report.js`: one champion alone on one track, under the evolution rules.
 - `countExamLap()`, `bestExamLap()` and `examGhost()` in `src/sim/exam.js`: my first 3 Exam laps, the best of them, and the ghost file.
+- `createMultiEvolution()` and `multiTrackFitness()` in `src/sim/multi-evolution.js`: Step 7b, training on three tracks with the summed fitness.
+- `unlockExam()` and `refuseTraining()` in `src/sim/held-out.js`: Exam opens for testing champions only after my lap is checked, and never for training.
+- `tools/exam-report.js`: the exam and the race.
 
 
 **The full code**
@@ -973,7 +1005,7 @@ It doesn't only compare lap times. Every car's path is kept as a fingerprint of 
 - **Generations 1 and 5:** no lap (stall at 3.00 s, crash at 19.88 s).
 - **Multi-track (Step 7b):** generation 10 drives 4 laps (best 14.38 s). Generations 20, 80 and 100 crash in the hairpin on their first visit, at 8.57, 8.58 and 8.48 s.
 
-**Our best explanation** (an inference, not a measurement): it's the same weakness as in chapter 7. Neon Loop's only hairpin turns left, and none of the three Step 7b training tracks has a right-hand hairpin either, so the later champions never needed one. This is not the exam: no AI has driven Exam.
+**Our best explanation** (an inference, not a measurement): it's the same weakness as in chapter 7. Neon Loop's only hairpin turns left, and none of the three Step 7b training tracks has a right-hand hairpin either, so the later champions never needed one. This was found before the exam, which chapter 7 now has, and it showed the same pattern.
 
 **What actually happened**
 - **How Paperclip was found.** We drew tracks until one broke the champion, and logged every try, with three champions (seed 3 generation 20, generation 80, and multi-track generation 100):

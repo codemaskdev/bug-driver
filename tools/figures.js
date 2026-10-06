@@ -14,6 +14,8 @@ import { STEPS_PER_SECOND } from '../src/sim/constants.js';
 import { createRace, stepRace, raceResult } from '../src/sim/race.js';
 import { buildScoreboard } from '../src/sim/scoreboard.js';
 import { checkTrack } from '../src/sim/track-check.js';
+import { unlockExam } from '../src/sim/held-out.js';
+import { trackDef } from '../src/sim/track.js';
 import { encodeTrack, decodeTrack, LETTERS } from '../src/sim/share-link.js';
 import { PAPERCLIP_LINK } from './replay-check.js';
 
@@ -908,6 +910,86 @@ scoreboardFigure('simple-6-scoreboard.svg', true);
   save('07-mirror-crash.svg', draw(false).svg, 'The gen 80 champion in the mirrored hairpin: full speed, a dead stop, then reverse into the wall.');
   save('simple-7-mirror-crash.svg', draw(true).svg, 'Simple guide, ch 7: the champion that beat me stops dead in the mirrored hairpin and reverses into the wall.');
   data.mirrorCrash = { stopSeconds: stopAt.step / 60, crashSeconds: last.step / 60, crashAt: { x: last.x, y: last.y }, minSpeed: Math.min(...trace.map((p) => p.speed)) };
+}
+
+// ---------- chapter 7, the exam (Step 7b part 3): only after my Exam lap was saved ----------
+{
+  const ghost = json('ghosts/me-exam.json');
+  unlockExam(ghost); // throws unless ghosts/me-exam.json is my real Exam lap
+  const report = json('runs/exam.json');
+  const multi = json('champions/seed-3-multi.json').champions;
+  const brainOf = (r) => (r.multi ? multi : champs[3])[String(r.generation)].brain;
+  const exam = buildTrack(trackDef('exam'));
+
+  // the results matrix: 7 champions x (Neon Loop home lap, Exam, Mirrored)
+  const names = report.results.filter((r) => r.track === 'exam');
+  const m = [text(20, 34, 'the exam: saved champions, alone, on Exam and on Neon Loop Mirrored', { size: 14, weight: 'bold', color: C.cyan })];
+  m.push(text(330, 66, 'Exam', { anchor: 'middle', size: 12, color: C.dim, weight: 'bold' }));
+  m.push(text(560, 66, 'Neon Loop Mirrored', { anchor: 'middle', size: 12, color: C.dim, weight: 'bold' }));
+  names.forEach((r, i) => {
+    const y = 96 + i * 32 + (r.multi ? 14 : 0);
+    m.push(text(20, y, r.multi ? `gen ${r.generation} · 3 tracks` : `gen ${r.generation} · 1 track`, { size: 12, color: C.text }));
+    ['exam', 'neon-loop-mirrored'].forEach((id, j) => {
+      const x = report.results.find((q) => q.track === id && q.name === r.name);
+      const ok = x.lapSeconds !== null;
+      const label = ok ? `${x.lapSeconds.toFixed(2)} s` : `${x.out} at ${Math.round(x.progress)}% (${x.outSeconds.toFixed(2)} s)`;
+      m.push(rect(330 + j * 230 - 100, y - 16, 200, 24, { fill: ok ? C.cyan : C.pink, opacity: 0.16, rx: 5 }));
+      m.push(text(330 + j * 230, y, label, { anchor: 'middle', size: 12, color: ok ? C.cyan : C.pink, weight: 'bold' }));
+    });
+  });
+  const yEnd = 96 + names.length * 32 + 14;
+  m.push(text(20, yEnd, 'seed 3 · 1 track = trained on Neon Loop · 3 tracks = Neon Loop + Zigzag + Wide Sweepers (Step 7b)', { size: 11, color: C.dim }));
+  m.push(text(20, yEnd + 18, `cyan = best lap · pink = no lap: how it got out, how far, when · my Exam lap: ${report.me.seconds.toFixed(2)} s`, { size: 11, color: C.dim }));
+  save('07-exam-results.svg', svg(700, yEnd + 36, 'The exam', m.join('\n')), 'The exam: every tested champion on Exam and on Neon Loop Mirrored.');
+
+  // the map: gen 20 finishes a lap, gen 80 stops and reverses in the right-hand hairpin, the 3-track champions crash
+  const trace = (r) => {
+    const gen = createGeneration(exam, [brainOf(r)]);
+    const pts = [], laps = [];
+    while (!gen.over) {
+      for (const e of stepGeneration(gen)) if (e.type === 'lap') laps.push(gen.step);
+      const c = gen.cars[0].world.car;
+      pts.push({ x: c.x, y: c.y, angle: c.angle, speed: c.speed, step: gen.step });
+    }
+    return { pts, laps, crash: gen.cars[0].world.car.crash };
+  };
+  const g20 = trace(names.find((r) => r.name === '3-20'));
+  const g80 = trace(names.find((r) => r.name === '3-80'));
+  const multis = names.filter((r) => r.multi).map((r) => ({ r, t: trace(r) }));
+  const draw = (big) => {
+    const v = { x0: 100, y0: 40, scale: big ? 0.68 : 0.62, ox: 20, oy: big ? 20 : 54 };
+    const parts = [drawAnyTrack(exam, v)];
+    parts.push(poly(g20.pts.filter((p) => p.step <= g20.laps[0]).map((p) => at(v, p)), { stroke: C.cyan, width: big ? 4 : 3, opacity: 0.85, glow: true }));
+    const stop = g80.pts.find((p) => p.step > 120 && p.speed <= 0);
+    parts.push(poly(g80.pts.filter((p) => p.step <= stop.step).map((p) => at(v, p)), { stroke: C.yellow, width: big ? 5 : 4, glow: true }));
+    parts.push(poly(g80.pts.filter((p) => p.step >= stop.step).map((p) => at(v, p)), { stroke: C.pink, width: big ? 7 : 5, glow: true }));
+    parts.push(drawBug(v, g80.pts[g80.pts.length - 1], { color: C.pink, scale: big ? 1.4 : 1.2 }));
+    for (const { t } of multis) {
+      const c = at(v, t.crash);
+      const k = big ? 9 : 7;
+      parts.push(line(c.x - k, c.y - k, c.x + k, c.y + k, C.magenta, 3, { glow: true }), line(c.x - k, c.y + k, c.x + k, c.y - k, C.magenta, 3, { glow: true }));
+    }
+    if (big) {
+      // the hairpin that turns right, named where it is
+      const pin = at(v, { x: 640, y: 300 });
+      parts.push(text(pin.x, pin.y, 'the hairpin turns right', { size: 17, color: C.text, weight: 'bold', anchor: 'middle' }));
+      [['gen 20: a clean lap, 18 s faster than me', C.cyan],
+        ['gen 80: stops dead in the hairpin, reverses into the wall', C.pink],
+        ['✕ the cars trained on 3 tracks: every one crashed', C.magenta]].forEach(([l, color], i) => parts.push(text(30, 500 + i * 30, l, { size: 18, color, weight: 'bold', glow: true })));
+    } else {
+      parts.push(text(20, 30, 'Exam: three of the champions, from the start', { size: 14, weight: 'bold', color: C.cyan }));
+      const crashes = multis.map(({ r }) => `gen ${r.generation} at ${r.outSeconds.toFixed(2)} s`).join(', ');
+      [[`cyan: seed 3 gen 20 (one track), its first lap. Best lap ${names.find((r) => r.name === '3-20').lapSeconds.toFixed(2)} s; my Exam lap is ${report.me.seconds.toFixed(2)} s`, C.cyan],
+        [`yellow: seed 3 gen 80 (one track) brakes to a dead stop in the hairpin, which turns right, at ${sec(stop.step)} s.`, C.yellow],
+        [`pink: it keeps BRAKE down (reverse, from a standstill) and backs into the wall at ${names.find((r) => r.name === '3-80').outSeconds.toFixed(2)} s.`, C.pink],
+        [`✕: where the four three-track champions crashed (${crashes})`, C.magenta]].forEach(([l, color], i) => parts.push(text(20, 548 + i * 20, l, { size: 11.5, color })));
+    }
+    return svg(big ? 920 : 900, big ? 600 : 638, 'The exam', parts.join('\n'));
+  };
+  save('simple-7-exam.svg', draw(true), 'Simple guide, ch 7: on Exam, gen 20 drives a clean lap, gen 80 stops dead in the right-hand hairpin and reverses, the three-track champions crash.');
+  save('07-exam-map.svg', draw(false), 'Exam: gen 20 lap, gen 80 stops and reverses in the right-hand hairpin, where the three-track champions crashed.');
+  data.exam = { me: report.me, race: report.race, gen80StopSeconds: stop80(g80) };
+  function stop80(t) { return t.pts.find((p) => p.step > 120 && p.speed <= 0).step / 60; }
 }
 
 // ===================================================================

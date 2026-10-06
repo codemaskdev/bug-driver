@@ -664,11 +664,15 @@ For the curious: [Deep dive →](DEEP-DIVE.md#6-me-vs-the-ai)
 
 Think of a student who memorized last year's exam answers. They score perfectly on last year's exam, and they're lost on a new one.
 
-![The champion that beat me stops dead in the mirrored hairpin and reverses into the wall](docs/img/simple-7-mirror-crash.svg)
+![On the exam track, an early champion drives a clean lap, while the champion of generation 80 stops dead in the hairpin and reverses into the wall](docs/img/simple-7-exam.svg)
 
 We built new tracks with the same road and the same rules, and let the best cars try them with no practice. On a wiggly track and on a fast, curvy one, almost every car drove fine. Then we turned the home track around and drove it the other way. The best car of generation 80, the one that beat me by 14 seconds, reached the hairpin at full speed. It stopped dead, kept holding the brake (which in this game means reverse), and backed into the wall.
 
-**What really happened:** some earlier champions did get round that backwards track. So the honest answer is: both. It learned to drive, and the cars that trained the longest also learned tricks that only work at home. That last part is our best guess, not something we measured. Next comes a final exam track that nobody has trained on, and I drive it first.
+**What really happened:** some earlier champions did get round that backwards track. So the honest answer is: both. It learned to drive, and the cars that trained the longest also learned tricks that only work at home. That last part is our best guess, not something we measured.
+
+Then came the final exam: a track nobody had ever trained on, with a hairpin that turns right. I drove it first, and my best lap took 32 seconds. Then the champions tried. The early ones drove clean laps, more than twice as fast as me, and in a race against my lap the car won easily. The champion of generation 80 did exactly what it did on the backwards track: it stopped dead in the hairpin and reversed into the wall.
+
+We had also trained new cars on three different tracks at once, hoping that would make them better drivers. It didn't: every one of them crashed on the exam. Our best guess is that none of those three tracks has a hairpin that turns right, so they never learned one.
 
 <!-- look-at-the-code
 file: src/sim/exam.js

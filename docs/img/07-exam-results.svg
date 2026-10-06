@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="370" viewBox="0 0 700 370" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+<title>The exam</title>
+<defs><filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="700" height="370"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9fb3c8"/></marker></defs>
+<rect x="0.5" y="0.5" width="699" height="369" rx="16" fill="#0b0d13" stroke="#00f0ff" stroke-opacity="0.25"/>
+<text x="20" y="34" font-size="14" fill="#00f0ff" fill-opacity="1" text-anchor="start" font-weight="bold">the exam: saved champions, alone, on Exam and on Neon Loop Mirrored</text>
+<text x="330" y="66" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">Exam</text>
+<text x="560" y="66" font-size="12" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">Neon Loop Mirrored</text>
+<text x="20" y="96" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 10 · 1 track</text>
+<rect x="230" y="80" width="200" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="330" y="96" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.87 s</text>
+<rect x="460" y="80" width="200" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="560" y="96" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.33 s</text>
+<text x="20" y="128" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 20 · 1 track</text>
+<rect x="230" y="112" width="200" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="330" y="128" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.83 s</text>
+<rect x="460" y="112" width="200" height="24" rx="5" fill="#00f0ff" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="560" y="128" font-size="12" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold">13.20 s</text>
+<text x="20" y="160" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 80 · 1 track</text>
+<rect x="230" y="144" width="200" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="330" y="160" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 38% (6.17 s)</text>
+<rect x="460" y="144" width="200" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="560" y="160" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 50% (7.63 s)</text>
+<text x="20" y="206" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 10 · 3 tracks</text>
+<rect x="230" y="190" width="200" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="330" y="206" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 39% (5.95 s)</text>
+<rect x="460" y="190" width="200" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="560" y="206" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 49% (7.62 s)</text>
+<text x="20" y="238" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 20 · 3 tracks</text>
+<rect x="230" y="222" width="200" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="330" y="238" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 40% (5.80 s)</text>
+<rect x="460" y="222" width="200" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="560" y="238" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 50% (7.52 s)</text>
+<text x="20" y="270" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 80 · 3 tracks</text>
+<rect x="230" y="254" width="200" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="330" y="270" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 40% (5.95 s)</text>
+<rect x="460" y="254" width="200" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="560" y="270" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 50% (7.52 s)</text>
+<text x="20" y="302" font-size="12" fill="#e6ebf2" fill-opacity="1" text-anchor="start" font-weight="normal">gen 100 · 3 tracks</text>
+<rect x="230" y="286" width="200" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="330" y="302" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 76% (11.60 s)</text>
+<rect x="460" y="286" width="200" height="24" rx="5" fill="#ff2e63" fill-opacity="0.16" stroke="none" stroke-width="1" stroke-opacity="1"/>
+<text x="560" y="302" font-size="12" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold">crash at 12% (2.27 s)</text>
+<text x="20" y="334" font-size="11" fill="#9fb3c8" fill-opacity="1" text-anchor="start" font-weight="normal">seed 3 · 1 track = trained on Neon Loop · 3 tracks = Neon Loop + Zigzag + Wide Sweepers (Step 7b)</text>
+<text x="20" y="352" font-size="11" fill="#9fb3c8" fill-opacity="1" text-anchor="start" font-weight="normal">cyan = best lap · pink = no lap: how it got out, how far, when · my Exam lap: 32.02 s</text>
+</svg>
