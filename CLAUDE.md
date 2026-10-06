@@ -28,6 +28,15 @@ material for the video and the guides.
 - One seeded RNG for everything: initial brains, mutations, spawns.
   Same seed = same evolution.
 - Never use Math.random().
+- Fixed timestep: the simulation advances in fixed steps of 1/60 s,
+  independent of the frame rate and rendering. Determinism must hold on
+  any monitor.
+
+## Simulation vs rendering
+- The simulation and the rendering are separate. Simulation code never
+  touches the DOM, the canvas or localStorage.
+- The simulation can run at x1, x10 and "max" (no rendering, as fast as
+  possible), and headless in Node for tests and benchmarks.
 
 ## Autoplay
 - `?autoplay=1&seed=N` runs hands-free for recording footage
@@ -55,6 +64,8 @@ material for the video and the guides.
 - After every prompt the user sends, append an entry: the prompt copied
   verbatim in full, then 2–3 lines on what was built and what broke.
 - Never edit earlier entries.
+- PROMPTS.md is public and English-only: if a prompt isn't in English,
+  log a faithful English version of it, with no translation marker.
 
 ## DEVLOG.md
 - After every commit, add an entry with real numbers: generation, best
