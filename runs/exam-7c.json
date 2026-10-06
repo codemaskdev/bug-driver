@@ -1,0 +1,554 @@
+{
+ "preRegistered": "DEVLOG.md, Step 7c pre-registration (commit 41039bd)",
+ "note": "The second time Exam is used for testing; Step 7c was decided after seeing the first exam.",
+ "me": {
+  "steps": 1921,
+  "seconds": 32.02
+ },
+ "training": [
+  "neon-loop",
+  "neon-loop-mirrored",
+  "zigzag",
+  "wide-sweepers"
+ ],
+ "rows": [
+  {
+   "generation": 1,
+   "name": "3-multi4-1",
+   "id": "1-85",
+   "training": {
+    "neon-loop": {
+     "lapSeconds": null,
+     "lapSteps": null,
+     "laps": 0,
+     "progress": 65.1,
+     "out": "crash",
+     "outSeconds": 11.4,
+     "where": {
+      "x": 840,
+      "y": 238,
+      "checkpoint": 54
+     }
+    },
+    "neon-loop-mirrored": {
+     "lapSeconds": null,
+     "lapSteps": null,
+     "laps": 0,
+     "progress": 10.5,
+     "out": "crash",
+     "outSeconds": 1.98,
+     "where": {
+      "x": 158,
+      "y": 656,
+      "checkpoint": 8
+     }
+    },
+    "zigzag": {
+     "lapSeconds": null,
+     "lapSteps": null,
+     "laps": 0,
+     "progress": 0.1,
+     "out": "stall",
+     "outSeconds": 3,
+     "where": {
+      "x": 490,
+      "y": 642,
+      "checkpoint": 0
+     }
+    },
+    "wide-sweepers": {
+     "lapSeconds": null,
+     "lapSteps": null,
+     "laps": 0,
+     "progress": 60.2,
+     "out": "crash",
+     "outSeconds": 7.43,
+     "where": {
+      "x": 480,
+      "y": 201,
+      "checkpoint": 34
+     }
+    }
+   },
+   "exam": {
+    "lapSeconds": null,
+    "lapSteps": null,
+    "laps": 0,
+    "progress": 13.3,
+    "out": "crash",
+    "outSeconds": 2.53,
+    "where": {
+     "x": 154,
+     "y": 633,
+     "checkpoint": 11
+    },
+    "minSpeed": 200.7,
+    "reverseSteps": 0,
+    "firstStop": null
+   }
+  },
+  {
+   "generation": 5,
+   "name": "3-multi4-5",
+   "id": "5-21",
+   "training": {
+    "neon-loop": {
+     "lapSeconds": 20.48,
+     "lapSteps": 1229,
+     "laps": 2,
+     "progress": 286.7,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 163,
+      "y": 570,
+      "checkpoint": 73
+     }
+    },
+    "neon-loop-mirrored": {
+     "lapSeconds": 22.25,
+     "lapSteps": 1335,
+     "laps": 2,
+     "progress": 267.3,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 973,
+      "y": 122,
+      "checkpoint": 57
+     }
+    },
+    "zigzag": {
+     "lapSeconds": 13.22,
+     "lapSteps": 793,
+     "laps": 4,
+     "progress": 442,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 881,
+      "y": 149,
+      "checkpoint": 29
+     }
+    },
+    "wide-sweepers": {
+     "lapSeconds": 13.08,
+     "lapSteps": 785,
+     "laps": 4,
+     "progress": 449.6,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 599,
+      "y": 166,
+      "checkpoint": 32
+     }
+    }
+   },
+   "exam": {
+    "lapSeconds": 22.95,
+    "lapSteps": 1377,
+    "laps": 2,
+    "progress": 256.9,
+    "out": "time",
+    "outSeconds": 60,
+    "where": {
+     "x": 638,
+     "y": 465,
+     "checkpoint": 51
+    },
+    "minSpeed": 139.7,
+    "reverseSteps": 0,
+    "firstStop": null
+   }
+  },
+  {
+   "generation": 10,
+   "name": "3-multi4-10",
+   "id": "10-0",
+   "training": {
+    "neon-loop": {
+     "lapSeconds": 14.75,
+     "lapSteps": 885,
+     "laps": 4,
+     "progress": 398.3,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 634,
+      "y": 669,
+      "checkpoint": 2
+     }
+    },
+    "neon-loop-mirrored": {
+     "lapSeconds": 16.08,
+     "lapSteps": 965,
+     "laps": 3,
+     "progress": 364.3,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 901,
+      "y": 112,
+      "checkpoint": 56
+     }
+    },
+    "zigzag": {
+     "lapSeconds": 10.58,
+     "lapSteps": 635,
+     "laps": 5,
+     "progress": 551.1,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 591,
+      "y": 144,
+      "checkpoint": 35
+     }
+    },
+    "wide-sweepers": {
+     "lapSeconds": 9.72,
+     "lapSteps": 583,
+     "laps": 6,
+     "progress": 600.8,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 824,
+      "y": 665,
+      "checkpoint": 6
+     }
+    }
+   },
+   "exam": {
+    "lapSeconds": 16.42,
+    "lapSteps": 985,
+    "laps": 3,
+    "progress": 357.4,
+    "out": "time",
+    "outSeconds": 60,
+    "where": {
+     "x": 709,
+     "y": 481,
+     "checkpoint": 52
+    },
+    "minSpeed": 104.2,
+    "reverseSteps": 0,
+    "firstStop": null
+   }
+  },
+  {
+   "generation": 20,
+   "name": "3-multi4-20",
+   "id": "20-0",
+   "training": {
+    "neon-loop": {
+     "lapSeconds": 13.53,
+     "lapSteps": 812,
+     "laps": 4,
+     "progress": 435.6,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 622,
+      "y": 88,
+      "checkpoint": 33
+     }
+    },
+    "neon-loop-mirrored": {
+     "lapSeconds": 13.8,
+     "lapSteps": 828,
+     "laps": 4,
+     "progress": 425.7,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 798,
+      "y": 445,
+      "checkpoint": 25
+     }
+    },
+    "zigzag": {
+     "lapSeconds": 9.92,
+     "lapSteps": 595,
+     "laps": 5,
+     "progress": 585,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 359,
+      "y": 626,
+      "checkpoint": 55
+     }
+    },
+    "wide-sweepers": {
+     "lapSeconds": 8.67,
+     "lapSteps": 520,
+     "laps": 6,
+     "progress": 675.7,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 220,
+      "y": 560,
+      "checkpoint": 49
+     }
+    }
+   },
+   "exam": {
+    "lapSeconds": 14.72,
+    "lapSteps": 883,
+    "laps": 2,
+    "progress": 237,
+    "out": "crash",
+    "outSeconds": 35.65,
+    "where": {
+     "x": 829,
+     "y": 218,
+     "checkpoint": 34
+    },
+    "minSpeed": 120.5,
+    "reverseSteps": 0,
+    "firstStop": null
+   }
+  },
+  {
+   "generation": 40,
+   "name": "3-multi4-40",
+   "id": "40-32",
+   "training": {
+    "neon-loop": {
+     "lapSeconds": 13.15,
+     "lapSteps": 789,
+     "laps": 4,
+     "progress": 448.4,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 328,
+      "y": 264,
+      "checkpoint": 44
+     }
+    },
+    "neon-loop-mirrored": {
+     "lapSeconds": 12.85,
+     "lapSteps": 771,
+     "laps": 4,
+     "progress": 453.3,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 512,
+      "y": 105,
+      "checkpoint": 48
+     }
+    },
+    "zigzag": {
+     "lapSeconds": 8.35,
+     "lapSteps": 501,
+     "laps": 7,
+     "progress": 693.3,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 610,
+      "y": 616,
+      "checkpoint": 2
+     }
+    },
+    "wide-sweepers": {
+     "lapSeconds": 8.15,
+     "lapSteps": 489,
+     "laps": 7,
+     "progress": 716,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 1179,
+      "y": 424,
+      "checkpoint": 16
+     }
+    }
+   },
+   "exam": {
+    "lapSeconds": 13.72,
+    "lapSteps": 823,
+    "laps": 1,
+    "progress": 139.1,
+    "out": "stall",
+    "outSeconds": 22.35,
+    "where": {
+     "x": 792,
+     "y": 243,
+     "checkpoint": 35
+    },
+    "minSpeed": 0,
+    "reverseSteps": 0,
+    "firstStop": {
+     "seconds": 19.87,
+     "x": 792,
+     "y": 243
+    }
+   }
+  },
+  {
+   "generation": 80,
+   "name": "3-multi4-80",
+   "id": "80-0",
+   "training": {
+    "neon-loop": {
+     "lapSeconds": 12.87,
+     "lapSteps": 772,
+     "laps": 4,
+     "progress": 456.9,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 665,
+      "y": 249,
+      "checkpoint": 51
+     }
+    },
+    "neon-loop-mirrored": {
+     "lapSeconds": 12.67,
+     "lapSteps": 760,
+     "laps": 4,
+     "progress": 460.5,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 798,
+      "y": 103,
+      "checkpoint": 54
+     }
+    },
+    "zigzag": {
+     "lapSeconds": 8.22,
+     "lapSteps": 493,
+     "laps": 7,
+     "progress": 710.9,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 1084,
+      "y": 611,
+      "checkpoint": 13
+     }
+    },
+    "wide-sweepers": {
+     "lapSeconds": 8.13,
+     "lapSteps": 488,
+     "laps": 7,
+     "progress": 717.8,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 1181,
+      "y": 380,
+      "checkpoint": 17
+     }
+    }
+   },
+   "exam": {
+    "lapSeconds": 13.33,
+    "lapSteps": 800,
+    "laps": 4,
+    "progress": 438.4,
+    "out": "time",
+    "outSeconds": 60,
+    "where": {
+     "x": 672,
+     "y": 242,
+     "checkpoint": 37
+    },
+    "minSpeed": 72.1,
+    "reverseSteps": 0,
+    "firstStop": null
+   }
+  },
+  {
+   "generation": 100,
+   "name": "3-multi4-100",
+   "id": "100-0",
+   "training": {
+    "neon-loop": {
+     "lapSeconds": 12.63,
+     "lapSteps": 758,
+     "laps": 4,
+     "progress": 464.2,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 836,
+      "y": 383,
+      "checkpoint": 57
+     }
+    },
+    "neon-loop-mirrored": {
+     "lapSeconds": 12.68,
+     "lapSteps": 761,
+     "laps": 4,
+     "progress": 462,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 859,
+      "y": 98,
+      "checkpoint": 55
+     }
+    },
+    "zigzag": {
+     "lapSeconds": 8.2,
+     "lapSteps": 492,
+     "laps": 7,
+     "progress": 712.2,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 1109,
+      "y": 597,
+      "checkpoint": 14
+     }
+    },
+    "wide-sweepers": {
+     "lapSeconds": 8.13,
+     "lapSteps": 488,
+     "laps": 7,
+     "progress": 717.6,
+     "out": "time",
+     "outSeconds": 60,
+     "where": {
+      "x": 1181,
+      "y": 384,
+      "checkpoint": 17
+     }
+    }
+   },
+   "exam": {
+    "lapSeconds": 13.25,
+    "lapSteps": 795,
+    "laps": 4,
+    "progress": 443.5,
+    "out": "time",
+    "outSeconds": 60,
+    "where": {
+     "x": 465,
+     "y": 272,
+     "checkpoint": 41
+    },
+    "minSpeed": 74.2,
+    "reverseSteps": 0,
+    "firstStop": null
+   }
+  }
+ ],
+ "race": {
+  "champion": "3-multi4-100",
+  "link": "index.html?race=exam&champion=3-multi4-100",
+  "winner": "ai",
+  "by": 18.77,
+  "meSteps": 1921,
+  "aiSteps": 795,
+  "aiProgress": null
+ }
+}
