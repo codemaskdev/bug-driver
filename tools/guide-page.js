@@ -4,12 +4,20 @@
 // A tiny Markdown reader for exactly what the guide uses (headings, paragraphs,
 // lists, quotes, tables, images, links, bold, italic, code). No dependencies.
 // Run with: node tools/guide-page.js   (again whenever either Markdown file changes)
+//
+// The pages must work when double-clicked (file://). Safari only lets a local page
+// read files in its own folder and below, so every figure the pages use is copied
+// into docs/guide/img/ and linked as img/... (never ../img/...). The build fails if
+// any <img> in a page, or any image path in the Markdown, doesn't exist on disk.
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync, rmSync, existsSync } from 'node:fs';
 
 const root = new URL('../', import.meta.url);
 const OUT = new URL('docs/guide/', root);
 mkdirSync(OUT, { recursive: true });
+rmSync(new URL('img/', OUT), { recursive: true, force: true });
+mkdirSync(new URL('img/', OUT), { recursive: true });
+const copied = new Set(); // files from docs/img/ the pages use, copied next to them
 
 const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -25,7 +33,15 @@ function href(url) {
   const tail = hash ? `#${hash}` : '';
   if (path === 'HOW-IT-WORKS.md') return `index.html${tail}`;
   if (path === 'DEEP-DIVE.md') return `deep-dive.html${tail}`;
-  if (path.startsWith('docs/')) return `../${path.slice(5)}${tail}`;
+  if (path.startsWith('docs/img/')) {
+    // copied into the page's own folder, so file:// pages in any browser can load it
+    const name = path.slice('docs/img/'.length);
+    if (!copied.has(name)) {
+      copyFileSync(new URL(path, root), new URL(`img/${name}`, OUT));
+      copied.add(name);
+    }
+    return `img/${name}${tail}`;
+  }
   return `../../${path}${tail}`;
 }
 
@@ -136,8 +152,30 @@ ${body}
 `;
 }
 
-const simple = readFileSync(new URL('HOW-IT-WORKS.md', root), 'utf8');
-const deep = readFileSync(new URL('DEEP-DIVE.md', root), 'utf8');
-writeFileSync(new URL('index.html', OUT), page('How a little car taught itself to drive', markdownToHtml(simple), 'simple'));
-writeFileSync(new URL('deep-dive.html', OUT), page('Deep dive: Bug Driver', markdownToHtml(deep), 'deep'));
-console.log('wrote docs/guide/index.html and docs/guide/deep-dive.html');
+const sources = { 'HOW-IT-WORKS.md': ['index.html', 'How a little car taught itself to drive', 'simple'], 'DEEP-DIVE.md': ['deep-dive.html', 'Deep dive: Bug Driver', 'deep'] };
+const problems = [];
+for (const [md, [html, title, here]] of Object.entries(sources)) {
+  const text = readFileSync(new URL(md, root), 'utf8');
+  // on GitHub, image paths in the Markdown are relative to the repo root
+  for (const [, src] of text.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)) {
+    if (!existsSync(new URL(src, root))) problems.push(`${md}: image ${src} does not exist`);
+  }
+  let images = 0;
+  try {
+    const out = page(title, markdownToHtml(text), here);
+    writeFileSync(new URL(html, OUT), out);
+    // every <img> in the generated page must exist on disk, relative to the page
+    for (const [, src] of out.matchAll(/<img src="([^"]+)"/g)) {
+      images++;
+      if (src.includes('..') || !existsSync(new URL(src, new URL(html, OUT)))) problems.push(`docs/guide/${html}: <img src="${src}"> does not exist (or leaves the page's folder)`);
+    }
+  } catch (e) {
+    problems.push(`${md}: ${e.message}`);
+  }
+  console.log(`docs/guide/${html}: ${images} images`);
+}
+if (problems.length) {
+  console.error(`\nBuild failed:\n${problems.map((p) => `  ${p}`).join('\n')}`);
+  process.exit(1);
+}
+console.log(`ok: every image exists; ${copied.size} files copied into docs/guide/img/`);

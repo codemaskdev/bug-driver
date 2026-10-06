@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="370" viewBox="0 0 720 370" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+<title>Eyes, brain, keys, and the best get children</title>
+<defs><filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="720" height="370"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9fb3c8"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="369" rx="16" fill="#0b0d13" stroke="#00f0ff" stroke-opacity="0.25"/>
+<rect x="30" y="40" width="190" height="90" rx="22" fill="#141826" fill-opacity="1" stroke="#00f0ff" stroke-width="3" stroke-opacity="1"/><text x="125" y="97" font-size="30" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">EYES</text>
+<rect x="265" y="40" width="190" height="90" rx="22" fill="#141826" fill-opacity="1" stroke="#ffd23f" stroke-width="3" stroke-opacity="1"/><text x="360" y="97" font-size="30" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">BRAIN</text>
+<rect x="500" y="40" width="190" height="90" rx="22" fill="#141826" fill-opacity="1" stroke="#ff2e63" stroke-width="3" stroke-opacity="1"/><text x="595" y="97" font-size="30" fill="#ff2e63" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">KEYS</text>
+<line x1="222" y1="85" x2="262" y2="85" stroke="#9fb3c8" stroke-width="4" stroke-opacity="1" marker-end="url(#arrow)"/>
+<line x1="457" y1="85" x2="497" y2="85" stroke="#9fb3c8" stroke-width="4" stroke-opacity="1" marker-end="url(#arrow)"/>
+<text x="125" y="168" font-size="20" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">walls: how far?</text>
+<text x="330" y="168" font-size="20" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">70 numbers</text>
+<text x="595" y="168" font-size="18" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">gas brake left right</text>
+<rect x="70" y="220" width="580" height="120" rx="22" fill="#141826" fill-opacity="1" stroke="#39ff88" stroke-width="3" stroke-opacity="1"/>
+<text x="360" y="265" font-size="24" fill="#39ff88" fill-opacity="1" text-anchor="middle" font-weight="bold">100 cars try</text>
+<text x="360" y="305" font-size="24" fill="#39ff88" fill-opacity="1" text-anchor="middle" font-weight="bold">the best ones get children</text>
+<path d="M430,220L430,135" stroke="#39ff88" stroke-width="4" stroke-opacity="1" fill="none" fill-opacity="1" stroke-linejoin="round" marker-end="url(#arrow)"/>
+</svg>

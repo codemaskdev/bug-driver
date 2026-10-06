@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="560" viewBox="0 0 760 560" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+<title>Me vs the AI: the scoreboard</title>
+<defs><filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="760" height="560"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9fb3c8"/></marker></defs>
+<rect x="0.5" y="0.5" width="759" height="559" rx="16" fill="#0b0d13" stroke="#00f0ff" stroke-opacity="0.25"/>
+<text x="380" y="56" font-size="38" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">ME vs THE AI</text>
+<text x="110" y="120" font-size="20" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">GEN</text>
+<text x="290" y="120" font-size="20" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">ME</text>
+<text x="470" y="120" font-size="20" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">AI</text>
+<text x="640" y="120" font-size="20" fill="#9fb3c8" fill-opacity="1" text-anchor="middle" font-weight="bold">WINS</text>
+<text x="110" y="160" font-size="26" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">1</text>
+<text x="290" y="160" font-size="26" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="470" y="160" font-size="26" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">no lap</text>
+<text x="640" y="160" font-size="26" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">ME</text>
+<text x="110" y="216" font-size="26" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">5</text>
+<text x="290" y="216" font-size="26" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="470" y="216" font-size="26" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">30.02</text>
+<text x="640" y="216" font-size="26" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">ME</text>
+<text x="110" y="272" font-size="26" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">10</text>
+<text x="290" y="272" font-size="26" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="470" y="272" font-size="26" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">13.17</text>
+<text x="640" y="272" font-size="26" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">AI</text>
+<text x="110" y="328" font-size="26" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">20</text>
+<text x="290" y="328" font-size="26" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="470" y="328" font-size="26" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">12.65</text>
+<text x="640" y="328" font-size="26" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">AI</text>
+<text x="110" y="384" font-size="26" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">40</text>
+<text x="290" y="384" font-size="26" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="470" y="384" font-size="26" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">12.53</text>
+<text x="640" y="384" font-size="26" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">AI</text>
+<text x="110" y="440" font-size="26" fill="#e6ebf2" fill-opacity="1" text-anchor="middle" font-weight="normal">80</text>
+<text x="290" y="440" font-size="26" fill="#00f0ff" fill-opacity="1" text-anchor="middle" font-weight="normal">26.40</text>
+<text x="470" y="440" font-size="26" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="normal">12.47</text>
+<text x="640" y="440" font-size="26" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">AI</text>
+<text x="380" y="526" font-size="44" fill="#ffd23f" fill-opacity="1" text-anchor="middle" font-weight="bold" filter="url(#glow)">ME 2 : 4 AI</text>
+</svg>

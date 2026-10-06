@@ -111,6 +111,8 @@ material for the video and the guides.
   mode.
 - The web version, docs/guide/, is generated from the two Markdown files by
   `node tools/guide-page.js` and must be regenerated whenever they change.
+  It copies the figures it uses into docs/guide/img/ (Safari's file:// pages
+  can't read ../ folders), and it fails if any image is missing.
   Interactive figures come later; mark the spots with "Interactive later: <idea>".
 
 ## Honesty

@@ -47,7 +47,7 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <h2 id="0-the-big-idea">0. The big idea</h2>
 <p><strong>A car learns to drive with no teacher. It only has trial and error, over many generations.</strong> (A generation is one round of 100 cars.)</p>
 <p>Imagine 100 blindfolded drivers on a race track. Nobody tells them how to drive. Nobody gets better during a drive, either. But the ones who get furthest pass their habits on to their children, with small copying mistakes. Some of those mistakes happen to help.</p>
-<figure><img src="../img/simple-0-big-idea.svg" alt="Eyes feed the brain, the brain presses keys, and the best cars get children"></figure>
+<figure><img src="img/simple-0-big-idea.svg" alt="Eyes feed the brain, the brain presses keys, and the best cars get children"></figure>
 <p>Each car has eyes that feel the walls. It has a brain that decides. And it has the same 4 keys I use when I drive myself.</p>
 <p><strong>What really happened:</strong> nobody wrote a single rule like "brake before a corner". The program only says: drive, and the ones who got furthest have children. In our main run, the first car finished a full lap in the 4th round.</p>
 <p>For the curious: <a href="deep-dive.html#0-what-were-building">Deep dive →</a></p>
@@ -55,7 +55,7 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <h2 id="1-the-track">1. The track</h2>
 <p><strong>Before anything can learn, it needs a world whose rules never change.</strong></p>
 <p>Think of a board game. If two players make exactly the same moves, the game ends exactly the same way. Our track works like that.</p>
-<figure><img src="../img/simple-1-track.svg" alt="The race track with its hairpin"></figure>
+<figure><img src="img/simple-1-track.svg" alt="The race track with its hairpin"></figure>
 <p>The walls glow pink. Touching one is a crash, and that car is out. Invisible lines across the road check that a car really drives the whole lap, in the right direction. No shortcuts.</p>
 <p>The world moves in tiny ticks, 60 per second, the same on every computer. So the same key presses always give exactly the same lap. That matters later, when we race.</p>
 <p>I drove it myself with the arrow keys. My best lap: about 26 seconds.</p>
@@ -65,7 +65,7 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <h2 id="2-eyes">2. Eyes</h2>
 <p><strong>The car can't see. It only knows how far away the wall is in 5 directions, and how fast it's going.</strong></p>
 <p>It's like the parking sensors on a real car. They don't show a picture. They only beep: something is close, over there.</p>
-<figure><img src="../img/simple-2-eyes.svg" alt="Five eyes reach out from the car until they hit a wall"></figure>
+<figure><img src="img/simple-2-eyes.svg" alt="Five eyes reach out from the car until they hit a wall"></figure>
 <p>Five invisible lines go out from the car, like whiskers. Each one stops at the first wall it meets. The closer the wall, the bigger the number that eye sends. Add the speed, and that's 6 numbers.</p>
 <p>Those 6 numbers are everything the car will ever know. It has no map. It has no idea where the finish line is.</p>
 <p><strong>What really happened:</strong> we froze one moment in the tight hairpin turn. The car's left eye saw the wall only about 23 pixels away. That's less than its own width.</p>
@@ -74,7 +74,7 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <h2 id="3-the-brain">3. The brain</h2>
 <p><strong>The brain is 70 numbers. They turn the 6 things the car feels into 4 key presses.</strong></p>
 <p>Picture a mixing desk full of knobs. The car's 6 feelings come in on one side. The knobs decide how much each one counts. The keys come out on the other side.</p>
-<figure><img src="../img/simple-3-brain.svg" alt="The real brain at the hairpin: BRAKE and LEFT are on"></figure>
+<figure><img src="img/simple-3-brain.svg" alt="The real brain at the hairpin: BRAKE and LEFT are on"></figure>
 <p>The brain is made of small parts called <strong>neurons</strong>. A neuron takes some numbers in, gives each one a weight, adds it all up, and keeps the result between two limits. A <strong>weight</strong> is how much the neuron cares about one input. A big weight means a lot. A negative weight means it pushes the other way.</p>
 <p>The last neurons are the keys: one for gas, one for brake, one for left, one for right. When a key's neuron ends up past halfway, that key is pressed. Count every weight, plus one extra number per neuron, and you get exactly 70 numbers.</p>
 <p><strong>What really happened:</strong> the first brains got random numbers, and it was chaos. In one run, more than a quarter of the cars crashed in the first couple of seconds, and almost half barely moved at all.</p>
@@ -83,7 +83,7 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <h2 id="4-evolution">4. Evolution</h2>
 <p><strong>Keep the cars that got furthest, copy their numbers with tiny changes, and repeat.</strong></p>
 <p>It's like breeding. A farmer doesn't design a faster horse. They let the fastest horses have foals, again and again.</p>
-<figure><img src="../img/simple-4-evolution.svg" alt="100 cars ranked; the best 10 become the parents of the next 100"></figure>
+<figure><img src="img/simple-4-evolution.svg" alt="100 cars ranked; the best 10 become the parents of the next 100"></figure>
 <p>One round of 100 cars driving together is a <strong>generation</strong>. Each car gets a score, its <strong>fitness</strong>: how far it got, plus a bonus for a fast lap. The best 10 become parents. The very best one is copied exactly, so the best can never get worse. Every other child is a copy of a parent with a few numbers nudged a little. That nudge is a <strong>mutation</strong>.</p>
 <p><strong>What really happened:</strong> the first full lap came in generation 4, and it was slower than mine. But one of our runs never learned at all. For 95 generations it was stuck at the same spot. In one of those generations, not a single car ever touched the brake. Its best car drove flat out all the way, and the hairpin is far too tight to take flat out. Our best guess: it got stuck on a hill that isn't the top. Every small change made things worse, and the real top was too far away to reach in tiny steps.</p>
 <p>For the curious: <a href="deep-dive.html#4-evolution">Deep dive →</a></p>
@@ -91,7 +91,7 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <h2 id="5-reading-a-brain">5. Reading a brain</h2>
 <p><strong>We can freeze one moment and see exactly why the car pressed a key.</strong></p>
 <p>It's like a sports replay with the referee's notes. You don't just see the turn. You see what pushed the car into it.</p>
-<figure><img src="../img/simple-5-inside-line.svg" alt="Generation 1 drives down the middle of the hairpin; generation 80 hugs the inside"></figure>
+<figure><img src="img/simple-5-inside-line.svg" alt="Generation 1 drives down the middle of the hairpin; generation 80 hugs the inside"></figure>
 <p>In the hairpin, the wall on the car's left was about 23 pixels away. You might expect it to steer away. Instead, the numbers flowed through the brain, and LEFT came out on. It turned toward that wall.</p>
 <p>Why? That wall is the inside of the corner, and the inside is the shortest way round. The best car of generation 80 passes just a few pixels from it. The best car of generation 1 drove down the middle.</p>
 <p>Nobody taught it that. The only rule was "go far, and finish fast". It isn't a perfect racing line, though. A real racing driver swings wide before the turn, and our cars don't.</p>
@@ -101,7 +101,7 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <h2 id="6-me-vs-the-ai">6. Me vs the AI</h2>
 <p><strong>My best lap against the best car of each generation, side by side.</strong></p>
 <p>It's like racing your own ghost in a video game. Here, the ghost is me. The challenger is a car that taught itself.</p>
-<figure><img src="../img/simple-6-scoreboard.svg" alt="The scoreboard: me 2, AI 4"></figure>
+<figure><img src="img/simple-6-scoreboard.svg" alt="The scoreboard: me 2, AI 4"></figure>
 <p>Both cars drive their best lap at the same moment, and they can't bump into each other. In generation 1 the AI never finishes a lap, so I win. In generation 5 it finishes, but I'm still faster, by about 4 seconds. From generation 10 on, it wins every race.</p>
 <p><strong>Final score: me 2, AI 4.</strong></p>
 <p><strong>What really happened:</strong> the first time the AI beat me, in generation 10, it won by about 13 seconds. Its lap took half as long as mine. And it's a fair fight: both cars drive their best lap, and each one starts exactly where that lap really began.</p>
