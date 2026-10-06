@@ -36,6 +36,9 @@ material for the video and the guides.
 - Physics and track are frozen at PHYSICS_VERSION 3. Do not change them
   without asking me first: any change invalidates my ghost lap and all
   training.
+- My official ghost lap is ghosts/me-v3.json (26.40 s). The scoreboard and
+  every race against me use this file, never localStorage.
+  tests/ghost.test.js must keep replaying it to the exact step.
 
 ## Simulation vs rendering
 - The simulation and the rendering are separate. Simulation code never
