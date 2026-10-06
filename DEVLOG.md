@@ -276,3 +276,18 @@ Commit 972e5f8. Opening docs/guide/index.html by double-click showed text but no
   - WebKit with access to docs/guide/ only: 7/7 and 22/22.
   - GitHub: all 7 + 22 image paths in HOW-IT-WORKS.md and DEEP-DIVE.md exist and are tracked in git.
 - **What broke, honestly:** my earlier page check passed because it ran in Chrome only, never in the browser that actually opens the file here.
+
+## 2026-10-06 — Fix, second try: pictures built into the web guide
+Commit 0407de0. After 972e5f8 the user reopened the page and the chapter 6 scoreboard was still a broken image. The broken-image icon in the screenshot was Chromium's, not Safari's.
+- **What I could and couldn't check.**
+  - Could: in headless Chrome via file:// and in WebKit (even with access to the HTML file only), all 7 + 22 images loaded.
+  - Couldn't: the Chrome extension can't open file:// pages, so I couldn't look at the user's own window.
+  - My best explanation: the page was shown by a viewer that lets a local page load no other files at all (some apps' built-in HTML previews work like that). Not confirmed.
+- **Fix, independent of the viewer.** tools/guide-page.js now builds every figure into the page itself, as a data: URL made from the SVG file. The docs/guide/img/ copies from 972e5f8 are gone.
+  - Page sizes: index.html 208 KB, deep-dive.html 748 KB.
+  - The build fails if a Markdown image path doesn't exist (tested: exit code 1 with simple-6-scoreboard.svg hidden, 0 normally), or if any <img> still points at a file.
+- **Checked:**
+  - Chrome file://, at 390 px and 1280 px: index.html 7/7 images, deep-dive.html 22/22.
+  - The strictest case: both HTML files copied alone into an empty folder, with no figures next to them. Chrome loads 7/7 and 22/22, and so does WebKit with read access to the HTML file only.
+  - GitHub is unaffected: the Markdown still points at docs/img/, and all of those files are tracked.
+- **What broke, honestly:** the first fix (972e5f8) solved a real Safari problem but not the one the user saw. I declared it done after testing in two engines, without knowing which app actually showed the page.
