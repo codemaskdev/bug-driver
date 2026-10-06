@@ -2,7 +2,7 @@
 // Plain canvas + vanilla JS ES modules, no build step.
 // Serve the folder (npx serve) and open index.html to play.
 //
-//   sim/     the simulation: track, car physics, laps. No DOM, runs in Node too.
+//   sim/     the simulation: track, car physics, laps, sensors. No DOM, runs in Node too.
 //   render/  drawing: canvas, track image, car sprite, sparks, HUD
 //   game/    browser glue: keyboard, saving the best lap
 
@@ -11,10 +11,13 @@ import { TRACKS, buildTrack } from './sim/track.js';
 import { createWorld, stepWorld, restartWorld } from './sim/world.js';
 import { ctx } from './render/canvas.js';
 import { renderTrack } from './render/track-view.js';
-import { drawCar } from './render/car-sprite.js';
+import { readSensors, getInputs } from './sim/sensors.js';
+import { drawCar, smoothPose } from './render/car-sprite.js';
+import { drawRays } from './render/rays.js';
+import { drawExplainPanel } from './render/explain-panel.js';
 import { burstSparks, clearSparks, drawSparks } from './render/sparks.js';
 import { drawHud } from './render/hud.js';
-import { readInput, takeRestart } from './game/keyboard.js';
+import { readInput, takeRestart, takeExplainToggle } from './game/keyboard.js';
 import { loadBestLap, saveBestLap } from './game/best-lap.js';
 
 const track = buildTrack(TRACKS[0]);
@@ -24,6 +27,7 @@ const world = createWorld(track);
 let best = loadBestLap(track);
 let lastSteps = null;
 let newBestFor = 0; // seconds left to show "NEW BEST LAP"
+let explain = false; // E: show the real sensor numbers
 
 function handle(events) {
   for (const e of events) {
@@ -59,10 +63,16 @@ function frame(now) {
     acc -= STEP;
   }
   newBestFor = Math.max(0, newBestFor - dt);
+  if (takeExplainToggle()) explain = !explain;
 
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(trackImage, 0, 0, trackImage.width * 2, trackImage.height * 2);
-  drawCar(world.car, acc / STEP);
+  // With the explain overlay on, draw the exact simulation pose (no smoothing),
+  // so the numbers on screen are exactly what the brain will get this step.
+  const pose = explain ? smoothPose(world.car, 1) : smoothPose(world.car, acc / STEP);
+  drawRays(pose, readSensors(pose, track.walls), explain);
+  drawCar(pose, world.car.crashed);
+  if (explain) drawExplainPanel(getInputs(world.car, track.walls));
   drawSparks(dt);
   drawHud({
     trackName: track.name,

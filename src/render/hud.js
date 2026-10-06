@@ -49,7 +49,7 @@ export function drawHud(hud) {
   glowText('laps done', VIEW_W - 16, 34, 'rgba(0, 240, 255, 0.35)', '11px monospace', 0);
 
   ctx.textAlign = 'left';
-  glowText('ARROWS / WASD  drive     R  restart', 16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
+  glowText('ARROWS / WASD  drive     R  restart     E  explain', 16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
 
   if (!hud.started && !hud.crashed) {
     ctx.textAlign = 'center';

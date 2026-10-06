@@ -52,16 +52,23 @@ sprite.height = SPRITE.length * PIXEL;
   });
 }
 
-// Draws the car between its last two simulation poses (alpha 0..1), so it moves smoothly on any monitor.
-export function drawCar(car, alpha) {
-  const x = car.prevX + (car.x - car.prevX) * alpha;
-  const y = car.prevY + (car.y - car.prevY) * alpha;
-  const angle = car.prevAngle + (car.angle - car.prevAngle) * alpha;
+// The car's pose between its last two simulation steps (alpha 0..1), so it moves smoothly on any monitor.
+// alpha = 1 is exactly the simulation's current pose.
+export function smoothPose(car, alpha) {
+  return {
+    x: car.prevX + (car.x - car.prevX) * alpha,
+    y: car.prevY + (car.y - car.prevY) * alpha,
+    angle: car.prevAngle + (car.angle - car.prevAngle) * alpha,
+  };
+}
+
+// Draws the car at `pose` (from smoothPose); `crashed` tints its glow.
+export function drawCar(pose, crashed) {
   ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(angle);
+  ctx.translate(pose.x, pose.y);
+  ctx.rotate(pose.angle);
   ctx.imageSmoothingEnabled = false;
-  ctx.shadowColor = car.crashed ? '#ff2e63' : '#00f0ff';
+  ctx.shadowColor = crashed ? '#ff2e63' : '#00f0ff';
   ctx.shadowBlur = 8;
   ctx.drawImage(sprite, -(ORIGIN_COL + 0.5) * PIXEL, -(ORIGIN_ROW + 0.5) * PIXEL);
   ctx.restore();

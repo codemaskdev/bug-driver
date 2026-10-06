@@ -10,10 +10,12 @@ const KEYS = {
 };
 const held = new Set();
 let restartAsked = false;
+let explainToggled = false;
 
 window.addEventListener('keydown', (e) => {
   if (e.code in KEYS) { held.add(e.code); e.preventDefault(); }
   if (e.code === 'KeyR' && !e.repeat) restartAsked = true;
+  if (e.code === 'KeyE' && !e.repeat) explainToggled = true;
 });
 window.addEventListener('keyup', (e) => held.delete(e.code));
 // Switching windows would otherwise leave a key stuck down
@@ -31,4 +33,11 @@ export function takeRestart() {
   const asked = restartAsked;
   restartAsked = false;
   return asked;
+}
+
+// True once per E press.
+export function takeExplainToggle() {
+  const toggled = explainToggled;
+  explainToggled = false;
+  return toggled;
 }
