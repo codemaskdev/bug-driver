@@ -82,3 +82,18 @@ Update PROMPTS.md and DEVLOG.md as usual.
 
 Built: the car is now a round-shelled cyan ladybug, 40×30 px on screen (it was 30×18). The hitbox is a 9-point outline that follows the shell, 36×26 px (it was a 24×16 rectangle). Three faint chevrons past the start line, plus the new commit rule. Re-run reference laps: 17.20 s careful (unchanged), 13.00 s fastest (was 12.88 s).
 What broke: nothing broke. The bigger car does make the track tighter: 806 of 980 scripted settings now crash, up from 718.
+
+## 4. The road is too tight
+
+````text
+Test drive feedback: steering and physics feel good, keep them exactly as they are. But the road is too tight.
+
+1. Widen the road from 64 px to about 90 px. Keep the same layout and turns, including the hairpin. If the track no longer fits on screen at 90 px, adjust the layout slightly (shorter straights or a smaller loop) rather than shrinking the road. Tell me what you changed.
+2. Bump PHYSICS_VERSION (old records and ghosts become invalid), move the checkpoints to the new centerline, and re-run the reference laps (cautious, fastest, crash count out of the same 980 settings) so I can compare with 64 px.
+3. Don't touch the car physics or the hitbox.
+
+Update PROMPTS.md and DEVLOG.md as usual.
+````
+
+Built: the road is 90 px wide, with the same layout and turns. The hairpin was redrawn as a rounder half-circle, and the top straight and the infield moved down 12–22 px so the walls clear the HUD. PHYSICS_VERSION is 3, the 82 checkpoints follow the new centerline, and there is a new test that the road is full width everywhere. Reference laps: 17.25 s careful, 12.68 s fastest, 543 of 980 settings crash (at 64 px: 17.20 s, 13.00 s, 806).
+What broke: at 90 px the old points didn't work. The hairpin's inner wall shrank to an almost-sharp point, and the top wall ran into the lap time HUD. The layout was adjusted to fix both. Car physics and hitbox untouched.

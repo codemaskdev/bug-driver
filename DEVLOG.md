@@ -48,3 +48,24 @@ Nothing broke.
 
 ## 2026-10-06 — Direction chevrons at the start
 Commit e14a0cb. Three faint cyan chevrons sit on the road 60, 92 and 124 px past the start line, pointing the way to drive. They are drawn once into the track image and have no effect on the simulation. Nothing broke.
+
+## 2026-10-06 — A 90 px road
+Commit a6c88e0. The human test drive said the steering and physics feel good but the 64 px road was too tight. The road is now 90 px wide. Car physics and the 36×26 hitbox are unchanged.
+
+Just setting width to 90 broke two things, so the layout was adjusted:
+- Hairpin: its tightest centerline radius was 47.9 px, barely more than the new half-width of 45, so the inner wall shrank to an almost-sharp point about 3 px across. It is now a proper half-circle of radius 70. Its two legs are 140 px apart (were 128), its apex moved from x 238 to x 260, and its tightest radius is now 57.4 px, so the inner wall bends at about 12 px (it was 16 px at 64 px). It is still the tightest turn on the track.
+- Top: the top wall would have sat at y 47, right under the lap time HUD. The top straight moved down 15 px (y 95 → 110), and the wall is now at y 63.
+- To make room, the infield leg under the hairpin moved down 22 px (y 232 → 254), and the long U-turn became a round half-circle from y 258 to 452. The leg after it moved down 12 px (y 440 → 452).
+- The right side, the bottom straight, the start line and the turn order are unchanged.
+- Track length went from 3961 px to 3939 px, and checkpoints from 83 to 82 (still every 48 px, now on the new centerline).
+PHYSICS_VERSION is now 3, so old best laps and ghosts are no longer loaded. A new test checks that the road is full width everywhere, meaning no other wall comes closer than 45 px to the centerline.
+
+Reference laps (`node tools/reference-lap.js`, same 980 driver settings), 64 px → 90 px:
+- Careful: 17.20 s (1032 steps) → 17.25 s (1035 steps)
+- Fastest: 13.00 s (780 steps) → 12.68 s (761 steps)
+- Crashed: 806 of 980 → 543 of 980
+- Theoretical floor (flat out on the centerline): 12.00 s → 11.93 s
+- Cars that finished a lap: 1 (scripted). No AI yet.
+All 9 tests pass. In headless Chrome: 2 laps counted, best lap saved under the physics-3 key, crash and R work, no errors.
+
+🎬 Maybe: the same hand-coded driver, 64 px vs 90 px road: 806 → 543 crashes out of 980.
