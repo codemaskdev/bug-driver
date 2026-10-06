@@ -118,3 +118,10 @@ What broke:
 - The explain panels' top corner sat on the inner wall of the top-right curve, so they moved 18 px down and got 6 px narrower.
 
 🎬 Seed 2: the best-looking chaos. At 1.5 s there are wrecks scattered all over the start straight, spark bursts on both walls, and cars sitting backwards, and 28 cars are dead in the first 2 seconds. Runner-up for a different Short is seed 3: a random brain, with no learning at all, still gets 65.1% of the way round before crashing in the U-turn. A "beginner's luck" moment.
+
+## 2026-10-06 — My ghost lap, saved to the repo
+Commit c5f6489. My best manual lap was exported from my own Chrome's localStorage (origin localhost:3000, key `bug-driver:best:neon-loop-6ujqcw:physics-3`) into ghosts/me-v3.json. The file holds the exact start state, all 1584 inputs (one per step) and the lap time: 1584 steps = 26.40 s.
+The page sent the stored text to a local file byte for byte: 1731 bytes, and the SHA-256 in the browser matches the file (8ff671bd9b064d07…). I didn't copy it by hand.
+Headless replay (`src/sim/ghost.js`, `tests/ghost.test.js`): the ghost finishes the lap in exactly 1584 steps, on its very last recorded input. CLAUDE.md now says the scoreboard uses this file, never localStorage.
+For scale: my 26.40 s is 9.15 s slower than the careful scripted driver (17.25 s) and 13.72 s slower than the fastest one (12.68 s). The same localStorage also still held an old 42.92 s lap from physics 1 (64 px road, old hitbox); it is invalid under the frozen rules and was not exported.
+Nothing broke.
