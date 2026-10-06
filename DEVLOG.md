@@ -625,3 +625,5 @@ Commits 41039bd (pre-registration, before any training), 9f3ea61 (training), b72
 🎬 **The outcome:** `index.html?race=exam&champion=3-multi4-100&autoplay=1`. The car that trained on a right-hand hairpin drives clean through Exam's and beats me by 18.77 s. For the before/after, the same hairpin with the one-track gen 80 first: `index.html?track=exam&champion=3-80` (it reverses into the wall), then `index.html?track=exam&champion=3-multi4-100` (clean laps).
 
 - 69 tests pass; the replay check is unchanged (7 of 7).
+
+**Correction to the Step 7c entry above:** "the first lap on all four tracks came in generation 5" was wrong. The first laps came earlier and track by track: Wide Sweepers in gen 2 (3 cars), Mirrored and Zigzag in gen 3, Neon Loop in gen 4 (runs/seed-3-multi4.json). Gen 5 is the first generation whose champion finished a lap on all four.
