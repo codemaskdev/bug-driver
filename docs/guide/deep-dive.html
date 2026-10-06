@@ -33,6 +33,17 @@ em { color: var(--dim); }
 table { border-collapse: collapse; font-size: 15px; min-width: 100%; }
 th, td { padding: 6px 10px; border-bottom: 1px solid rgba(0, 240, 255, 0.15); text-align: left; white-space: nowrap; }
 th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
+pre.code { background: #0d1019; border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 10px; padding: 12px 14px; overflow-x: auto; font: 13px/1.5 ui-monospace, Menlo, monospace; color: #cfe9ff; }
+.code-box { margin: 24px 0; padding: 14px 16px 10px; background: var(--panel); border: 1px solid rgba(255, 210, 63, 0.45); border-radius: 14px; }
+.code-box h4 { margin: 0 0 6px; font: 700 16px ui-monospace, Menlo, monospace; color: var(--yellow); }
+.code-box p { margin: 0 0 10px; font-size: 16px; }
+.code-rows { display: grid; gap: 0; }
+.code-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; padding: 6px 0; border-top: 1px solid rgba(0, 240, 255, 0.08); align-items: start; }
+.code-row pre { margin: 0; font: 13px/1.45 ui-monospace, Menlo, monospace; color: #b8fbff; white-space: pre-wrap; word-break: break-word; }
+.code-row .say { font-size: 15px; line-height: 1.45; color: var(--text); }
+.code-row.skipped pre { color: var(--dim); }
+.code-row.skipped .say { color: var(--dim); font-style: italic; }
+@media (max-width: 640px) { .code-row { grid-template-columns: 1fr; gap: 2px; } .code-row pre { background: #0d1019; padding: 4px 8px; border-radius: 6px; } }
 @media (max-width: 480px) { body { font-size: 17px; } h1 { font-size: 25px; } h2 { font-size: 21px; } }
 </style>
 </head>
@@ -100,6 +111,16 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <p><strong>The prompts:</strong> <a href="../../PROMPTS.md#2-three-new-rules-then-step-1-a-track-and-a-car-i-can-drive">entry 2: the track and the car</a>, <a href="../../PROMPTS.md#3-the-car-is-hard-to-see">entry 3: the car is hard to see</a>, <a href="../../PROMPTS.md#4-the-road-is-too-tight">entry 4: the road is too tight</a>.</p>
 <p><strong>In the code</strong></p>
 <ul><li><code>buildTrack()</code> in <code>src/sim/track.js</code>: turns the 35 points and the width into walls, checkpoints and a start spot.</li><li><code>stepCar()</code> in <code>src/sim/car.js</code>: moves the car one step for the keys held.</li><li><code>steeringGrip()</code> in <code>src/sim/car.js</code>: how sharply the car can turn at its current speed.</li><li><code>hitWall()</code> in <code>src/sim/car.js</code>: does the car's hitbox touch a wall?</li><li><code>crossedCheckpoint()</code> and <code>updateLaps()</code> in <code>src/sim/laps.js</code>: lap counting with checkpoints.</li><li><code>stepWorld()</code> in <code>src/sim/world.js</code>: one step of the whole world.</li><li><code>STEP</code> in <code>src/sim/constants.js</code>: the fixed step, one sixtieth of a second.</li><li><code>makeRng()</code> in <code>src/sim/rng.js</code>: the seeded random number generator.</li><li><code>replayGhost()</code> in <code>src/sim/ghost.js</code>: drives a recorded lap again from its keys.</li></ul>
+<p><strong>The full code</strong></p>
+<p><code>crossedCheckpoint()</code>: first it measures how much of the car's last move went along the track's direction (positive means forward). Then it checks whether that move crossed the checkpoint line. Only a forward crossing counts.</p>
+<pre class="code"><code>// Did the car's center cross this checkpoint during the last step, moving forward along the track?
+export function crossedCheckpoint(car, cp) {
+  const movedX = car.x - car.prevX;
+  const movedY = car.y - car.prevY;
+  const forward = movedX * cp.tx + movedY * cp.ty;
+  if (forward &lt;= 0) return false;
+  return segmentHit(car.prevX, car.prevY, car.x, car.y, cp.ax, cp.ay, cp.bx, cp.by) &gt;= 0;
+}</code></pre>
 <hr>
 <h2 id="2-eyes">2. Eyes</h2>
 <p><strong>The one idea:</strong> the car can't see the track; it only knows how far away the wall is in 5 directions, plus how fast it's going: 6 numbers, nothing else.</p>
@@ -126,6 +147,24 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <p><strong>The prompt:</strong> <a href="../../PROMPTS.md#5-physics-freeze-then-step-2-give-the-car-eyes">entry 5: give the car eyes</a>.</p>
 <p><strong>In the code</strong></p>
 <ul><li><code>castRay()</code> in <code>src/sim/sensors.js</code>: how far can the car see in one direction.</li><li><code>readSensors()</code> in <code>src/sim/sensors.js</code>: the car's whole view of the world, 5 distances.</li><li><code>eyePosition()</code> in <code>src/sim/sensors.js</code>: where each eye sits on the car's outline.</li><li><code>getInputs()</code> in <code>src/sim/sensors.js</code>: the only 6 numbers the car will ever know.</li><li><code>inputsFromView()</code> in <code>src/sim/sensors.js</code>: the same 6 numbers, from distances already measured.</li></ul>
+<p><strong>The full code</strong></p>
+<p><code>getInputs()</code>: measure the 5 distances, then hand them and the speed to <code>inputsFromView()</code>.</p>
+<pre class="code"><code>// The brain's input: the only 6 numbers the car will ever know.
+// 5 eyes, each 0..1 (1 = wall touching the car, 0 = nothing in range), then speed 0..1 (reversing counts as 0).
+export function getInputs(car, walls) {
+  return inputsFromView(readSensors(car, walls), car.speed);
+}</code></pre>
+<p><code>inputsFromView()</code>: each distance becomes 1 minus (distance divided by 200), so 0 px gives 1 and 200 px gives 0. The speed becomes speed divided by 330, kept between 0 and 1.</p>
+<pre class="code"><code>// The same 6 numbers, from 5 distances already measured with readSensors() and the car's speed.
+export function inputsFromView(distances, speed) {
+  const inputs = [];
+  for (const distance of distances) {
+    inputs.push(1 - distance / SENSOR_RANGE);
+  }
+  const speedShare = speed / CAR.maxSpeed;
+  inputs.push(Math.max(0, Math.min(1, speedShare)));
+  return inputs;
+}</code></pre>
 <hr>
 <h2 id="3-brain">3. Brain</h2>
 <p><strong>The one idea:</strong> the brain is 70 numbers; it multiplies what the car sees by those numbers, adds things up, and the result decides which of the 4 keys to press.</p>
@@ -168,6 +207,61 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <p><strong>The prompt:</strong> <a href="../../PROMPTS.md#6-step-3-a-brain-and-100-cars-with-random-brains">entry 6: a brain, and 100 cars with random brains</a>.</p>
 <p><strong>In the code</strong></p>
 <ul><li><code>neuron()</code> in <code>src/sim/brain.js</code>: multiply each input by its weight, add them up, add the bias, squash.</li><li><code>layer()</code> in <code>src/sim/brain.js</code>: several neurons looking at the same inputs.</li><li><code>tanh()</code> and <code>sigmoid()</code> in <code>src/sim/brain.js</code>: the two squash functions.</li><li><code>outputs()</code> in <code>src/sim/brain.js</code>: the 4 key values for 6 inputs.</li><li><code>think()</code> in <code>src/sim/brain.js</code>: which keys to press, every output above 0.5.</li><li><code>randomBrain()</code> in <code>src/sim/brain.js</code>: 70 seeded random numbers between −1 and 1.</li><li><code>BRAIN_SIZE</code> in <code>src/sim/brain.js</code>: 70.</li><li><code>createGeneration()</code> and <code>stepGeneration()</code> in <code>src/sim/generation.js</code>: 100 cars, the stall rule, the 60-second limit.</li></ul>
+<p><strong>The full code</strong></p>
+<p><code>neuron()</code>: a running total of input × weight, then + bias, then squash. The weights of neuron <em>n</em> sit side by side in the 70-number list, followed by its bias.</p>
+<pre class="code"><code>// One neuron: multiply each input by its weight, add them up, add the bias, squash.
+export function neuron(inputs, brain, start, squash) {
+  let sum = 0;
+  for (let i = 0; i &lt; inputs.length; i++) {
+    const weight = brain[start + i];
+    sum += inputs[i] * weight;
+  }
+  const bias = brain[start + inputs.length];
+  sum += bias;
+  return squash(sum);
+}</code></pre>
+<p><code>think()</code>: the 4 outputs, each compared with 0.5. The four keys are separate bits (gas 1, brake 2, left 4, right 8), so adding them up gives one number that says which keys are held.</p>
+<pre class="code"><code>// Which keys to press this step: every output above 0.5 is a key held down.
+export function think(brain, inputs) {
+  const [gas, brake, left, right] = outputs(brain, inputs);
+  let keys = 0;
+  if (gas &gt; 0.5) keys += UP;
+  if (brake &gt; 0.5) keys += DOWN;
+  if (left &gt; 0.5) keys += LEFT;
+  if (right &gt; 0.5) keys += RIGHT;
+  return keys;
+}</code></pre>
+<p><code>stepGeneration()</code>: one tick for every car that's still driving. Look (<code>readSensors</code>), turn what it sees into numbers (<code>inputsFromView</code>), think, move (<code>stepWorld</code>). Then keep score: the best lap, the last new checkpoint, and whether it's now out by crash, stall (3 s without a new checkpoint) or time (60 s).</p>
+<pre class="code"><code>// Advances every car that's still driving by one step (1/60 s): look, think, press keys, move.
+export function stepGeneration(gen) {
+  if (gen.over) return [];
+  gen.step++;
+  const events = [];
+  let driving = 0;
+  for (let index = 0; index &lt; gen.cars.length; index++) {
+    const c = gen.cars[index];
+    if (c.out) continue;
+    c.view = readSensors(c.world.car, gen.track.walls);
+    c.inputs = inputsFromView(c.view, c.world.car.speed);
+    c.keys = think(c.brain, c.inputs);
+    const happened = stepWorld(c.world, c.keys);
+    for (const e of happened) {
+      if (e.type === 'lap' &amp;&amp; (c.bestLapSteps === null || e.steps &lt; c.bestLapSteps)) c.bestLapSteps = e.steps;
+      events.push({ ...e, index });
+    }
+    if (c.world.laps.checkpointsPassed &gt; c.progressSeen) {
+      c.progressSeen = c.world.laps.checkpointsPassed;
+      c.lastProgressStep = gen.step;
+    }
+    if (c.world.car.crashed) c.out = 'crash';
+    else if (gen.step - c.lastProgressStep &gt;= STALL_STEPS) c.out = 'stall';
+    else if (gen.step &gt;= GENERATION_STEPS) c.out = 'time';
+    if (c.out) c.outStep = gen.step;
+    else driving++;
+  }
+  if (driving === 0) gen.over = true;
+  return events;
+}</code></pre>
 <hr>
 <h2 id="4-evolution">4. Evolution</h2>
 <p><strong>The one idea:</strong> keep the brains that drove furthest, make slightly changed copies of them, and repeat. No one ever tells the car how to drive.</p>
@@ -209,6 +303,55 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <p><strong>The prompt:</strong> <a href="../../PROMPTS.md#7-export-my-ghost-then-step-4-evolution">entry 7: export my ghost, then evolution</a>.</p>
 <p><strong>In the code</strong></p>
 <ul><li><code>fitness()</code> in <code>src/sim/generation.js</code>: go as far as you can; if you finish a lap, finish fast.</li><li><code>trackProgress()</code> in <code>src/sim/generation.js</code>: checkpoints passed in order, plus the fraction to the next one.</li><li><code>selection()</code> in <code>src/sim/evolution.js</code>: rank all cars, keep the top 10.</li><li><code>pickParent()</code> in <code>src/sim/evolution.js</code>: pick a parent, better ranks more often.</li><li><code>mutate()</code> in <code>src/sim/evolution.js</code>: copy 70 numbers, nudge each one with a 10% chance.</li><li><code>gaussian()</code> in <code>src/sim/evolution.js</code>: a random nudge, mostly small, sometimes bigger.</li><li><code>nextGeneration()</code> in <code>src/sim/evolution.js</code>: 1 elite + 99 mutated children.</li><li><code>finishGeneration()</code> in <code>src/sim/evolution.js</code>: records the stats and saves the champions of generations 1, 5, 10, 20, 40, 80.</li><li><code>stepEvolution()</code> and <code>runEvolution()</code> in <code>src/sim/evolution.js</code>: run it all, generation after generation.</li></ul>
+<p><strong>The full code</strong></p>
+<p><code>fitness()</code>: track progress, plus 6000 divided by the best lap time in seconds when there is one.</p>
+<pre class="code"><code>// How good a car was: go as far as you can; if you finish a lap, finish fast (a bonus that grows as the lap time shrinks).
+export function fitness(car) {
+  let score = trackProgress(car.world);
+  if (car.bestLapSteps !== null) {
+    const lapSeconds = car.bestLapSteps / STEPS_PER_SECOND;
+    score += LAP_BONUS / lapSeconds;
+  }
+  return score;
+}</code></pre>
+<p><code>selection()</code>: sort a copy of the cars by score, highest first, and keep 10. JavaScript's sort is stable, so cars with equal scores keep their order and the result never depends on luck. Step 7b passes in its own score, the fitness summed over three tracks.</p>
+<pre class="code"><code>// Selection: rank all cars by fitness, best first, and keep the top 10 as parents.
+// (Step 7b scores a car differently, by its fitness summed over three tracks, and passes that in as `score`.)
+export function selection(cars, score = fitness) {
+  const ranked = cars.slice();
+  ranked.sort((a, b) =&gt; score(b) - score(a));
+  return ranked.slice(0, PARENTS);
+}</code></pre>
+<p><code>mutate()</code>: for each of the 70 numbers, one random draw decides (10%) whether it changes. Only if it does, two more draws make a bell-curve nudge of typical size 0.3. The draws always come in the same order, so the same seed gives the same children.</p>
+<pre class="code"><code>// Mutation: copy a parent's 70 numbers, and give each one a 10% chance to be nudged a little.
+export function mutate(brain, rand) {
+  const child = [];
+  for (const number of brain) {
+    if (rand() &lt; MUTATION_RATE) {
+      child.push(number + gaussian(rand) * MUTATION_SIZE);
+    } else {
+      child.push(number);
+    }
+  }
+  return child;
+}</code></pre>
+<p><code>nextGeneration()</code>: the elite (an exact copy of the best) first, then 99 mutated children of parents picked by rank. The family list records each car's parent for the family tree.</p>
+<pre class="code"><code>// The next generation: 1 elite (the best brain, unchanged, so the best can never get worse) + 99 mutated children.
+export function nextGeneration(evo) {
+  const gen = evo.gen;
+  const parents = selection(gen.cars);
+  const elite = parents[0];
+  const brains = [elite.brain.slice()];
+  const family = [{ parentId: elite.id, elite: true }];
+  while (brains.length &lt; POPULATION) {
+    const parent = pickParent(parents, evo.rand);
+    brains.push(mutate(parent.brain, evo.rand));
+    family.push({ parentId: parent.id, elite: false });
+  }
+  evo.gen = createGeneration(evo.track, brains, gen.number + 1, family);
+  for (const c of evo.gen.cars) evo.parentOf[c.id] = c.parentId;
+  return evo.gen;
+}</code></pre>
 <hr>
 <h2 id="5-reading-a-brain">5. Reading a brain</h2>
 <p><strong>The one idea:</strong> we can freeze any moment and follow one decision all the way, from "the wall on my left is 23 px away" to "press LEFT", and every number on the way is the real one.</p>
@@ -244,6 +387,13 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <p><strong>The prompt:</strong> <a href="../../PROMPTS.md#8-step-5-let-us-see-the-brain-think">entry 8: let us see the brain think</a>.</p>
 <p><strong>In the code</strong></p>
 <ul><li><code>explainThink()</code> in <code>src/sim/brain.js</code>: the whole calculation behind one decision, every number of it.</li><li><code>strongestHidden()</code> in <code>src/render/decision-panel.js</code>: the hidden neuron with the biggest say in a key.</li><li><code>drawBrainPanel()</code> in <code>src/render/brain-panel.js</code>: the live network (key B in the game).</li><li><code>drawDecisionPanel()</code> in <code>src/render/decision-panel.js</code>: "explain one decision" (key F).</li><li><code>drawWeightsGrid()</code> in <code>src/render/weights-grid.js</code>: the 70 numbers (key N).</li><li><code>ancestors()</code> in <code>src/sim/evolution.js</code>: a champion's family line, back to generation 1.</li></ul>
+<p><strong>The full code</strong></p>
+<p><code>outputs()</code>: the whole network. Layer 1 is 6 tanh neurons using numbers 0–41; layer 2 is 4 sigmoid neurons using numbers 42–69.</p>
+<pre class="code"><code>// The 4 output values (0..1) for these 6 inputs: gas, brake, left, right.
+export function outputs(brain, inputs) {
+  const hidden = layer(inputs, brain, 0, HIDDEN, tanh);
+  return layer(hidden, brain, HIDDEN * (INPUTS + 1), OUTPUTS, sigmoid);
+}</code></pre>
 <hr>
 <h2 id="6-me-vs-the-ai">6. Me vs the AI</h2>
 <p><strong>The one idea:</strong> my best lap and the AI's best lap drive at the same time, side by side, and the clock decides.</p>
@@ -269,6 +419,21 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <p><strong>The prompt:</strong> <a href="../../PROMPTS.md#10-the-guide-in-two-levels-then-step-6-me-vs-the-ai">entry 10: the guide in two levels, then me vs the AI</a>.</p>
 <p><strong>In the code</strong></p>
 <ul><li><code>createRace()</code> in <code>src/sim/race.js</code>: my ghost and one champion, each at the start of its best lap.</li><li><code>championBestLap()</code> in <code>src/sim/race.js</code>: drives a champion alone and keeps its fastest lap and where it began.</li><li><code>stepRace()</code> and <code>runRace()</code> in <code>src/sim/race.js</code>: one step, or a whole race, for both cars.</li><li><code>raceGap()</code> in <code>src/sim/race.js</code>: who's ahead right now, and by how many seconds.</li><li><code>raceResult()</code> in <code>src/sim/race.js</code>: who won and by how much, or how the AI got out.</li><li><code>buildScoreboard()</code> in <code>src/sim/scoreboard.js</code>: the six rows and the running score, from the saved files only.</li><li><code>drawRaceHud()</code> and <code>drawScoreboard()</code> in <code>src/render/race-view.js</code>: the race screen and the scoreboard.</li></ul>
+<p><strong>The full code</strong></p>
+<p><code>raceResult()</code>: no result while racing. If the AI never finished, I win and the result says how it got out. Otherwise the winner is the car with fewer steps, and the gap is the step difference divided by 60.</p>
+<pre class="code"><code>// The final result: who won, by how much, and how the AI got out if it never finished.
+export function raceResult(race) {
+  const { me, ai } = race;
+  if (!race.over) return null;
+  if (!ai.finishSteps) {
+    return { winner: 'me', by: null, aiOut: ai.out, aiProgress: progressShare(ai), meSteps: me.finishSteps, aiSteps: null };
+  }
+  const diff = me.finishSteps - ai.finishSteps;
+  let winner = 'tie';
+  if (diff &gt; 0) winner = 'ai';
+  if (diff &lt; 0) winner = 'me';
+  return { winner, by: Math.abs(diff) / STEPS_PER_SECOND, meSteps: me.finishSteps, aiSteps: ai.finishSteps };
+}</code></pre>
 <hr>
 <h2 id="7-did-it-learn-or-memorize">7. Did it learn, or memorize?</h2>
 <p><strong>The one idea:</strong> a car that really learned to drive should manage a track it has never seen; one that only memorized its home track shouldn't.</p>
@@ -297,6 +462,14 @@ th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
 <p><strong>The prompt:</strong> <a href="../../PROMPTS.md#14-step-7a-did-it-learn-or-memorize">entry 14: did it learn, or memorize?</a>.</p>
 <p><strong>In the code</strong></p>
 <ul><li><code>trackDef()</code> in <code>src/sim/track.js</code>: a track's data by its id (Neon Loop, Mirrored, Zigzag, Wide Sweepers, Exam).</li><li><code>trackData()</code> and <code>sha256()</code> in <code>tools/track-hash.js</code>: the frozen tracks' fingerprint.</li><li><code>trialRun()</code> in <code>tools/generalization-report.js</code>: one champion alone on one track, under the evolution rules.</li><li><code>countExamLap()</code>, <code>bestExamLap()</code> and <code>examGhost()</code> in <code>src/sim/exam.js</code>: my first 3 Exam laps, the best of them, and the ghost file.</li></ul>
+<p><strong>The full code</strong></p>
+<p><code>countExamLap()</code>: a lap is kept only while fewer than 3 have been kept. Anything after that doesn't count.</p>
+<pre class="code"><code>// Adds a completed lap if fewer than 3 have counted so far. Returns true if it counted.
+export function countExamLap(record, lap) {
+  if (record.laps.length &gt;= COUNTED_LAPS) return false;
+  record.laps.push({ steps: lap.steps, start: lap.start, inputs: lap.inputs });
+  return true;
+}</code></pre>
 <hr>
 <h2 id="glossary">Glossary</h2>
 <ul><li><strong>Activation function:</strong> another name for a squash function. See <em>squash</em>.</li><li><strong>Apex:</strong> the innermost point of a curve.</li><li><strong>Best lap:</strong> a car's fastest lap. In races, both sides drive their best lap.</li><li><strong>Bias:</strong> one extra number a neuron adds after summing up. It shifts the neuron's result up or down, whatever the inputs are.</li><li><strong>Brain:</strong> here, a neural network of 70 numbers that turns 6 inputs into 4 key presses.</li><li><strong>Champion:</strong> the car with the highest fitness in its generation.</li><li><strong>Checkpoint:</strong> an invisible line across the road. There are 82, and a lap only counts if the car crosses them all, in order.</li><li><strong>Child:</strong> a car of the next generation, made from a copy of one parent's numbers with small changes.</li><li><strong>Crossover:</strong> mixing the numbers of two parents into one child. We don't use it.</li><li><strong>Elitism:</strong> copying the single best brain into the next generation unchanged, so the best can never get worse.</li><li><strong>Evolution:</strong> keep the best, copy them with small changes, repeat.</li><li><strong>Fitness:</strong> the score that decides who becomes a parent. Here: how far along the track, plus a bonus for a fast lap.</li><li><strong>Flying lap:</strong> a lap that starts with the car already moving across the line, like my 26.40 s lap.</li><li><strong>Fixed timestep:</strong> the simulation always moves forward in steps of the same length (one sixtieth of a second), whatever the screen does.</li><li><strong>Function:</strong> a small, named piece of code that does one job.</li><li><strong>Generalize:</strong> do well on something new, not just on what you trained on. A car that generalizes can drive tracks it has never seen.</li><li><strong>Generation:</strong> one round of 100 cars driving at the same time.</li><li><strong>Ghost:</strong> a recorded lap: the starting position plus the keys held on every step. Replaying it drives exactly the same lap.</li><li><strong>Held out:</strong> kept aside on purpose and never used for training, so it can be a fair test later. The Exam track is held out.</li><li><strong>Hidden neuron:</strong> a neuron between the inputs and the outputs. It's "hidden" because you never see it from outside.</li><li><strong>Hitbox:</strong> the shape the program uses to decide whether the car touched a wall.</li><li><strong>Input:</strong> one of the 6 numbers the brain gets: 5 eyes and the speed, each between 0 and 1.</li><li><strong>Layer:</strong> a group of neurons that all look at the same inputs.</li><li><strong>Local optimum:</strong> a dead end that looks like the top. Every small change makes things worse, even though something much better exists.</li><li><strong>Mutation:</strong> a small random change to some of a child's numbers. Here, each number has a 10% chance.</li><li><strong>Neural network:</strong> many neurons connected in layers. Ours has 6 inputs, 6 hidden neurons and 4 outputs.</li><li><strong>Neuron:</strong> multiplies each input by its weight, adds them up, adds the bias, and squashes the result.</li><li><strong>Normalize:</strong> turn a number into a common range, here 0 to 1, so that every input gets a fair say.</li><li><strong>Output:</strong> one of the 4 numbers the brain produces, one per key. Above 0.5 means that key is pressed.</li><li><strong>Parent:</strong> one of the top 10 cars of a generation, whose numbers are copied into the next one.</li><li><strong>Pre-register:</strong> write down the exact test before running it, so the results can't change the question.</li><li><strong>Population:</strong> all the cars of one generation, here 100.</li><li><strong>px (pixel):</strong> one dot on the screen. The screen is 1280 × 720 px.</li><li><strong>Race:</strong> my ghost lap and a champion's best lap, driven at the same time on the same track. They can't collide.</li><li><strong>Ray:</strong> one of the car's 5 eyes: a line that goes out until it hits a wall, up to 200 px.</li><li><strong>Seed:</strong> the starting number for the random number generator. The same seed always gives the same "random" numbers.</li><li><strong>Scoreboard:</strong> my best lap against the champion of each of the six fixed generations (1, 5, 10, 20, 40, 80), and the running score.</li><li><strong>Selection:</strong> ranking the cars by fitness and keeping the best as parents.</li><li><strong>Sigmoid:</strong> a squash function whose result is always between 0 and 1. Used for the 4 keys.</li><li><strong>Simulation:</strong> a pretend world inside the computer that follows fixed rules.</li><li><strong>Squash:</strong> turn any number into one in a fixed range, so nothing runs off to infinity.</li><li><strong>Stall:</strong> a car that goes 3 seconds without reaching a new checkpoint is out.</li><li><strong>Standing start:</strong> a lap that starts from rest, 30 px behind the line. A champion's first lap is one.</li><li><strong>Step:</strong> one tick of the simulation, one sixtieth of a second.</li><li><strong>tanh:</strong> a squash function whose result is always between −1 and 1. Used for the hidden neurons.</li><li><strong>Weight:</strong> the number a neuron multiplies one input by. A big weight means "this input matters a lot". A negative weight means "this input pushes the other way".</li></ul>

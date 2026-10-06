@@ -139,6 +139,24 @@ After that, the physics, the car's shape and the track were **frozen**: changing
 - `makeRng()` in `src/sim/rng.js`: the seeded random number generator.
 - `replayGhost()` in `src/sim/ghost.js`: drives a recorded lap again from its keys.
 
+
+**The full code**
+
+`crossedCheckpoint()`: first it measures how much of the car's last move went along the track's direction (positive means forward). Then it checks whether that move crossed the checkpoint line. Only a forward crossing counts.
+
+<!-- full-code src/sim/laps.js crossedCheckpoint -->
+```js
+// Did the car's center cross this checkpoint during the last step, moving forward along the track?
+export function crossedCheckpoint(car, cp) {
+  const movedX = car.x - car.prevX;
+  const movedY = car.y - car.prevY;
+  const forward = movedX * cp.tx + movedY * cp.ty;
+  if (forward <= 0) return false;
+  return segmentHit(car.prevX, car.prevY, car.x, car.y, cp.ax, cp.ay, cp.bx, cp.by) >= 0;
+}
+```
+<!-- /full-code -->
+
 ---
 
 ## 2. Eyes
@@ -204,6 +222,38 @@ Looking doesn't change anything. A lap where the car reads its eyes every step i
 - `eyePosition()` in `src/sim/sensors.js`: where each eye sits on the car's outline.
 - `getInputs()` in `src/sim/sensors.js`: the only 6 numbers the car will ever know.
 - `inputsFromView()` in `src/sim/sensors.js`: the same 6 numbers, from distances already measured.
+
+
+**The full code**
+
+`getInputs()`: measure the 5 distances, then hand them and the speed to `inputsFromView()`.
+
+<!-- full-code src/sim/sensors.js getInputs -->
+```js
+// The brain's input: the only 6 numbers the car will ever know.
+// 5 eyes, each 0..1 (1 = wall touching the car, 0 = nothing in range), then speed 0..1 (reversing counts as 0).
+export function getInputs(car, walls) {
+  return inputsFromView(readSensors(car, walls), car.speed);
+}
+```
+<!-- /full-code -->
+
+`inputsFromView()`: each distance becomes 1 minus (distance divided by 200), so 0 px gives 1 and 200 px gives 0. The speed becomes speed divided by 330, kept between 0 and 1.
+
+<!-- full-code src/sim/sensors.js inputsFromView -->
+```js
+// The same 6 numbers, from 5 distances already measured with readSensors() and the car's speed.
+export function inputsFromView(distances, speed) {
+  const inputs = [];
+  for (const distance of distances) {
+    inputs.push(1 - distance / SENSOR_RANGE);
+  }
+  const speedShare = speed / CAR.maxSpeed;
+  inputs.push(Math.max(0, Math.min(1, speedShare)));
+  return inputs;
+}
+```
+<!-- /full-code -->
 
 ---
 
@@ -311,6 +361,81 @@ Seed 3's best random brain got 65% of the way round on pure luck. Random numbers
 - `BRAIN_SIZE` in `src/sim/brain.js`: 70.
 - `createGeneration()` and `stepGeneration()` in `src/sim/generation.js`: 100 cars, the stall rule, the 60-second limit.
 
+
+**The full code**
+
+`neuron()`: a running total of input × weight, then + bias, then squash. The weights of neuron *n* sit side by side in the 70-number list, followed by its bias.
+
+<!-- full-code src/sim/brain.js neuron -->
+```js
+// One neuron: multiply each input by its weight, add them up, add the bias, squash.
+export function neuron(inputs, brain, start, squash) {
+  let sum = 0;
+  for (let i = 0; i < inputs.length; i++) {
+    const weight = brain[start + i];
+    sum += inputs[i] * weight;
+  }
+  const bias = brain[start + inputs.length];
+  sum += bias;
+  return squash(sum);
+}
+```
+<!-- /full-code -->
+
+`think()`: the 4 outputs, each compared with 0.5. The four keys are separate bits (gas 1, brake 2, left 4, right 8), so adding them up gives one number that says which keys are held.
+
+<!-- full-code src/sim/brain.js think -->
+```js
+// Which keys to press this step: every output above 0.5 is a key held down.
+export function think(brain, inputs) {
+  const [gas, brake, left, right] = outputs(brain, inputs);
+  let keys = 0;
+  if (gas > 0.5) keys += UP;
+  if (brake > 0.5) keys += DOWN;
+  if (left > 0.5) keys += LEFT;
+  if (right > 0.5) keys += RIGHT;
+  return keys;
+}
+```
+<!-- /full-code -->
+
+`stepGeneration()`: one tick for every car that's still driving. Look (`readSensors`), turn what it sees into numbers (`inputsFromView`), think, move (`stepWorld`). Then keep score: the best lap, the last new checkpoint, and whether it's now out by crash, stall (3 s without a new checkpoint) or time (60 s).
+
+<!-- full-code src/sim/generation.js stepGeneration -->
+```js
+// Advances every car that's still driving by one step (1/60 s): look, think, press keys, move.
+export function stepGeneration(gen) {
+  if (gen.over) return [];
+  gen.step++;
+  const events = [];
+  let driving = 0;
+  for (let index = 0; index < gen.cars.length; index++) {
+    const c = gen.cars[index];
+    if (c.out) continue;
+    c.view = readSensors(c.world.car, gen.track.walls);
+    c.inputs = inputsFromView(c.view, c.world.car.speed);
+    c.keys = think(c.brain, c.inputs);
+    const happened = stepWorld(c.world, c.keys);
+    for (const e of happened) {
+      if (e.type === 'lap' && (c.bestLapSteps === null || e.steps < c.bestLapSteps)) c.bestLapSteps = e.steps;
+      events.push({ ...e, index });
+    }
+    if (c.world.laps.checkpointsPassed > c.progressSeen) {
+      c.progressSeen = c.world.laps.checkpointsPassed;
+      c.lastProgressStep = gen.step;
+    }
+    if (c.world.car.crashed) c.out = 'crash';
+    else if (gen.step - c.lastProgressStep >= STALL_STEPS) c.out = 'stall';
+    else if (gen.step >= GENERATION_STEPS) c.out = 'time';
+    if (c.out) c.outStep = gen.step;
+    else driving++;
+  }
+  if (driving === 0) gen.over = true;
+  return events;
+}
+```
+<!-- /full-code -->
+
 ---
 
 ## 4. Evolution
@@ -416,6 +541,81 @@ Four of the five seeds learned to drive. One never did.
 - `finishGeneration()` in `src/sim/evolution.js`: records the stats and saves the champions of generations 1, 5, 10, 20, 40, 80.
 - `stepEvolution()` and `runEvolution()` in `src/sim/evolution.js`: run it all, generation after generation.
 
+
+**The full code**
+
+`fitness()`: track progress, plus 6000 divided by the best lap time in seconds when there is one.
+
+<!-- full-code src/sim/generation.js fitness -->
+```js
+// How good a car was: go as far as you can; if you finish a lap, finish fast (a bonus that grows as the lap time shrinks).
+export function fitness(car) {
+  let score = trackProgress(car.world);
+  if (car.bestLapSteps !== null) {
+    const lapSeconds = car.bestLapSteps / STEPS_PER_SECOND;
+    score += LAP_BONUS / lapSeconds;
+  }
+  return score;
+}
+```
+<!-- /full-code -->
+
+`selection()`: sort a copy of the cars by score, highest first, and keep 10. JavaScript's sort is stable, so cars with equal scores keep their order and the result never depends on luck. Step 7b passes in its own score, the fitness summed over three tracks.
+
+<!-- full-code src/sim/evolution.js selection -->
+```js
+// Selection: rank all cars by fitness, best first, and keep the top 10 as parents.
+// (Step 7b scores a car differently, by its fitness summed over three tracks, and passes that in as `score`.)
+export function selection(cars, score = fitness) {
+  const ranked = cars.slice();
+  ranked.sort((a, b) => score(b) - score(a));
+  return ranked.slice(0, PARENTS);
+}
+```
+<!-- /full-code -->
+
+`mutate()`: for each of the 70 numbers, one random draw decides (10%) whether it changes. Only if it does, two more draws make a bell-curve nudge of typical size 0.3. The draws always come in the same order, so the same seed gives the same children.
+
+<!-- full-code src/sim/evolution.js mutate -->
+```js
+// Mutation: copy a parent's 70 numbers, and give each one a 10% chance to be nudged a little.
+export function mutate(brain, rand) {
+  const child = [];
+  for (const number of brain) {
+    if (rand() < MUTATION_RATE) {
+      child.push(number + gaussian(rand) * MUTATION_SIZE);
+    } else {
+      child.push(number);
+    }
+  }
+  return child;
+}
+```
+<!-- /full-code -->
+
+`nextGeneration()`: the elite (an exact copy of the best) first, then 99 mutated children of parents picked by rank. The family list records each car's parent for the family tree.
+
+<!-- full-code src/sim/evolution.js nextGeneration -->
+```js
+// The next generation: 1 elite (the best brain, unchanged, so the best can never get worse) + 99 mutated children.
+export function nextGeneration(evo) {
+  const gen = evo.gen;
+  const parents = selection(gen.cars);
+  const elite = parents[0];
+  const brains = [elite.brain.slice()];
+  const family = [{ parentId: elite.id, elite: true }];
+  while (brains.length < POPULATION) {
+    const parent = pickParent(parents, evo.rand);
+    brains.push(mutate(parent.brain, evo.rand));
+    family.push({ parentId: parent.id, elite: false });
+  }
+  evo.gen = createGeneration(evo.track, brains, gen.number + 1, family);
+  for (const c of evo.gen.cars) evo.parentOf[c.id] = c.parentId;
+  return evo.gen;
+}
+```
+<!-- /full-code -->
+
 ---
 
 ## 5. Reading a brain
@@ -509,6 +709,21 @@ The brain didn't grow or get new parts. It's the same 70 slots from the first ra
 - `drawWeightsGrid()` in `src/render/weights-grid.js`: the 70 numbers (key N).
 - `ancestors()` in `src/sim/evolution.js`: a champion's family line, back to generation 1.
 
+
+**The full code**
+
+`outputs()`: the whole network. Layer 1 is 6 tanh neurons using numbers 0–41; layer 2 is 4 sigmoid neurons using numbers 42–69.
+
+<!-- full-code src/sim/brain.js outputs -->
+```js
+// The 4 output values (0..1) for these 6 inputs: gas, brake, left, right.
+export function outputs(brain, inputs) {
+  const hidden = layer(inputs, brain, 0, HIDDEN, tanh);
+  return layer(hidden, brain, HIDDEN * (INPUTS + 1), OUTPUTS, sigmoid);
+}
+```
+<!-- /full-code -->
+
 ---
 
 ## 6. Me vs the AI
@@ -577,6 +792,29 @@ Where do I lose to generation 10? Everywhere, by about half. From the start to 4
 - `buildScoreboard()` in `src/sim/scoreboard.js`: the six rows and the running score, from the saved files only.
 - `drawRaceHud()` and `drawScoreboard()` in `src/render/race-view.js`: the race screen and the scoreboard.
 
+
+**The full code**
+
+`raceResult()`: no result while racing. If the AI never finished, I win and the result says how it got out. Otherwise the winner is the car with fewer steps, and the gap is the step difference divided by 60.
+
+<!-- full-code src/sim/race.js raceResult -->
+```js
+// The final result: who won, by how much, and how the AI got out if it never finished.
+export function raceResult(race) {
+  const { me, ai } = race;
+  if (!race.over) return null;
+  if (!ai.finishSteps) {
+    return { winner: 'me', by: null, aiOut: ai.out, aiProgress: progressShare(ai), meSteps: me.finishSteps, aiSteps: null };
+  }
+  const diff = me.finishSteps - ai.finishSteps;
+  let winner = 'tie';
+  if (diff > 0) winner = 'ai';
+  if (diff < 0) winner = 'me';
+  return { winner, by: Math.abs(diff) / STEPS_PER_SECOND, meSteps: me.finishSteps, aiSteps: ai.finishSteps };
+}
+```
+<!-- /full-code -->
+
 ---
 
 ## 7. Did it learn, or memorize?
@@ -639,6 +877,22 @@ The test: each champion drives alone, from the track's normal start, under the s
 - `trackData()` and `sha256()` in `tools/track-hash.js`: the frozen tracks' fingerprint.
 - `trialRun()` in `tools/generalization-report.js`: one champion alone on one track, under the evolution rules.
 - `countExamLap()`, `bestExamLap()` and `examGhost()` in `src/sim/exam.js`: my first 3 Exam laps, the best of them, and the ghost file.
+
+
+**The full code**
+
+`countExamLap()`: a lap is kept only while fewer than 3 have been kept. Anything after that doesn't count.
+
+<!-- full-code src/sim/exam.js countExamLap -->
+```js
+// Adds a completed lap if fewer than 3 have counted so far. Returns true if it counted.
+export function countExamLap(record, lap) {
+  if (record.laps.length >= COUNTED_LAPS) return false;
+  record.laps.push({ steps: lap.steps, start: lap.start, inputs: lap.inputs });
+  return true;
+}
+```
+<!-- /full-code -->
 
 ---
 

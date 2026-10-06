@@ -12,6 +12,7 @@
 // Markdown doesn't exist on disk, or if a page still points an <img> at a file.
 
 import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
+import { syncCode, boxPlaceholders, boxHtml } from './code-boxes.js';
 
 const root = new URL('../', import.meta.url);
 const OUT = new URL('docs/guide/', root);
@@ -59,11 +60,26 @@ export function markdownToHtml(md) {
   const lines = md.split('\n');
   const out = [];
   let i = 0;
-  const isBlockStart = (l) => /^(#{1,6} |> |- |\d+\. |\||---\s*$)/.test(l) || l.trim() === '';
+  const isBlockStart = (l) => /^(#{1,6} |> |- |\d+\. |\||---\s*$|```|<!--)/.test(l) || l.trim() === '';
   while (i < lines.length) {
     const l = lines[i];
     if (l.trim() === '') { i++; continue; }
     let m;
+    if (l.startsWith('<!--')) {
+      // a hidden comment (on GitHub too): skip it
+      while (i < lines.length && !lines[i].includes('-->')) i++;
+      i++;
+      continue;
+    }
+    if (l.startsWith('```')) {
+      // a block of code, shown as it is
+      const code = [];
+      i++;
+      while (i < lines.length && !lines[i].startsWith('```')) code.push(lines[i++]);
+      i++;
+      out.push(`<pre class="code"><code>${escapeHtml(code.join('\n'))}</code></pre>`);
+      continue;
+    }
     if ((m = /^(#{1,6}) (.*)$/.exec(l))) {
       const level = m[1].length, text = m[2];
       out.push(`<h${level} id="${slug(text)}">${inline(text)}</h${level}>`);
@@ -128,6 +144,17 @@ em { color: var(--dim); }
 table { border-collapse: collapse; font-size: 15px; min-width: 100%; }
 th, td { padding: 6px 10px; border-bottom: 1px solid rgba(0, 240, 255, 0.15); text-align: left; white-space: nowrap; }
 th { color: var(--cyan); font-family: ui-monospace, Menlo, monospace; }
+pre.code { background: #0d1019; border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 10px; padding: 12px 14px; overflow-x: auto; font: 13px/1.5 ui-monospace, Menlo, monospace; color: #cfe9ff; }
+.code-box { margin: 24px 0; padding: 14px 16px 10px; background: var(--panel); border: 1px solid rgba(255, 210, 63, 0.45); border-radius: 14px; }
+.code-box h4 { margin: 0 0 6px; font: 700 16px ui-monospace, Menlo, monospace; color: var(--yellow); }
+.code-box p { margin: 0 0 10px; font-size: 16px; }
+.code-rows { display: grid; gap: 0; }
+.code-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; padding: 6px 0; border-top: 1px solid rgba(0, 240, 255, 0.08); align-items: start; }
+.code-row pre { margin: 0; font: 13px/1.45 ui-monospace, Menlo, monospace; color: #b8fbff; white-space: pre-wrap; word-break: break-word; }
+.code-row .say { font-size: 15px; line-height: 1.45; color: var(--text); }
+.code-row.skipped pre { color: var(--dim); }
+.code-row.skipped .say { color: var(--dim); font-style: italic; }
+@media (max-width: 640px) { .code-row { grid-template-columns: 1fr; gap: 2px; } .code-row pre { background: #0d1019; padding: 4px 8px; border-radius: 6px; } }
 @media (max-width: 480px) { body { font-size: 17px; } h1 { font-size: 25px; } h2 { font-size: 21px; } }
 `;
 
@@ -154,14 +181,26 @@ ${body}
 const sources = { 'HOW-IT-WORKS.md': ['index.html', 'How a little car taught itself to drive', 'simple'], 'DEEP-DIVE.md': ['deep-dive.html', 'Deep dive: Bug Driver', 'deep'] };
 const problems = [];
 for (const [md, [html, title, here]] of Object.entries(sources)) {
-  const text = readFileSync(new URL(md, root), 'utf8');
+  let text = readFileSync(new URL(md, root), 'utf8');
+  // the code in the guide is always the real code: regenerate every box from the source files
+  let boxes = [];
+  try {
+    const synced = syncCode(text);
+    boxes = synced.boxes;
+    if (synced.text !== text) { writeFileSync(new URL(md, root), synced.text); text = synced.text; console.log(`${md}: code boxes updated from the source`); }
+  } catch (e) {
+    problems.push(`${md}: ${e.message}`);
+  }
   // on GitHub, image paths in the Markdown are relative to the repo root
   for (const [, src] of text.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)) {
     if (!existsSync(new URL(src, root))) problems.push(`${md}: image ${src} does not exist`);
   }
   let images = 0;
   try {
-    const out = page(title, markdownToHtml(text), here);
+    let body = markdownToHtml(boxPlaceholders(text));
+    body = body.replace(/<p>@@LOOK-AT-THE-CODE-(\d+)@@<\/p>/g, (_, n) => boxHtml(boxes[n], inline, escapeHtml));
+    if (body.includes('@@LOOK-AT-THE-CODE')) throw new Error('a code box was not placed');
+    const out = page(title, body, here);
     writeFileSync(new URL(html, OUT), out);
     // every <img> in the generated page must be built in, never a file the viewer might not be allowed to open
     for (const [, src] of out.matchAll(/<img src="([^"]+)"/g)) {
@@ -171,7 +210,7 @@ for (const [md, [html, title, here]] of Object.entries(sources)) {
   } catch (e) {
     problems.push(`${md}: ${e.message}`);
   }
-  console.log(`docs/guide/${html}: ${images} images`);
+  console.log(`docs/guide/${html}: ${images} images, ${boxes.length} code boxes`);
 }
 if (problems.length) {
   console.error(`\nBuild failed:\n${problems.map((p) => `  ${p}`).join('\n')}`);

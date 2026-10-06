@@ -97,6 +97,12 @@ material for the video and the guides.
   names; each chapter ends with "For the curious: [Deep dive →](DEEP-DIVE.md#...)".
   Lighter template: the one idea → analogy → picture → the one real moment
   (what actually happened) → deep-dive link. Simpler, never wrong.
+- Every chapter of HOW-IT-WORKS.md has a "Look at the code" box: real code pulled out of the
+  source by function name (tools/code-boxes.js, built by tools/guide-page.js), never retyped,
+  at most 12 lines, with every line explained in plain words about the car's world. Longer
+  functions show the core and say in plain words what the skipped lines do. The deep dive shows
+  the whole function (`<!-- full-code file function -->`) with a short walkthrough. The build
+  fails if a function is missing or a box no longer matches the code.
 - DEEP-DIVE.md keeps every detail: tables, precise numbers, "reproduce it"
   notes, function names with file paths, and the full template (The one
   idea · Analogy · Key figure · Real numbers · What actually happened ·
