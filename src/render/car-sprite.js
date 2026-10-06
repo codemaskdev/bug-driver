@@ -63,13 +63,17 @@ export function smoothPose(car, alpha) {
 }
 
 // Draws the car at `pose` (from smoothPose); `crashed` tints its glow.
-export function drawCar(pose, crashed) {
+// look: {alpha, scale, glow} for the AI crowd (dim wrecks, semi-transparent cars, a bright leader).
+export function drawCar(pose, crashed, look = {}) {
+  const { alpha = 1, scale = 1, glow = 8 } = look;
   ctx.save();
   ctx.translate(pose.x, pose.y);
   ctx.rotate(pose.angle);
+  if (scale !== 1) ctx.scale(scale, scale);
+  ctx.globalAlpha = alpha;
   ctx.imageSmoothingEnabled = false;
   ctx.shadowColor = crashed ? '#ff2e63' : '#00f0ff';
-  ctx.shadowBlur = 8;
+  ctx.shadowBlur = glow;
   ctx.drawImage(sprite, -(ORIGIN_COL + 0.5) * PIXEL, -(ORIGIN_ROW + 0.5) * PIXEL);
   ctx.restore();
 }

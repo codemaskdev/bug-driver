@@ -9,13 +9,16 @@ const KEYS = {
   ArrowRight: RIGHT, KeyD: RIGHT,
 };
 const held = new Set();
-let restartAsked = false;
-let explainToggled = false;
+// Keys that act once per press (R restart, E explain, Tab mode, 1/2/3 speed)
+const ONCE = new Set(['KeyR', 'KeyE', 'Tab', 'Digit1', 'Digit2', 'Digit3']);
+const pressed = new Set();
 
 window.addEventListener('keydown', (e) => {
   if (e.code in KEYS) { held.add(e.code); e.preventDefault(); }
-  if (e.code === 'KeyR' && !e.repeat) restartAsked = true;
-  if (e.code === 'KeyE' && !e.repeat) explainToggled = true;
+  if (ONCE.has(e.code)) {
+    if (e.code === 'Tab') e.preventDefault(); // don't move the browser's focus
+    if (!e.repeat) pressed.add(e.code);
+  }
 });
 window.addEventListener('keyup', (e) => held.delete(e.code));
 // Switching windows would otherwise leave a key stuck down
@@ -28,16 +31,14 @@ export function readInput() {
   return input;
 }
 
-// True once per R press.
-export function takeRestart() {
-  const asked = restartAsked;
-  restartAsked = false;
-  return asked;
+// True once per press of `code` (e.g. 'KeyR').
+export function takePress(code) {
+  const was = pressed.has(code);
+  pressed.delete(code);
+  return was;
 }
 
-// True once per E press.
-export function takeExplainToggle() {
-  const toggled = explainToggled;
-  explainToggled = false;
-  return toggled;
+// Forget presses nobody has read yet (e.g. a speed key pressed while driving yourself).
+export function clearPresses() {
+  pressed.clear();
 }

@@ -49,7 +49,7 @@ export function drawHud(hud) {
   glowText('laps done', VIEW_W - 16, 34, 'rgba(0, 240, 255, 0.35)', '11px monospace', 0);
 
   ctx.textAlign = 'left';
-  glowText('ARROWS / WASD  drive     R  restart     E  explain', 16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
+  glowText('ARROWS / WASD  drive     R  restart     E  explain     TAB  let the AI drive', 16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
 
   if (!hud.started && !hud.crashed) {
     ctx.textAlign = 'center';
@@ -66,4 +66,45 @@ export function drawHud(hud) {
     glowText('CRASHED', VIEW_W / 2, 300, PINK, 'bold 48px monospace', 18);
     glowText('press R to restart', VIEW_W / 2, 358, TEXT, '16px monospace', 6);
   }
+}
+
+// ai = {trackName, generation, alive, total, leaderPercent, seconds, speed, seed, over, best}
+export function drawAiHud(ai) {
+  ctx.textBaseline = 'top';
+
+  ctx.textAlign = 'left';
+  glowText('BUG DRIVER', 16, 14, DIM, '14px monospace', 0);
+  glowText(`${ai.trackName.toUpperCase()}  ·  AI DRIVES`, 16, 32, 'rgba(0, 240, 255, 0.35)', '11px monospace', 0);
+
+  ctx.textAlign = 'center';
+  glowText(`GEN ${ai.generation}`, VIEW_W / 2, 8, TEXT, 'bold 26px monospace');
+  glowText(`ALIVE ${ai.alive}/${ai.total}    LEADER ${ai.leaderPercent.toFixed(1)}%    ${ai.seconds.toFixed(1)} s`,
+    VIEW_W / 2, 40, DIM, '12px monospace', 0);
+
+  ctx.textAlign = 'right';
+  glowText(ai.speed === 'max' ? 'MAX' : `x${ai.speed}`, VIEW_W - 16, 12, YELLOW, 'bold 18px monospace', 8);
+  glowText(`seed ${ai.seed}`, VIEW_W - 16, 34, 'rgba(0, 240, 255, 0.35)', '11px monospace', 0);
+
+  ctx.textAlign = 'left';
+  glowText('1 2 3  speed x1 / x10 / max     R  restart generation     E  explain     TAB  drive yourself',
+    16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
+
+  if (ai.over) {
+    ctx.textAlign = 'center';
+    glowText(`GENERATION ${ai.generation} OVER`, VIEW_W / 2, 296, YELLOW, 'bold 30px monospace', 14);
+    glowText(`best car: ${ai.best.percent.toFixed(1)}% of a lap, out by ${ai.best.out} at ${ai.best.seconds.toFixed(2)} s`,
+      VIEW_W / 2, 338, TEXT, '14px monospace', 4);
+    glowText('R  run it again', VIEW_W / 2, 362, 'rgba(230, 235, 242, 0.55)', '12px monospace', 0);
+  }
+}
+
+// Max speed: nothing is drawn while the generation runs, just this line.
+export function drawMaxSpeedScreen(generation, seconds) {
+  ctx.fillStyle = '#05060a';
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+  glowText('MAX SPEED', VIEW_W / 2, VIEW_H / 2 - 18, YELLOW, 'bold 26px monospace', 12);
+  glowText(`simulating generation ${generation} without drawing it · ${seconds.toFixed(1)} s simulated`,
+    VIEW_W / 2, VIEW_H / 2 + 16, DIM, '13px monospace', 0);
 }
