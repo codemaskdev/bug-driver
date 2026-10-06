@@ -60,7 +60,31 @@ export function renderTrack(track) {
   }
 
   drawStartLine(g, track.checkpoints[0]);
+  drawDirectionChevrons(g, track);
   return img;
+}
+
+// Three faint chevrons just past the start line, pointing the way to drive.
+function drawDirectionChevrons(g, track) {
+  const spacing = track.length / track.center.length; // px between centerline samples
+  g.save();
+  g.strokeStyle = 'rgba(0, 240, 255, 0.28)';
+  g.shadowColor = '#00f0ff';
+  g.shadowBlur = 4;
+  g.lineWidth = 4;
+  g.lineCap = 'square';
+  for (const dist of [60, 92, 124]) {
+    const i = Math.round(dist / spacing);
+    const p = track.center[i], t = track.tangents[i];
+    const nx = -t.y, ny = t.x; // across the track
+    const tip = 7, back = 7, half = 13;
+    g.beginPath();
+    g.moveTo(p.x - t.x * back + nx * half, p.y - t.y * back + ny * half);
+    g.lineTo(p.x + t.x * tip, p.y + t.y * tip);
+    g.lineTo(p.x - t.x * back - nx * half, p.y - t.y * back - ny * half);
+    g.stroke();
+  }
+  g.restore();
 }
 
 // Checkered start/finish line: two rows of squares across the track.
