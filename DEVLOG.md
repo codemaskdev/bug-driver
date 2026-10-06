@@ -358,3 +358,39 @@ The mirrored hairpin is around checkpoint 41 of 82, i.e. 50% of the lap.
 What broke: nothing in the code. While designing, before registration, Wide Sweepers' inner wall crossed itself (fixed by opening the corner) and Zigzag was lifted 8 px. The prompt hoped for a first-corner crash; the real failure is mid-lap, at the mirrored hairpin, and that's what's reported.
 
 🎬 The champion that beat me by 14 s stops dead in its own hairpin driven backwards, keeps the brake down, and reverses into the wall (`?champion=3-80&track=neon-loop-mirrored`, crash at 7.63 s).
+
+## 2026-10-06 — Step 7b: training on three tracks (the exam waits for my Exam lap)
+Commits 4b4662f (training, champions) and 9250e2a (races on other tracks).
+
+**My Exam lap isn't there yet.**
+- The prompt reported "I drove Exam: 3 counted laps, best 21.37 s".
+- There was no me-exam.json in Downloads or anywhere on disk.
+- In the browser's localStorage (localhost:3000) there was no Exam record and no Exam lap. The best lap stored for **Zigzag** is exactly 1282 steps = 21.37 s, so the drive was on Zigzag (T cycles Neon Loop → Mirrored → Zigzag → Wide Sweepers → Exam).
+- So Exam is still undriven and still blind. Part 1 (my Exam ghost) and part 3 (the exam) wait for that drive. Neon Loop Mirrored is held back too, because the prompt puts it in part 3.
+- Seen in the same storage, not used anywhere: my Neon Loop best is now 1349 steps (22.48 s). My official Neon Loop ghost stays ghosts/me-v3.json (26.40 s), as frozen in Step 4.
+
+**Step 7b, exactly as pre-registered.**
+- Seed 3, from scratch, 100 generations on Neon Loop + Zigzag + Wide Sweepers.
+- Every car drives all three tracks alone; its fitness is the sum of its three single-track fitness scores.
+- Everything else is unchanged: 100 cars, top 10, elite, mutation 10% / sigma 0.3, the one seeded RNG.
+- Run time: 554 s in Node.
+- Exam isn't a training track (a test checks that). Nothing about the training set, the method or Exam was changed.
+
+Multi-track champions (`node tools/multi-train.js`, champions/seed-3-multi.json). Each one, run alone again, reproduces these laps to the step (tests/step7b.test.js).
+| gen | car | Neon Loop | Zigzag | Wide Sweepers | fitness (sum) |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 1-85 | no lap (65%) | no lap (0%) | no lap (60%) | 89.0 |
+| 5 | 5-0 | no lap (67%) | 11.53 s | 11.82 s | 1672.7 |
+| 10 | 10-47 | 13.53 s | 8.65 s | 8.37 s | 2926.4 |
+| 20 | 20-0 | 13.20 s | 8.25 s | 8.17 s | 3117.8 |
+| 40 | 40-0 | 13.25 s | 8.17 s | 8.20 s | 3130.7 |
+| 80 | 80-0 | 13.20 s | 8.15 s | 8.18 s | 3135.3 |
+| 100 | 100-0 | 13.17 s | 8.15 s | 8.17 s | 3138.4 |
+
+- Gen 1 is the same 100 random brains as the one-track run, since it's the same seed: car 1-85 again.
+- At home on Neon Loop the multi-track champions are slower than the one-track ones: 13.17 s at gen 100, against 12.47 s for the one-track gen 80 champion. On the two other tracks they're faster than the one-track champions were.
+
+**A risk noticed after Step 7a, written down before the exam is run.** None of the three training tracks has a right-hand hairpin. Neon Loop's turns left, and Zigzag and Wide Sweepers have none. Exam has one, and a right-hand hairpin is exactly what broke the gen 80 champions on Mirrored. We kept the pre-registered plan anyway, so if multi-track training doesn't help on Exam, that's the result.
+
+- Also new: `?race=exam&champion=3-multi-100` races a champion against my ghost on another track. It refuses when I have no ghost lap there; for Exam that means until ghosts/me-exam.json exists.
+- 55 tests pass.
