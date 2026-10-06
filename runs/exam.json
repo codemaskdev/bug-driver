@@ -1,0 +1,338 @@
+{
+ "me": {
+  "steps": 1921,
+  "seconds": 32.02,
+  "countedLaps": [
+   3242,
+   2658,
+   1921
+  ]
+ },
+ "results": [
+  {
+   "track": "exam",
+   "name": "3-10",
+   "label": "seed 3 · gen 10 (one track)",
+   "multi": false,
+   "generation": 10,
+   "id": "10-60",
+   "lapSeconds": 13.87,
+   "lapSteps": 832,
+   "laps": 4,
+   "progress": 424.5,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 406,
+    "y": 113,
+    "checkpoint": 25
+   },
+   "minSpeed": 68.2,
+   "reverseSteps": 0,
+   "firstStop": null
+  },
+  {
+   "track": "exam",
+   "name": "3-20",
+   "label": "seed 3 · gen 20 (one track)",
+   "multi": false,
+   "generation": 20,
+   "id": "20-27",
+   "lapSeconds": 13.83,
+   "lapSteps": 830,
+   "laps": 4,
+   "progress": 425.3,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 438,
+    "y": 109,
+    "checkpoint": 26
+   },
+   "minSpeed": 70.3,
+   "reverseSteps": 0,
+   "firstStop": null
+  },
+  {
+   "track": "exam",
+   "name": "3-80",
+   "label": "seed 3 · gen 80 (one track)",
+   "multi": false,
+   "generation": 80,
+   "id": "80-0",
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 38.4,
+   "out": "crash",
+   "outSeconds": 6.17,
+   "where": {
+    "x": 730,
+    "y": 162,
+    "checkpoint": 33
+   },
+   "minSpeed": -90,
+   "reverseSteps": 33,
+   "firstStop": {
+    "seconds": 5.6,
+    "x": 769,
+    "y": 168
+   }
+  },
+  {
+   "track": "exam",
+   "name": "3-multi-10",
+   "label": "seed 3 · gen 10 (three tracks)",
+   "multi": true,
+   "generation": 10,
+   "id": "10-47",
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 38.9,
+   "out": "crash",
+   "outSeconds": 5.95,
+   "where": {
+    "x": 834,
+    "y": 167,
+    "checkpoint": 33
+   },
+   "minSpeed": 194.5,
+   "reverseSteps": 0,
+   "firstStop": null
+  },
+  {
+   "track": "exam",
+   "name": "3-multi-20",
+   "label": "seed 3 · gen 20 (three tracks)",
+   "multi": true,
+   "generation": 20,
+   "id": "20-0",
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 40.1,
+   "out": "crash",
+   "outSeconds": 5.8,
+   "where": {
+    "x": 808,
+    "y": 256,
+    "checkpoint": 34
+   },
+   "minSpeed": 176.3,
+   "reverseSteps": 0,
+   "firstStop": null
+  },
+  {
+   "track": "exam",
+   "name": "3-multi-80",
+   "label": "seed 3 · gen 80 (three tracks)",
+   "multi": true,
+   "generation": 80,
+   "id": "80-0",
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 40.2,
+   "out": "crash",
+   "outSeconds": 5.95,
+   "where": {
+    "x": 805,
+    "y": 260,
+    "checkpoint": 34
+   },
+   "minSpeed": 173.4,
+   "reverseSteps": 0,
+   "firstStop": null
+  },
+  {
+   "track": "exam",
+   "name": "3-multi-100",
+   "label": "seed 3 · gen 100 (three tracks)",
+   "multi": true,
+   "generation": 100,
+   "id": "100-0",
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 75.8,
+   "out": "crash",
+   "outSeconds": 11.6,
+   "where": {
+    "x": 1142,
+    "y": 80,
+    "checkpoint": 65
+   },
+   "minSpeed": 118.1,
+   "reverseSteps": 0,
+   "firstStop": null
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "name": "3-10",
+   "label": "seed 3 · gen 10 (one track)",
+   "multi": false,
+   "generation": 10,
+   "id": "10-60",
+   "lapSeconds": 13.33,
+   "lapSteps": 800,
+   "laps": 4,
+   "progress": 438.2,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 529,
+    "y": 252,
+    "checkpoint": 35
+   },
+   "minSpeed": 68.7,
+   "reverseSteps": 0,
+   "firstStop": null
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "name": "3-20",
+   "label": "seed 3 · gen 20 (one track)",
+   "multi": false,
+   "generation": 20,
+   "id": "20-27",
+   "lapSeconds": 13.2,
+   "lapSteps": 792,
+   "laps": 4,
+   "progress": 444.3,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 299,
+    "y": 231,
+    "checkpoint": 40
+   },
+   "minSpeed": 64.5,
+   "reverseSteps": 0,
+   "firstStop": null
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "name": "3-80",
+   "label": "seed 3 · gen 80 (one track)",
+   "multi": false,
+   "generation": 80,
+   "id": "80-0",
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 49.8,
+   "out": "crash",
+   "outSeconds": 7.63,
+   "where": {
+    "x": 320,
+    "y": 205,
+    "checkpoint": 41
+   },
+   "minSpeed": -90,
+   "reverseSteps": 31,
+   "firstStop": {
+    "seconds": 7.1,
+    "x": 283,
+    "y": 202
+   }
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "name": "3-multi-10",
+   "label": "seed 3 · gen 10 (three tracks)",
+   "multi": true,
+   "generation": 10,
+   "id": "10-47",
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 49.4,
+   "out": "crash",
+   "outSeconds": 7.62,
+   "where": {
+    "x": 234,
+    "y": 246,
+    "checkpoint": 41
+   },
+   "minSpeed": 157.4,
+   "reverseSteps": 0,
+   "firstStop": null
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "name": "3-multi-20",
+   "label": "seed 3 · gen 20 (three tracks)",
+   "multi": true,
+   "generation": 20,
+   "id": "20-0",
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 50.4,
+   "out": "crash",
+   "outSeconds": 7.52,
+   "where": {
+    "x": 215,
+    "y": 186,
+    "checkpoint": 41
+   },
+   "minSpeed": 158.4,
+   "reverseSteps": 0,
+   "firstStop": null
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "name": "3-multi-80",
+   "label": "seed 3 · gen 80 (three tracks)",
+   "multi": true,
+   "generation": 80,
+   "id": "80-0",
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 50.1,
+   "out": "crash",
+   "outSeconds": 7.52,
+   "where": {
+    "x": 216,
+    "y": 199,
+    "checkpoint": 41
+   },
+   "minSpeed": 150.6,
+   "reverseSteps": 0,
+   "firstStop": null
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "name": "3-multi-100",
+   "label": "seed 3 · gen 100 (three tracks)",
+   "multi": true,
+   "generation": 100,
+   "id": "100-0",
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 12.3,
+   "out": "crash",
+   "outSeconds": 2.27,
+   "where": {
+    "x": 105,
+    "y": 568,
+    "checkpoint": 10
+   },
+   "minSpeed": 185.3,
+   "reverseSteps": 0,
+   "firstStop": null
+  }
+ ],
+ "race": {
+  "champion": "3-20",
+  "link": "index.html?race=exam&champion=3-20",
+  "winner": "ai",
+  "by": 18.18,
+  "meSteps": 1921,
+  "aiSteps": 830,
+  "aiProgress": null
+ }
+}
