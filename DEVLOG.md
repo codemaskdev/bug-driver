@@ -551,3 +551,32 @@ How they got out:
 🎬 **The first-corner crash Step 7a predicted, finally.** It's the most-trained multi-track car on Mirrored: `index.html?track=neon-loop-mirrored&champion=3-multi-100`, into the first corner at 2.27 s.
 
 - 66 tests pass.
+
+## 2026-10-06 — Step 7c pre-registration (written and committed before any training)
+**Decided after seeing the exam, and said openly.** Step 7c was not part of the original plan. It exists because of the Step 7b exam result.
+
+**Why.** On Exam, every one of the four three-track champions (Step 7b, gens 10, 20, 80, 100) crashed, three of them in the hairpin that turns right. None of the three training tracks (Neon Loop, Zigzag, Wide Sweepers) has a right-hand hairpin.
+
+**Plan, fixed now:**
+- Seed 3, from scratch, 100 generations, on 4 tracks: Neon Loop, Neon Loop Mirrored, Zigzag, Wide Sweepers.
+- Mirrored is added because it has a right-hand hairpin (Neon Loop's hairpin, driven the other way).
+- Every car drives all 4 tracks alone. Its fitness is the sum of its 4 single-track fitness scores.
+- Everything else is unchanged from Step 7b: 100 cars, top 10 parents, 1 elite, mutation 10% / sigma 0.3, the one seeded random generator, the same rules (out on crash, after 3 s without a new checkpoint, or at 60 s).
+- Champions at gens 1, 5, 10, 20, 40, 80, 100 go to champions/seed-3-multi4.json, the history to runs/seed-3-multi4.json.
+- Exam is not a training track, and never will be. The training tool and every evolution refuse it.
+
+**Test, fixed now:**
+- After training, and only once, each of the 7 champions drives Exam alone under the same rules.
+- Reported per champion:
+  - on each of the 4 training tracks: its best lap, or how far it got and how it got out;
+  - on Exam: the same, plus where it got out.
+- The headline comparison uses the same generations as the Step 7b exam (10, 20, 80, 100): how many finish a lap on Exam, against 0 of 4 for the three-track champions and 2 of 3 for the one-track ones (gens 10, 20, 80).
+- Then my Exam ghost (32.02 s) races the best of them on Exam: the fastest best lap, or if nobody finishes, the one that got furthest. Best lap vs best lap, as in every race.
+
+**What this test can and can't show:**
+- This is the second time Exam is used for testing. The first exam is why this step exists, so Exam is no longer a fully untouched test: we picked the change (adding Mirrored) because of what Exam showed.
+- A pass would be weaker evidence than a pass on the first exam. A fail is still a fail.
+- Mirrored becomes a training track, so its results here are training results, not a test.
+- No other track is added or changed. Exam's own hairpin is not copied into training: Mirrored's hairpin is Neon Loop's, driven the other way.
+
+**Whatever happens is the result.** No retries, no other seeds, no changes to the method, the tracks or the fitness after seeing anything.
