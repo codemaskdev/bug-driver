@@ -6,8 +6,17 @@ import { segmentHit } from './geometry.js';
 
 // Tuning numbers (px and seconds)
 export const CAR = {
-  length: 24,          // hitbox, nose to tail (the antennae don't count)
-  width: 16,           // hitbox, wheel to wheel
+  length: 36,          // nose to tail, px (the antennae don't count)
+  width: 26,           // across the shell, px
+  // The hitbox: an outline around the ladybug's round shell and small head,
+  // in px from the shell's center, x pointing forward. It sits just inside
+  // the drawn shell, so you only crash when you visibly touch a wall.
+  hitbox: [
+    [21, -5], [21, 5],                     // head
+    [10.6, 9.2], [0, 13], [-10.6, 9.2],    // right side of the shell
+    [-15, 0],                              // tail
+    [-10.6, -9.2], [0, -13], [10.6, -9.2], // left side of the shell
+  ],
   accel: 380,          // px/s² when holding throttle
   brake: 900,          // px/s² when braking while moving forward
   reverseAccel: 260,   // px/s² when holding brake from a standstill
@@ -93,23 +102,23 @@ export function stepCar(car, input, walls) {
   }
 }
 
-// The four corners of the car's hitbox, front-left first, going clockwise.
-export function carCorners(car) {
+// Farthest hitbox point from the car's center: walls farther than this can't touch it
+const REACH = Math.max(...CAR.hitbox.map(([x, y]) => Math.hypot(x, y)));
+
+// The car's hitbox outline in world coordinates, rotated with the car.
+export function carOutline(car) {
   const c = Math.cos(car.angle), s = Math.sin(car.angle);
-  const hl = CAR.length / 2, hw = CAR.width / 2;
-  const corner = (fx, fy) => ({ x: car.x + c * fx - s * fy, y: car.y + s * fx + c * fy });
-  return [corner(hl, -hw), corner(hl, hw), corner(-hl, hw), corner(-hl, -hw)];
+  return CAR.hitbox.map(([fx, fy]) => ({ x: car.x + c * fx - s * fy, y: car.y + s * fx + c * fy }));
 }
 
 // Does the car's hitbox touch any wall? Returns the touching point, or null.
 export function hitWall(car, walls) {
-  const k = carCorners(car);
-  const reach = CAR.length; // anything farther than this from the car's center can't touch it
+  const k = carOutline(car);
   for (const w of walls) {
-    if (Math.min(w.ax, w.bx) > car.x + reach || Math.max(w.ax, w.bx) < car.x - reach) continue;
-    if (Math.min(w.ay, w.by) > car.y + reach || Math.max(w.ay, w.by) < car.y - reach) continue;
-    for (let i = 0; i < 4; i++) {
-      const a = k[i], b = k[(i + 1) % 4];
+    if (Math.min(w.ax, w.bx) > car.x + REACH || Math.max(w.ax, w.bx) < car.x - REACH) continue;
+    if (Math.min(w.ay, w.by) > car.y + REACH || Math.max(w.ay, w.by) < car.y - REACH) continue;
+    for (let i = 0; i < k.length; i++) {
+      const a = k[i], b = k[(i + 1) % k.length];
       const t = segmentHit(a.x, a.y, b.x, b.y, w.ax, w.ay, w.bx, w.by);
       if (t >= 0) return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
     }

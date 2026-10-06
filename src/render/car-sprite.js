@@ -3,34 +3,40 @@
 import { ctx } from './canvas.js';
 
 const PIXEL = 2;
-// A ladybug, facing right. W = wheels, O = cyan neon outline, S = shell shine,
-// B = shell, K = spots, L = the line between the two wing cases, H = head,
-// E = eyes, A = antennae (they stick out past the hitbox).
+// A ladybug seen from above, facing right. O = glowing cyan outline,
+// B = shell, S = shine, K = dots, L = the center line between the two
+// wing cases, H = head, E = eyes, A = antennae, W = wheels peeking out.
+// The antennae and wheels stick out past the hitbox (see CAR.hitbox).
 const SPRITE = [
-  '...WWW...WWW...',
-  '..OOOOOOOOO....',
-  '.OSSBBKBBBOHO.A',
-  'OSBBBBBBKBOHEA.',
-  'OLLLLLLLLLOHHO.',
-  'OSBBKBBBBBOHEA.',
-  '.OSBBBBKBBOHO.A',
-  '..OOOOOOOOO....',
-  '...WWW...WWW...',
+  '...WW....WW.........',
+  '....OOOOOOO.........',
+  '..OOSSSBBBBOO.......',
+  '.OBSBBBBBKKBBO.....A',
+  '.OSBKKBBBKKBBBOO..A.',
+  'OBBBKKBBBBBBBBOHOO..',
+  'OBBBBBBBBBBKKBOHEO..',
+  'OLLLLLLLLLLLLLOHHO..',
+  'OBBBBBBBBBBKKBOHEO..',
+  'OBBBKKBBBBBBBBOHOO..',
+  '.OBBKKBBBKKBBBOO..A.',
+  '.OBBBBBBBKKBBO.....A',
+  '..OOBBBBBBBOO.......',
+  '....OOOOOOO.........',
+  '...WW....WW.........',
 ];
 const COLORS = {
   W: '#3a4256',
   O: '#00f0ff',
-  S: '#a6faff',
-  B: '#0a8c9c',
-  K: '#04343b',
-  L: '#04343b',
+  S: '#b8fbff',
+  B: '#0aa3b5',
+  K: '#03262c',
+  L: '#03262c',
   H: '#0d0e12',
   E: '#e8feff',
   A: '#00f0ff',
 };
-// The body (13 columns, nose to tail) is centered on the car's position;
-// the hitbox (CAR.length x CAR.width) is a little smaller than the rounded shell's corners.
-const BODY_COLS = 13;
+// Cell (7, 7), the middle of the shell, is the car's position
+const ORIGIN_COL = 7, ORIGIN_ROW = 7;
 
 const sprite = document.createElement('canvas');
 sprite.width = SPRITE[0].length * PIXEL;
@@ -57,6 +63,6 @@ export function drawCar(car, alpha) {
   ctx.imageSmoothingEnabled = false;
   ctx.shadowColor = car.crashed ? '#ff2e63' : '#00f0ff';
   ctx.shadowBlur = 8;
-  ctx.drawImage(sprite, -BODY_COLS * PIXEL / 2, -sprite.height / 2);
+  ctx.drawImage(sprite, -(ORIGIN_COL + 0.5) * PIXEL, -(ORIGIN_ROW + 0.5) * PIXEL);
   ctx.restore();
 }

@@ -28,7 +28,7 @@ export const TRACKS = [
 
 const SAMPLE_SPACING = 8;      // px between centerline samples
 const CHECKPOINT_EVERY = 6;    // one checkpoint every 6 samples = every 48 px
-const SPAWN_BEHIND_LINE = 20;  // px: the car starts this far behind the start line
+const SPAWN_BEHIND_LINE = 30;  // px: the car's center starts this far behind the start line (its nose stays behind it)
 
 // Turns track data into walls, checkpoints and a start position.
 export function buildTrack(def) {
