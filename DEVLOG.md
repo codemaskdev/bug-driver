@@ -494,3 +494,60 @@ Not pre-registered: it's a track drawn for fun, chosen because it broke the cham
 - R on a multi-track champion restarted the one-track champion of the same generation. This bug has been there since 9250e2a.
 - On a crowded track the fitness chart landed on the start line. It now goes where it covers the least road, and stays in Neon Loop's infield there.
 - The editor's buttons covered the start point; they moved to the top right.
+
+## 2026-10-06 — Step 7b, the exam
+Commits 2dff84d (my Exam ghost), 0be70eb (Exam unlocked for testing), 5973520 (the exam), 0420dc5 (replay check), 8dc8606 (guide chapter 7), cc891eb (CLAUDE.md).
+
+**My Exam lap** (2dff84d).
+- ghosts/me-exam.json, copied unchanged from Downloads.
+- My first 3 counted laps took 3242, 2658 and 1921 steps (54.03 s, 44.30 s, 32.02 s). The file is the third and best of them: **32.02 s is my official Exam time**.
+- Checked three ways:
+  - the browser's first-3-laps record holds exactly those three laps;
+  - the file's inputs and start state are identical to lap 3 in it (same hash);
+  - it replays headless to exactly 1921 steps (tests/exam-ghost.test.js).
+- Prompt 15 said 21.37 s. As found then, that lap was on Zigzag. The real Exam lap is 32.02 s, and every race and number here uses it.
+
+**Exam opened for testing, never for training** (0be70eb).
+- `unlockExam()` checks the ghost: the exact track and physics, 3 counted laps, the best of them, and that it replays to its own time. Only then may `createGeneration()` put a saved champion on Exam.
+- `createEvolution()` and `createMultiEvolution()` refuse Exam, always.
+- In the game, Exam allows champions (`?track=exam&champion=3-80`) and the race; "train from scratch" and the seed box say "Nobody trains on Exam, ever".
+- Exam still never opens in the editor or goes in a share link.
+- Tests: a fake ghost doesn't unlock it; after a real unlock, training is still refused.
+
+**The exam** (5973520, `node tools/exam-report.js` → runs/exam.json, every result checked again in tests/exam.test.js). Seed 3, each champion alone, under the evolution rules:
+| champion | Exam | Neon Loop Mirrored |
+| --- | --- | --- |
+| gen 10, one track | 13.87 s (4 laps) | 13.33 s |
+| gen 20, one track | 13.83 s (4 laps) | 13.20 s |
+| gen 80, one track | crash at 6.17 s, 38.4% | crash at 7.63 s, 49.8% |
+| gen 10, three tracks | crash at 5.95 s, 38.9% | crash at 7.62 s, 49.4% |
+| gen 20, three tracks | crash at 5.80 s, 40.1% | crash at 7.52 s, 50.4% |
+| gen 80, three tracks | crash at 5.95 s, 40.2% | crash at 7.52 s, 50.1% |
+| gen 100, three tracks | crash at 11.60 s, 75.8% | crash at 2.27 s, 12.3% |
+
+How they got out:
+- **One-track gen 80:** the Mirrored failure all over again. It brakes to a dead stop in Exam's right-hand hairpin at 5.60 s, keeps BRAKE (reverse from a standstill) and backs into the wall, after 33 steps in reverse.
+- **Three-track gens 10, 20, 80:** they go into the same hairpin too fast and never slow below 173–195 px/s.
+- **Three-track gen 100:** gets round the hairpin, then crashes in the right-hand corner at the top right.
+- **Mirrored:** the one-track results are identical to Step 7a. The three-track ones are new.
+
+**The race:**
+- My Exam lap against the best of them on Exam, the one-track gen 20 champion, best lap vs best lap: 32.02 s vs 13.83 s.
+- **The AI wins by 18.18 s.** The browser gives the same result as Node.
+
+**Did multi-track training help? No.**
+- On Exam, none of the four three-track champions finishes a lap; two of the three one-track champions do.
+- On Mirrored, none of the three-track champions finishes either.
+- **Our best explanation:** none of the three training tracks has a right-hand hairpin (Neon Loop's turns left; Zigzag and Wide Sweepers have none). Training on them sped the cars up through the turns they knew; it didn't teach the one they didn't.
+- We saw this risk after Step 7a and wrote it down in the Step 7b entry before the exam ran, and kept the pre-registered plan. Nothing was changed after seeing these results.
+- One seed only, so it's a pattern, not a proof.
+
+**Replay check** (0420dc5): now 7 scenarios. My Exam ghost was added. The golden results were updated on purpose with `--update`, and the diff is only the 6 new lines; the old 6 scenarios are unchanged.
+
+🎬 **The exam race:** `index.html?race=exam&champion=3-20&autoplay=1`. My 32.02 s against 13.83 s, and the AI wins by 18.18 s.
+
+🎬 **The champion that beat me reverses on Exam too:** `index.html?track=exam&champion=3-80`. A dead stop in the right-hand hairpin at 5.60 s, then backwards into the wall at 6.17 s.
+
+🎬 **The first-corner crash Step 7a predicted, finally.** It's the most-trained multi-track car on Mirrored: `index.html?track=neon-loop-mirrored&champion=3-multi-100`, into the first corner at 2.27 s.
+
+- 66 tests pass.

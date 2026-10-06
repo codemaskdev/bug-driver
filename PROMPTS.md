@@ -465,3 +465,12 @@ Update PROMPTS.md and DEVLOG.md. 🎬-mark a custom track where the gen 80 champ
 
 Built: the guide fixes, then the Exam rule in one place (createGeneration refuses Exam), a track check with plain messages, share links, a track menu (T) with an editor, champions and live training on any track except Exam, a replay check that runs in npm test, and guide chapter 8 in both levels.
 What broke: the first replay check compared only my ghost's lap time, and a deliberate tiny physics change got past it, so path fingerprints were added. Pressing R on a multi-track champion restarted the one-track one (an old bug, now fixed). The chart landed on the start line on a crowded track, and the editor buttons covered the start point. 🎬 Paperclip: the gen 80 champion crawls round its right-hand hairpin once, then reverses into the wall on lap 2.
+
+## 18. My Exam ghost
+
+````text
+'~/Downloads/me-exam.json'
+````
+
+Built: my Exam lap saved as ghosts/me-exam.json (32.02 s, the best of my first 3 counted laps), Exam opened for testing champions (never for training), the exam itself (Step 7b part 3), the race, and guide chapter 7 with the results.
+What broke: nothing in the code. The lap in the file is 32.02 s, not the 21.37 s from prompt 15 (that one was on Zigzag). And training on three tracks didn't help on Exam: all four three-track champions crashed there.
