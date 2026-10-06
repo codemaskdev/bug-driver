@@ -165,3 +165,8 @@ Honest caveat: picking a seed after seeing the results is a choice. The video sh
 
 🎬 Official seed 3, generation 4: car 4-78 completes the first lap ever, in 38.18 s, slower than my 26.40. "FIRST LAP — GEN 4" flashes over a track full of generation-4 wrecks. Six generations later the best lap is 13.17 s.
 🎬 Seed 1's flat line: best fitness 43.0 for 95 generations straight, all stuck at the same hairpin.
+
+Addendum to the Step 4 entry (precision; the numbers above are unchanged):
+- When each seed first beat my 26.40 s, outside the fixed scoreboard generations: seed 2 at gen 8 (18.40 s, its very first lap), seed 3 at gen 6 (19.25 s), seed 4 at gen 23 (19.88 s), seed 5 at gen 22 (15.07 s).
+- So seed 4's first lap (27.27 s, gen 21) was also slower than mine, but that is not a scoreboard generation. On the fixed scoreboard, seed 3 still beats me only at gen 5, and first overtakes me at gen 10.
+- "First lap" in the table is the first lap ever completed, not the fastest lap of that generation. For seed 5 at gen 22, the first car over the line did 15.50 s, while the fastest lap of that generation was 15.07 s.
