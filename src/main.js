@@ -2,7 +2,8 @@
 // Plain canvas + vanilla JS ES modules, no build step.
 // Serve the folder (npx serve) and open index.html to play,
 // or index.html?autoplay=1&seed=42 to watch the AI from the start,
-// or index.html?champion=3-40 to run one saved champion alone.
+// or index.html?champion=3-40 to run one saved champion alone,
+// or index.html?race=3-10 (me vs a champion) / ?scoreboard=3 (add &autoplay=1 to start right away).
 //
 //   sim/     the simulation: track, car physics, laps, sensors, brain, generations, evolution. No DOM, runs in Node too.
 //   render/  drawing: canvas, track image, car sprite, rays, sparks, HUD, chart, brain panels
@@ -10,6 +11,7 @@
 //
 // Two modes, switched with Tab: "I drive" (arrows, lap timer, ghost recording)
 // and "AI drives": the live evolution, or one saved champion running alone.
+// From AI mode, S opens "me vs the AI": the scoreboard and the races against my ghost.
 // The brain panels (E, B, F, N) only read the simulation; they never change it.
 
 import { STEP, PHYSICS_VERSION } from './sim/constants.js';
@@ -32,14 +34,18 @@ import { drawDecisionPanel, strongestHidden } from './render/decision-panel.js';
 import { drawWeightsGrid, GRID_BLOCK_W } from './render/weights-grid.js';
 import { readInput, takePress, clearPresses } from './game/keyboard.js';
 import { loadBestLap, saveBestLap } from './game/best-lap.js';
-import { AUTOPLAY, SEED, CHAMPION, COMPARE } from './game/params.js';
-import { loadChampion, parseChampionName } from './game/champions.js';
+import { AUTOPLAY, SEED, CHAMPION, COMPARE, RACE, SCOREBOARD } from './game/params.js';
+import { loadChampion, loadChampionsFile, loadGhost, parseChampionName } from './game/champions.js';
+import { createRace, stepRace, raceGap, raceResult, progressShare } from './sim/race.js';
+import { buildScoreboard } from './sim/scoreboard.js';
+import { drawRaceHud, drawScoreboard, drawTag, drawOutMark } from './render/race-view.js';
 import { setupPicker, showPicker } from './game/picker.js';
 
 const track = buildTrack(TRACKS[0]);
 const trackImage = renderTrack(track);
 
-let mode = AUTOPLAY || CHAMPION ? 'ai' : 'drive';
+// 'drive', 'ai', 'race', 'scoreboard', or 'loading' while the race files load
+let mode = RACE || SCOREBOARD ? 'loading' : AUTOPLAY || CHAMPION ? 'ai' : 'drive';
 let explain = false; // E: show the real sensor (and brain) numbers
 
 // ---------- I drive ----------
@@ -283,6 +289,53 @@ function championHudState() {
   };
 }
 
+// ---------- me vs the AI ----------
+// My ghost lap (ghosts/me-v3.json) against saved champions, nothing typed in by hand.
+const REVEAL_SECONDS = 1.2; // autoplay: one scoreboard row every 1.2 s
+const versus = { seed: 3, ghost: null, file: null, board: null, race: null, generation: null, started: false, selected: 0, reveal: 0, speed: 1 };
+
+async function loadVersus(seed) {
+  if (versus.board && versus.seed === seed) return true;
+  const [ghost, file] = await Promise.all([loadGhost(), loadChampionsFile(seed)]);
+  if (!ghost || !file) return false;
+  Object.assign(versus, { seed, ghost, file, board: buildScoreboard(ghost, file.champions) });
+  return true;
+}
+
+// A race: my ghost lap against the best lap of the champion of this generation.
+async function startRace(seed, generation, autostart) {
+  if (!(await loadVersus(seed)) || !versus.file.champions[generation]) { mode = 'ai'; return; }
+  versus.generation = generation;
+  versus.race = createRace(track, versus.ghost, { generation, brain: versus.file.champions[generation].brain });
+  versus.started = autostart;
+  versus.selected = Math.max(0, versus.board.rows.findIndex((r) => r.generation === generation));
+  acc = 0;
+  mode = 'race';
+}
+
+async function openScoreboard(seed, animate) {
+  if (!(await loadVersus(seed))) { mode = 'ai'; return; }
+  versus.reveal = animate ? 0 : versus.board.rows.length;
+  mode = 'scoreboard';
+}
+
+function drawRace(alpha) {
+  const { me, ai } = versus.race;
+  drawTrack();
+  // a car that has finished or is out stands still: draw it where it stopped
+  const poseOf = (lane) => smoothPose(lane.world.car, lane.finishSteps || lane.out ? 1 : alpha);
+  if (ai.out) {
+    const c = ai.world.car;
+    drawOutMark(c.x, c.y, `${ai.out === 'crash' ? 'crashed' : 'stalled'} here`);
+  }
+  const aiPose = poseOf(ai), mePose = poseOf(me);
+  drawCar(aiPose, ai.out === 'crash', { color: 'yellow', glow: 12 });
+  drawCar(mePose, false, { glow: 12 });
+  const close = Math.hypot(aiPose.x - mePose.x, aiPose.y - mePose.y) < 60;
+  drawTag(aiPose, ai.name, '#ffd23f');
+  drawTag(mePose, me.name, '#00f0ff', close);
+}
+
 // ---------- the loop ----------
 // Fixed timestep: the simulation always advances in 1/60 s steps; the screen
 // just draws whatever the latest state is, however fast it refreshes.
@@ -301,12 +354,56 @@ function frame(now) {
   }
   if (takePress('KeyE')) explain = !explain;
   const left = takePress('ArrowLeft'), right = takePress('ArrowRight'); // only used by "explain one decision"
+  if (mode !== 'drive' && takePress('KeyS')) {
+    if (mode === 'scoreboard') mode = 'ai';
+    else openScoreboard(versus.seed, false);
+  }
   showPicker(mode === 'ai', {
     running: ai.champion ? `${ai.champion.seed}-${ai.champion.generation}` : '',
     comparing: ai.compare?.name ?? '',
   });
 
-  if (mode === 'drive') {
+  if (mode === 'loading') {
+    ctx.fillStyle = '#05060a';
+    ctx.fillRect(0, 0, 1280, 720);
+  } else if (mode === 'scoreboard') {
+    const rows = versus.board.rows;
+    if (takePress('ArrowUp')) versus.selected = (versus.selected + rows.length - 1) % rows.length;
+    if (takePress('ArrowDown')) versus.selected = (versus.selected + 1) % rows.length;
+    if (takePress('Enter')) startRace(versus.seed, rows[versus.selected].generation, true);
+    if (takePress('Escape')) mode = 'ai';
+    if (versus.reveal < rows.length) versus.reveal = Math.min(rows.length, versus.reveal + dt / REVEAL_SECONDS);
+    drawTrack();
+    drawScoreboard({ seed: versus.seed, rows, total: versus.board.total, reveal: Math.floor(versus.reveal), selected: versus.selected });
+  } else if (mode === 'race') {
+    const race = versus.race;
+    if (takePress('Digit1')) versus.speed = 1;
+    if (takePress('Digit2')) versus.speed = 10;
+    if (takePress('Escape')) mode = 'ai';
+    if (takePress('Space')) {
+      if (!versus.started) versus.started = true;
+      else if (race.over) startRace(versus.seed, versus.generation, true);
+    }
+    if (versus.started && !race.over) {
+      acc += dt * versus.speed;
+      let steps = 0;
+      while (acc >= STEP && !race.over && steps < 20 * versus.speed) { stepRace(race); acc -= STEP; steps++; }
+    }
+    if (race.over) acc = 0;
+    drawRace(Math.min(1, acc / STEP));
+    drawRaceHud({
+      aiName: race.ai.name,
+      seconds: race.step * STEP,
+      started: versus.started,
+      gap: raceGap(race),
+      meTime: race.me.finishSteps,
+      aiTime: race.ai.finishSteps,
+      aiOut: race.ai.out,
+      aiProgress: progressShare(race.ai),
+      result: raceResult(race),
+      speed: versus.speed,
+    });
+  } else if (mode === 'drive') {
     acc += dt;
     if (takePress('KeyR')) {
       restartWorld(world);
@@ -385,8 +482,14 @@ function drawTrack() {
 }
 
 if (CHAMPION) startChampion(CHAMPION);
+if (RACE) {
+  const which = parseChampionName(RACE);
+  if (which) startRace(which.seed, which.generation, AUTOPLAY);
+  else mode = 'ai';
+}
+if (SCOREBOARD) openScoreboard(SCOREBOARD, AUTOPLAY);
 if (COMPARE) setCompare(COMPARE);
 requestAnimationFrame(frame);
 
 // For in-browser checks and autoplay tooling
-export { world, track, ai };
+export { world, track, ai, versus };

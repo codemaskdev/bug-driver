@@ -10,12 +10,24 @@ export function parseChampionName(text) {
   return m ? { seed: Number(m[1]), generation: Number(m[2]) } : null;
 }
 
-// Loads one champion: {seed, generation, id, brain, lapSteps, fitness, ...}, or null if it doesn't exist.
-export async function loadChampion({ seed, generation }) {
+// The whole champions/seed-N.json file, or null.
+export function loadChampionsFile(seed) {
   if (!files.has(seed)) {
     files.set(seed, fetch(`champions/seed-${seed}.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null));
   }
-  const file = await files.get(seed);
+  return files.get(seed);
+}
+
+// My official ghost lap, ghosts/me-v3.json (the scoreboard never uses localStorage).
+let ghostFile = null;
+export function loadGhost() {
+  ghostFile ??= fetch('ghosts/me-v3.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  return ghostFile;
+}
+
+// Loads one champion: {seed, generation, id, brain, lapSteps, fitness, ...}, or null if it doesn't exist.
+export async function loadChampion({ seed, generation }) {
+  const file = await loadChampionsFile(seed);
   const champ = file?.champions?.[generation];
   return champ ? { seed, generation, ...champ } : null;
 }

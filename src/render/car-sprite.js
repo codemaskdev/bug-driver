@@ -24,7 +24,7 @@ const SPRITE = [
   '....OOOOOOO.........',
   '...WW....WW.........',
 ];
-const COLORS = {
+const CYAN = {
   W: '#3a4256',
   O: '#00f0ff',
   S: '#b8fbff',
@@ -35,22 +35,27 @@ const COLORS = {
   E: '#e8feff',
   A: '#00f0ff',
 };
+// The AI's car in a race against me: the same ladybug in yellow
+const YELLOW = { ...CYAN, O: '#ffd23f', S: '#fff2b8', B: '#b8901a', K: '#3a2c05', L: '#3a2c05', A: '#ffd23f' };
+const GLOW = { cyan: '#00f0ff', yellow: '#ffd23f' };
 // Cell (7, 7), the middle of the shell, is the car's position
 const ORIGIN_COL = 7, ORIGIN_ROW = 7;
 
-const sprite = document.createElement('canvas');
-sprite.width = SPRITE[0].length * PIXEL;
-sprite.height = SPRITE.length * PIXEL;
-{
+function paintSprite(colors) {
+  const sprite = document.createElement('canvas');
+  sprite.width = SPRITE[0].length * PIXEL;
+  sprite.height = SPRITE.length * PIXEL;
   const g = sprite.getContext('2d');
   SPRITE.forEach((row, y) => {
     [...row].forEach((ch, x) => {
       if (ch === '.') return;
-      g.fillStyle = COLORS[ch];
+      g.fillStyle = colors[ch];
       g.fillRect(x * PIXEL, y * PIXEL, PIXEL, PIXEL);
     });
   });
+  return sprite;
 }
+const SPRITES = { cyan: paintSprite(CYAN), yellow: paintSprite(YELLOW) };
 
 // The car's pose between its last two simulation steps (alpha 0..1), so it moves smoothly on any monitor.
 // alpha = 1 is exactly the simulation's current pose.
@@ -63,16 +68,18 @@ export function smoothPose(car, alpha) {
 }
 
 // Draws the car at `pose` (from smoothPose); `crashed` tints its glow.
-// look: {alpha, scale, glow} for the AI crowd (dim wrecks, semi-transparent cars, a bright leader).
+// look: {alpha, scale, glow} for the AI crowd (dim wrecks, semi-transparent cars, a bright leader),
+// color: 'cyan' (default) or 'yellow' (the AI in a race against me).
 export function drawCar(pose, crashed, look = {}) {
-  const { alpha = 1, scale = 1, glow = 8 } = look;
+  const { alpha = 1, scale = 1, glow = 8, color = 'cyan' } = look;
+  const sprite = SPRITES[color];
   ctx.save();
   ctx.translate(pose.x, pose.y);
   ctx.rotate(pose.angle);
   if (scale !== 1) ctx.scale(scale, scale);
   ctx.globalAlpha = alpha;
   ctx.imageSmoothingEnabled = false;
-  ctx.shadowColor = crashed ? '#ff2e63' : '#00f0ff';
+  ctx.shadowColor = crashed ? '#ff2e63' : GLOW[color];
   ctx.shadowBlur = glow;
   ctx.drawImage(sprite, -(ORIGIN_COL + 0.5) * PIXEL, -(ORIGIN_ROW + 0.5) * PIXEL);
   ctx.restore();

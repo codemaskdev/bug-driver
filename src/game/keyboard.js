@@ -10,13 +10,14 @@ const KEYS = {
 };
 const held = new Set();
 // Keys that act once per press (R restart, E explain, Tab mode, 1/2/3 speed, B brain, F freeze, N numbers, ← → pick)
-const ONCE = new Set(['KeyR', 'KeyE', 'Tab', 'Digit1', 'Digit2', 'Digit3', 'KeyB', 'KeyF', 'KeyN', 'ArrowLeft', 'ArrowRight']);
+const ONCE = new Set(['KeyR', 'KeyE', 'Tab', 'Digit1', 'Digit2', 'Digit3', 'KeyB', 'KeyF', 'KeyN', 'ArrowLeft', 'ArrowRight',
+  'ArrowUp', 'ArrowDown', 'KeyS', 'Space', 'Enter', 'Escape']);
 const pressed = new Set();
 
 window.addEventListener('keydown', (e) => {
   if (e.code in KEYS) { held.add(e.code); e.preventDefault(); }
   if (ONCE.has(e.code)) {
-    if (e.code === 'Tab') e.preventDefault(); // don't move the browser's focus
+    if (e.code === 'Tab' || e.code === 'Space') e.preventDefault(); // don't move focus or scroll the page
     if (!e.repeat) pressed.add(e.code);
   }
 });
