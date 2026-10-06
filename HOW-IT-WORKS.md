@@ -33,6 +33,7 @@ Want every detail, table and number? Read the [deep dive](DEEP-DIVE.md).
 ### How to read the code in this guide
 Every chapter has a "Look at the code" box. It shows the real code from the game, never a simplified copy, and explains every line. These few symbols are all you need:
 - `function think(brain, inputs) { … }` is a **function**: a named recipe. What it needs goes in the round brackets `( )`, and its steps go in the curly brackets `{ }`.
+- `export` in front of a function means other files may use this recipe.
 - `const total = 0;` gives a value a name. `let` does the same for a value that will change later. The `;` just ends the step.
 - `total += 5;` adds 5 to total.
 - `[1, 2, 3]` is a **list**. `list[0]` is its first item, because counting starts at 0. `list.push(x)` adds x at the end.
@@ -278,7 +279,7 @@ export function neuron(inputs, brain, start, squash) { => A neuron gets the numb
   } => Every input has had its say.
   const bias = brain[start + inputs.length]; => Right after the weights comes one more number, the bias...
   sum += bias; => ...which is added on top, whatever the inputs were.
-  return squash(sum); => Squash the total into a small, tidy range, and pass it on.
+  return squash(sum); => Squash the total (keep it within small limits, as explained above) and pass it on.
 } => End.
 -->
 > **Look at the code: one neuron**
@@ -305,7 +306,7 @@ export function neuron(inputs, brain, start, squash) { => A neuron gets the numb
 > 6. `}` — Every input has had its say.
 > 7. `const bias = brain[start + inputs.length];` — Right after the weights comes one more number, the bias...
 > 8. `sum += bias;` — ...which is added on top, whatever the inputs were.
-> 9. `return squash(sum);` — Squash the total into a small, tidy range, and pass it on.
+> 9. `return squash(sum);` — Squash the total (keep it within small limits, as explained above) and pass it on.
 > 10. `}` — End.
 <!-- /look-at-the-code -->
 
@@ -441,8 +442,8 @@ intro: Every child starts as a copy of one parent, made by this.
 export function mutate(brain, rand) { => It gets a parent's 70 numbers, and the game's random number maker.
   const child = []; => Start the child's list of numbers, empty.
   for (const number of brain) { => Go through the parent's 70 numbers, one by one.
-    if (rand() < MUTATION_RATE) { => Roll a dice. 1 time in 10 (a 10% chance)...
-      child.push(number + gaussian(rand) * MUTATION_SIZE); => ...the child gets this number nudged a little: usually a small change, now and then a bigger one.
+    if (rand() < MUTATION_RATE) { => Roll a die. 1 time in 10 (a 10% chance)...
+      child.push(number + gaussian(rand) * MUTATION_SIZE); => ...the child gets this number nudged up or down a little: usually by about 0.3 or less, now and then by more.
     } else { => The other 9 times in 10...
       child.push(number); => ...the child gets the number exactly as it was.
     } => One number done.
@@ -470,8 +471,8 @@ export function mutate(brain, rand) { => It gets a parent's 70 numbers, and the 
 > 1. `export function mutate(brain, rand) {` — It gets a parent's 70 numbers, and the game's random number maker.
 > 2. `const child = [];` — Start the child's list of numbers, empty.
 > 3. `for (const number of brain) {` — Go through the parent's 70 numbers, one by one.
-> 4. `if (rand() < MUTATION_RATE) {` — Roll a dice. 1 time in 10 (a 10% chance)...
-> 5. `child.push(number + gaussian(rand) * MUTATION_SIZE);` — ...the child gets this number nudged a little: usually a small change, now and then a bigger one.
+> 4. `if (rand() < MUTATION_RATE) {` — Roll a die. 1 time in 10 (a 10% chance)...
+> 5. `child.push(number + gaussian(rand) * MUTATION_SIZE);` — ...the child gets this number nudged up or down a little: usually by about 0.3 or less, now and then by more.
 > 6. `} else {` — The other 9 times in 10...
 > 7. `child.push(number);` — ...the child gets the number exactly as it was.
 > 8. `}` — One number done.
