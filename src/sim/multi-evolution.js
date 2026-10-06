@@ -6,10 +6,12 @@
 import { makeRng } from './rng.js';
 import { createGeneration, randomBrains, runGeneration, fitness, trackProgress, POPULATION } from './generation.js';
 import { selection, pickParent, mutate } from './evolution.js';
+import { refuseTraining } from './held-out.js';
 
 export const MULTI_CHAMPION_GENERATIONS = [1, 5, 10, 20, 40, 80, 100];
 
 export function createMultiEvolution(tracks, seed) {
+  tracks.forEach(refuseTraining); // never on Exam
   const rand = makeRng(seed);
   return {
     seed, tracks, rand,

@@ -4,6 +4,7 @@
 // Everything random comes from one seeded generator: same seed, same evolution.
 
 import { makeRng } from './rng.js';
+import { refuseTraining } from './held-out.js';
 import { POPULATION, createGeneration, randomBrains, stepGeneration, fitness, trackProgress } from './generation.js';
 
 export const PARENTS = 10;          // the top 10 cars become parents
@@ -11,8 +12,9 @@ export const MUTATION_RATE = 0.1;   // each of the 70 numbers has a 10% chance t
 export const MUTATION_SIZE = 0.3;   // ...by a random nudge of typical size 0.3 (gaussian sigma)
 export const CHAMPION_GENERATIONS = [1, 5, 10, 20, 40, 80]; // fixed in advance, never picked by looks
 
-// A fresh evolution: generation 1 is 100 random brains from the seed.
+// A fresh evolution: generation 1 is 100 random brains from the seed. (Never on Exam.)
 export function createEvolution(track, seed) {
+  refuseTraining(track);
   const rand = makeRng(seed);
   return {
     seed,

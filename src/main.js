@@ -18,7 +18,7 @@
 
 import { STEP, PHYSICS_VERSION } from './sim/constants.js';
 import { TRACKS, buildTrack, trackDef, trackKey } from './sim/track.js';
-import { isHeldOut, HELD_OUT_ID } from './sim/held-out.js';
+import { isHeldOut, HELD_OUT_ID, unlockExam, examIsUnlocked } from './sim/held-out.js';
 import { decodeTrack } from './sim/share-link.js';
 import { emptyExamRecord, countExamLap, bestExamLap, examGhost, COUNTED_LAPS } from './sim/exam.js';
 import { encodeInputs } from './game/best-lap.js';
@@ -77,12 +77,22 @@ if (TRACK_LINK !== null) {
 }
 let here = viewOf(startDef);
 let myTrack = loadMyTrack(); // the last valid track I made in the editor (kept in this browser)
-// The track the AI may drive: the current one, unless it's the held-out Exam
+// The track the AI may train on: the current one, unless it's the held-out Exam (nobody trains there, ever)
 const aiAllowedHere = () => !isHeldOut(here.def);
+// Saved champions may also be tested on Exam, but only once my Exam lap is saved (ghosts/me-exam.json)
+const examReady = loadGhostFor(HELD_OUT_ID).then((ghost) => {
+  if (!ghost) return false;
+  try { unlockExam(ghost); return true; } catch (err) { console.warn(err.message); return false; }
+});
+const NO_TRAINING = 'Nobody trains on Exam, ever. Pick a saved champion to test there.';
 
 // 'drive', 'ai', 'race', 'scoreboard', 'edit', or 'loading' while the race files load
 let mode = RACE || SCOREBOARD ? 'loading' : AUTOPLAY || CHAMPION ? 'ai' : 'drive';
-if (mode === 'ai' && !aiAllowedHere()) { mode = 'drive'; say('Exam is held out: you drive it, no AI does.'); }
+// On Exam the AI view only ever shows a saved champion (startChampion() falls back to driving if Exam is locked)
+if (mode === 'ai' && !aiAllowedHere()) {
+  if (CHAMPION) mode = 'loading'; // until we know whether Exam is unlocked
+  else { mode = 'drive'; say('Nobody trains on Exam, ever.'); }
+}
 let explain = false; // E: show the real sensor (and brain) numbers
 
 // ---------- I drive ----------
@@ -104,8 +114,10 @@ function setTrack(def) {
   acc = 0;
   clearSparks();
   if (!aiAllowedHere()) {
+    // Exam: a champion that's running goes on to Exam (once it's unlocked); never a training run
+    if (mode === 'ai' && ai.champion && examIsUnlocked()) { startChampion(ai.champion.name); return; }
     if (mode === 'ai') mode = 'drive';
-    say('Exam is held out: you drive it, no AI does.');
+    say(examIsUnlocked() ? NO_TRAINING : 'Exam is held out: you drive it, no AI does.');
     return;
   }
   startEvolution();
@@ -188,10 +200,14 @@ startEvolution();
 // One saved champion, alone on the track, exactly as it drove during evolution.
 async function startChampion(name) {
   const which = parseChampionName(name);
-  const record = which && await loadChampion(which);
+  const [record, examOpen] = await Promise.all([which && loadChampion(which), examReady]);
   if (!record) { ai.champion = null; return; }
-  // it runs on the current track (never on the held-out Exam: then on Neon Loop)
-  const where = aiAllowedHere() ? here : neon;
+  // it runs on the current track; on Exam only once my Exam lap is saved (else on Neon Loop)
+  const where = aiAllowedHere() || examOpen ? here : neon;
+  if (mode === 'loading' && !RACE && !SCOREBOARD) {
+    mode = where === here ? 'ai' : 'drive';
+    if (where !== here) say('Exam is held out: you drive it, no AI does.');
+  }
   const gen = createGeneration(where.track, [record.brain], which.generation);
   gen.cars[0].id = record.id; // the id it had during evolution
   ai.champion = { name, ...which, record, gen, laps: [], where };
@@ -208,8 +224,15 @@ async function setCompare(name) {
 }
 
 setupPicker({
-  onSeed: (n) => { ai.seed = n; ai.champion = null; startEvolution(); },
-  onRun: (name) => (name ? startChampion(name) : (ai.champion = null)),
+  onSeed: (n) => {
+    if (!aiAllowedHere()) { say(NO_TRAINING); return; }
+    ai.seed = n; ai.champion = null; startEvolution();
+  },
+  onRun: (name) => {
+    if (name) startChampion(name);
+    else if (!aiAllowedHere()) say(NO_TRAINING);
+    else ai.champion = null;
+  },
   onCompare: (name) => setCompare(name),
 });
 
@@ -416,7 +439,7 @@ async function startRace(seed, generation, autostart) {
 // (on Exam that's ghosts/me-exam.json, which exists only after my first 3 laps there).
 async function startTrackRace(trackId, championName, autostart) {
   const which = parseChampionName(championName);
-  const [ghost, record] = await Promise.all([loadGhostFor(trackId), which ? loadChampion(which) : null]);
+  const [ghost, record] = await Promise.all([loadGhostFor(trackId), which ? loadChampion(which) : null, examReady]);
   if (!ghost || !record) { console.warn(`no race: ${!ghost ? `no ghost lap of mine on ${trackId}` : `no champion ${championName}`}`); mode = 'ai'; return; }
   const v = view(trackId);
   try {
@@ -467,8 +490,10 @@ function frame(now) {
   lastTime = now;
 
   if (mode !== 'edit' && takePress('Tab')) {
-    if (mode === 'drive' && !aiAllowedHere()) {
-      say('Exam is held out: you drive it, no AI does. T picks another track.');
+    const championOnExam = examIsUnlocked() && ai.champion?.where === here;
+    if (mode === 'drive' && !aiAllowedHere() && !championOnExam) {
+      say(examIsUnlocked() ? 'Nobody trains on Exam. To test a champion there: ?track=exam&champion=3-80'
+        : 'Exam is held out: you drive it, no AI does. T picks another track.');
     } else {
       mode = mode === 'drive' ? 'ai' : 'drive';
       closeTrackMenu();

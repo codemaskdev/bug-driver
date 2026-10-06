@@ -43,7 +43,7 @@ export function openTrackMenu(now) {
 
   add(el('h3', 'TRACKS'));
   for (const def of TRACKS) {
-    const label = isHeldOut(def) ? `${def.name} · you drive, no AI (held out)` : def.name;
+    const label = isHeldOut(def) ? `${def.name} · held out: you drive, champions only after my lap, no training` : def.name;
     button(label, () => pick(def), same(def, now.current));
   }
   if (now.mine) button('My track', () => pick(now.mine), same(now.mine, now.current));
