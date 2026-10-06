@@ -1,0 +1,45 @@
+# Bug Driver — PROMPTS
+
+Every prompt sent during the build, verbatim, in order. Earlier entries are never edited.
+
+## 1. Project setup
+
+````text
+We're starting episode 02 of CodeMask. Don't build the game yet — only set up the project.
+
+## 1. The game repo (standalone from day one)
+Create ~/Desktop/bug-driver as its own git repo (not inside CodeMask). Local git config: user.name "CodeMask", user.email "codemask@users.noreply.github.com". Create a PRIVATE repo codemaskdev/bug-driver on GitHub and push to it; we'll make it public at release.
+
+Files:
+- CLAUDE.md, the rules for this project:
+  - What it is: a small car that learns to drive by itself in the browser (neural network + genetic algorithm), for a "how to" video titled "How to Build a Self-Driving Car AI Without Knowing AI".
+  - Plain HTML5 + Canvas + vanilla JS, ES modules, no frameworks, NO ML libraries. The neural network and the evolution are written from scratch and must stay readable, because we explain them on screen.
+  - Every core idea (sensor/ray, neuron, layer, activation, fitness, selection, crossover/mutation, generation) lives in a clearly named function with a one-line plain-English comment. The beginner guide will link to these by name.
+  - Deterministic: one seeded RNG for everything (initial brains, mutations, spawns). Same seed = same evolution. Never Math.random().
+  - ?autoplay=1&seed=N runs hands-free for recording footage.
+  - Numbers shown on screen (sensor distances, weights, outputs, fitness) must be the real values from the simulation, never decorative.
+  - One commit per feature/fix, authored as CodeMask.
+  - After every prompt I send, append to PROMPTS.md: the prompt verbatim, then 2–3 lines on what was built and what broke. Never edit earlier entries.
+  - After every commit, add a DEVLOG.md entry with real numbers (generation, best distance/lap time, how many cars finished). Mark moments that would make a good Short with "🎬".
+  - Be honest: never invent or exaggerate problems for drama. If nothing broke, write "nothing broke". Corrections are new commits, never rewritten history.
+  - The game must stay playable after every commit.
+  - Visual style: CodeMask neon, like Bug Survivor (dark background, cyan hero, glowing pixel look). The car is a small bug-shaped car.
+- README.md: one paragraph placeholder.
+- PROMPTS.md and DEVLOG.md with headers only. Add this very prompt as the first PROMPTS.md entry.
+- LICENSE: MIT, "CodeMask".
+
+## 2. The episode folder (in this CodeMask repo)
+Create episodes/02-bug-driver/plan.md with the plan below, so future sessions have the context:
+
+Title: How to Build a Self-Driving Car AI Without Knowing AI
+Format: viral "how to", 12–15 min, steps "Step 1/6 … 6/6" on screen. Each step: prompt on screen → result → 20–30 s explanation with real numbers → what broke and the fix. Thread through it: "AI vs me" race, my best lap vs the best car at generations 1, 5, 10, 20, 40, 80 (fixed in advance).
+Story: hook (gen 1 chaos vs gen 50 clean lap, split screen) → promise (6 prompts, one evening, no ML knowledge) → build steps with 4 explainers (eyes/rays, brain/neuron, evolution, learned vs memorized) → car beats my lap → twist: new unseen track → honest fix attempt (train on several tracks) → final score → challenge: "draw a track that breaks my car" (tracks shareable as links).
+Deliverables: the video; PROMPTS.md with 6 "golden path" prompts tested from an empty folder; HOW-IT-WORKS.md (beginner guide, links to functions); HOW-IT-WAS-MADE.md (all real prompts + failures); live demo on GitHub Pages with an "explain" overlay and a track editor.
+Build stages: 0 setup, 1 track + manual driving + lap timer, 2 sensors, 3 brain + 100 cars, 4 evolution, 5 live brain view, 6 race vs my ghost, 7 new track / generalization, 8 track editor + share links + autoplay + replay check, 9 guides, 9½ golden-path test in an empty folder, 10 video.
+Rules: scoreboard only at the fixed generations; if no car finishes a lap by generation 100, that becomes the story — no quiet parameter tuning; all on-screen numbers are real.
+
+Commit in CodeMask as CodeMask. Then show me the bug-driver CLAUDE.md and the GitHub repo URL.
+````
+
+Built: the standalone repo with CLAUDE.md (project rules), README placeholder, empty PROMPTS/DEVLOG, MIT LICENSE, pushed to a private codemaskdev/bug-driver; plus episodes/02-bug-driver/plan.md in the CodeMask repo. No game code yet.
+What broke: nothing broke.

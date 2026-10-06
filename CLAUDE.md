@@ -1,0 +1,69 @@
+# Bug Driver — dev rules for this project
+
+## What it is
+A small bug-shaped car that learns to drive by itself in the browser: a
+neural network drives it, a genetic algorithm evolves the networks. It is
+built on camera for the CodeMask video "How to Build a Self-Driving Car AI
+Without Knowing AI". The git history, PROMPTS.md and DEVLOG.md are the raw
+material for the video and the guides.
+
+## Tech
+- Plain HTML5 + Canvas + vanilla JS, ES modules. No frameworks, no build
+  step, no npm dependencies.
+- NO ML libraries. The neural network and the evolution are written from
+  scratch and must stay readable, because we explain them on screen.
+- Run it with `npx serve` in this folder and open the printed URL
+  (ES modules don't load from file://).
+- The game must stay playable after every commit.
+
+## Readable core ideas
+- Every core idea lives in its own clearly named function with a one-line
+  plain-English comment above it: sensor/ray, neuron, layer, activation,
+  fitness, selection, crossover/mutation, generation.
+- The beginner guide (HOW-IT-WORKS.md) links to these functions by name,
+  so don't rename or merge them casually. If one must be renamed, update
+  the guide in the same commit.
+
+## Determinism
+- One seeded RNG for everything: initial brains, mutations, spawns.
+  Same seed = same evolution.
+- Never use Math.random().
+
+## Autoplay
+- `?autoplay=1&seed=N` runs hands-free for recording footage
+  (seed defaults to 1).
+
+## On-screen numbers
+- Every number shown on screen (sensor distances, weights, outputs,
+  fitness, generation, lap time) must be the real value from the
+  simulation. Never decorative or faked.
+
+## Visual style
+- CodeMask neon, like Bug Survivor: dark background (#0b0d13), cyan hero
+  (#00f0ff), glowing pixel look. Accents from the same palette: yellow
+  #ffd23f, pink-red #ff2e63, green #39ff88.
+- The car is a small bug-shaped car.
+
+## Commits
+- One commit per feature or fix, never batch. Authored as CodeMask
+  (already set in this repo's local git config).
+- Message format: `<type>: <what changed, in plain English>`
+  types: feat, fix, tweak, refactor, docs.
+- Never squash, amend or rewrite history. Corrections are new commits.
+
+## PROMPTS.md
+- After every prompt the user sends, append an entry: the prompt copied
+  verbatim in full, then 2–3 lines on what was built and what broke.
+- Never edit earlier entries.
+
+## DEVLOG.md
+- After every commit, add an entry with real numbers: generation, best
+  distance / best lap time, how many cars finished a lap. Include the
+  commit hash.
+- Mark moments that would make a good Short with "🎬".
+
+## Honesty
+- Never invent or exaggerate problems for drama. If nothing broke, write
+  "nothing broke". Real failures matter, made-up ones ruin the video.
+- No quiet parameter tuning to rescue the story: if the cars fail, that
+  is the story, and it gets logged.
