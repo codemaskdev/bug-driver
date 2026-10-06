@@ -37,7 +37,7 @@ import { drawWeightsGrid, GRID_BLOCK_W } from './render/weights-grid.js';
 import { readInput, takePress, clearPresses } from './game/keyboard.js';
 import { loadBestLap, saveBestLap } from './game/best-lap.js';
 import { AUTOPLAY, SEED, CHAMPION, COMPARE, RACE, SCOREBOARD, TRACK } from './game/params.js';
-import { loadChampion, loadChampionsFile, loadGhost, parseChampionName } from './game/champions.js';
+import { loadChampion, loadChampionsFile, loadGhost, loadGhostFor, parseChampionName } from './game/champions.js';
 import { createRace, stepRace, raceGap, raceResult, progressShare } from './sim/race.js';
 import { buildScoreboard } from './sim/scoreboard.js';
 import { drawRaceHud, drawScoreboard, drawTag, drawOutMark } from './render/race-view.js';
@@ -334,8 +334,10 @@ function championHudState() {
     id: ch.record.id,
     laps: ch.laps,
     bestLapSteps: car.bestLapSteps,
-    // its recorded lap is from Neon Loop: only comparable there
-    recordedLapSteps: ch.where === neon ? ch.record.lapSteps : undefined,
+    // its recorded lap is only comparable on a track it trained on (multi-track champions: one per track)
+    recordedLapSteps: typeof ch.record.lapSteps === 'object' && ch.record.lapSteps !== null
+      ? ch.record.lapSteps[ch.where.track.id]
+      : ch.where === neon ? ch.record.lapSteps : undefined,
     over: ch.gen.over,
     out: car.out,
     percent: progressPercent(car.world),
@@ -363,8 +365,25 @@ async function startRace(seed, generation, autostart) {
   if (!(await loadVersus(seed)) || !versus.file.champions[generation]) { mode = 'ai'; return; }
   versus.generation = generation;
   versus.race = createRace(track, versus.ghost, { generation, brain: versus.file.champions[generation].brain });
+  versus.view = neon;
+  versus.restart = () => startRace(seed, generation, true);
   versus.started = autostart;
   versus.selected = Math.max(0, versus.board.rows.findIndex((r) => r.generation === generation));
+  acc = 0;
+  mode = 'race';
+}
+
+// A race on another track: ?race=exam&champion=3-multi-100. Only where I have a ghost lap
+// (on Exam that's ghosts/me-exam.json, which exists only after my first 3 laps there).
+async function startTrackRace(trackId, championName, autostart) {
+  const which = parseChampionName(championName);
+  const [ghost, record] = await Promise.all([loadGhostFor(trackId), which ? loadChampion(which) : null]);
+  if (!ghost || !record) { console.warn(`no race: ${!ghost ? `no ghost lap of mine on ${trackId}` : `no champion ${championName}`}`); mode = 'ai'; return; }
+  const v = view(trackId);
+  versus.race = createRace(v.track, ghost, { generation: which.generation, brain: record.brain, name: `GEN ${which.generation}${which.multi ? ' ×3 TRACKS' : ''}` });
+  versus.view = v;
+  versus.restart = () => startTrackRace(trackId, championName, true);
+  versus.started = autostart;
   acc = 0;
   mode = 'race';
 }
@@ -377,7 +396,7 @@ async function openScoreboard(seed, animate) {
 
 function drawRace(alpha) {
   const { me, ai } = versus.race;
-  drawTrack();
+  drawTrack(versus.view);
   // a car that has finished or is out stands still: draw it where it stopped
   const poseOf = (lane) => smoothPose(lane.world.car, lane.finishSteps || lane.out ? 1 : alpha);
   if (ai.out) {
@@ -438,7 +457,7 @@ function frame(now) {
     if (takePress('Escape')) mode = 'ai';
     if (takePress('Space')) {
       if (!versus.started) versus.started = true;
-      else if (race.over) startRace(versus.seed, versus.generation, true);
+      else if (race.over) versus.restart();
     }
     if (versus.started && !race.over) {
       acc += dt * versus.speed;
@@ -544,10 +563,11 @@ function drawTrack(v = neon) {
   ctx.drawImage(v.image, 0, 0, v.image.width * 2, v.image.height * 2);
 }
 
-if (CHAMPION) startChampion(CHAMPION);
+if (CHAMPION && !RACE) startChampion(CHAMPION);
 if (RACE) {
   const which = parseChampionName(RACE);
   if (which) startRace(which.seed, which.generation, AUTOPLAY);
+  else if (TRACKS.some((t) => t.id === RACE)) startTrackRace(RACE, CHAMPION, AUTOPLAY);
   else mode = 'ai';
 }
 if (SCOREBOARD) openScoreboard(SCOREBOARD, AUTOPLAY);

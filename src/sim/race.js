@@ -32,7 +32,7 @@ function lapStartWorld(track, start) {
 }
 
 // The race: lane "me" replays my ghost's keys; lane "ai" lets the champion's brain drive.
-// champion = {generation, brain}; its best lap is found by driving it, never typed in.
+// champion = {generation, brain, name?}; its best lap is found by driving it, never typed in.
 export function createRace(track, ghost, champion) {
   const meWorld = ghostWorld(track, ghost);
   meWorld.laps.checkpointsPassed = 1;
@@ -40,7 +40,7 @@ export function createRace(track, ghost, champion) {
 
   const bestLap = championBestLap(track, champion.brain);
   const ai = {
-    name: `GEN ${champion.generation}`,
+    name: champion.name ?? `GEN ${champion.generation}`,
     brain: champion.brain,
     bestLap,
     // no lap ever: it starts from the normal start spot and drives until it crashes or stalls
