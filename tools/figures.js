@@ -1,4 +1,4 @@
-// Generates every figure of the beginner guide (HOW-IT-WORKS.md) from the real simulation:
+// Generates every figure of the guide (HOW-IT-WORKS.md and DEEP-DIVE.md) from the real simulation:
 // real frames, real weights, real generation stats. Nothing is drawn by hand.
 // It also writes docs/img/figure-data.json with every number the guide quotes.
 // Run with: node tools/figures.js   (about half a minute)
@@ -645,6 +645,98 @@ function chart(x0, y0, w, h, series, yMax, yMin = 0, o = {}) {
   save('05-family-line.svg', svg(880, 350, 'The family line', parts.join('\n')), 'The unbroken family line of the gen 80 champion, back to car 1-85: mutated children and unchanged elite copies.');
   data.family = { from: lineIds[0], to: lineIds.at(-1), cars: lineIds.length, elites, mutated: lineIds.length - 1 - elites, lastChange, gen4: lineIds[3], firstLapCarInLine: lineIds.includes('4-78'),
     championsInLine: lineIds.filter((id, i) => h[i].championId === id).length };
+}
+
+// ===================================================================
+// The simple guide (HOW-IT-WORKS.md): one big picture per chapter, big text for phones,
+// still drawn from the same real data. Files start with "simple-".
+// ===================================================================
+const BIG = 30, MID = 24;
+{
+  // chapter 0: the whole idea in one loop
+  const parts = [];
+  const pill = (x, y, w, label, color) => rect(x, y, w, 90, { fill: C.road, stroke: color, width: 3, rx: 22 }) + text(x + w / 2, y + 57, label, { anchor: 'middle', size: BIG, weight: 'bold', color, glow: true });
+  parts.push(pill(30, 40, 190, 'EYES', C.cyan), pill(265, 40, 190, 'BRAIN', C.yellow), pill(500, 40, 190, 'KEYS', C.pink));
+  parts.push(line(222, 85, 262, 85, C.dim, 4, { arrow: true }), line(457, 85, 497, 85, C.dim, 4, { arrow: true }));
+  parts.push(text(125, 168, 'walls: how far?', { anchor: 'middle', size: 20, color: C.text }));
+  parts.push(text(330, 168, '70 numbers', { anchor: 'middle', size: 20, color: C.text }));
+  parts.push(text(595, 168, 'gas brake left right', { anchor: 'middle', size: 18, color: C.text }));
+  parts.push(rect(70, 220, 580, 120, { fill: C.road, stroke: C.green, width: 3, rx: 22 }));
+  parts.push(text(360, 265, '100 cars try', { anchor: 'middle', size: MID, color: C.green, weight: 'bold' }));
+  parts.push(text(360, 305, 'the best ones get children', { anchor: 'middle', size: MID, color: C.green, weight: 'bold' }));
+  parts.push(poly([{ x: 430, y: 220 }, { x: 430, y: 135 }], { stroke: C.green, width: 4 }).replace('/>', ' marker-end="url(#arrow)"/>'));
+  save('simple-0-big-idea.svg', svg(720, 370, 'Eyes, brain, keys, and the best get children', parts.join('\n')), 'Simple guide, ch 0: eyes → brain → keys, and the best cars get children.');
+}
+{
+  // chapter 1: the track, big and clean
+  const v = { x0: 80, y0: 40, scale: 0.6, ox: 0, oy: 10 };
+  const parts = [drawTrack(v)];
+  parts.push(drawBug({ ...v }, track.spawn, { scale: 1.8 }));
+  const spot = (x, y) => at(v, { x, y });
+  const s1 = spot(560, 712), h = spot(350, 192), w = spot(1020, 360);
+  parts.push(text(s1.x, s1.y + 8, 'start', { anchor: 'middle', size: MID, color: C.text, weight: 'bold' }));
+  parts.push(text(h.x, h.y, '← hairpin', { size: MID, color: C.yellow, weight: 'bold' }));
+  parts.push(text(w.x, w.y, 'walls', { anchor: 'middle', size: MID, color: C.magenta, weight: 'bold' }), text(w.x, w.y + 32, '= crash', { anchor: 'middle', size: MID, color: C.magenta, weight: 'bold' }));
+  save('simple-1-track.svg', svg(720, 470, 'The track', parts.join('\n')), 'Simple guide, ch 1: the track, the start and the hairpin.');
+}
+{
+  // chapter 2: the eyes at the hairpin, bigger and fewer words
+  const v = { x0: 215, y0: 70, scale: 2.2, ox: 10, oy: 10 };
+  const parts = [drawTrack(v, { clip: { w: 720, h: 470 } })];
+  frame.view.forEach((d, i) => {
+    const e = eyePosition(frame.pose, i), ang = frame.pose.angle + SENSOR_ANGLES[i];
+    const a = at(v, e), b = at(v, { x: e.x + Math.cos(ang) * d, y: e.y + Math.sin(ang) * d });
+    parts.push(line(a.x, a.y, b.x, b.y, rayColor(d), 4, { glow: true }), circle(b.x, b.y, 7, { fill: rayColor(d) }));
+    if (i === 0) parts.push(text(b.x + 14, b.y + 34, `${Math.round(d)} px`, { size: BIG, color: rayColor(d), weight: 'bold', glow: true }));
+  });
+  parts.push(drawBug(v, frame.pose));
+  parts.push(text(395, 240, 'the closer the wall,', { size: 22, color: C.text }), text(395, 272, 'the bigger the number', { size: 22, color: C.text }));
+  save('simple-2-eyes.svg', svg(720, 470, 'Five eyes', parts.join('\n')), 'Simple guide, ch 2: the 5 eyes at the hairpin; the left one sees the wall about 23 px away.');
+}
+{
+  // chapter 3: the real network of the gen 40 champion, without the numbers
+  const ex = frame.ex, parts = [];
+  const inX = 120, hidX = 360, outX = 560;
+  const inY = (i) => 90 + i * 52, hidY = (h) => 90 + h * 52, outY = (k) => 130 + k * 62;
+  const conn = (x1, y1, x2, y2, w) => { const size = Math.min(1, Math.abs(w) / 2); return line(x1, y1, x2, y2, w >= 0 ? C.cyan : C.pink, 1 + 5 * size, { opacity: 0.15 + 0.6 * size }); };
+  ex.hidden.forEach((n, h) => n.terms.forEach((t, i) => parts.push(conn(inX, inY(i), hidX, hidY(h), t.weight))));
+  ex.output.forEach((n, k) => n.terms.forEach((t, h) => parts.push(conn(hidX, hidY(h), outX, outY(k), t.weight))));
+  ex.inputs.forEach((v, i) => parts.push(circle(inX, inY(i), 16, { fill: C.cyan, opacity: 0.15 + 0.85 * v, stroke: C.text, width: 1.5 })));
+  ex.hidden.forEach((n) => { const i = ex.hidden.indexOf(n); parts.push(circle(hidX, hidY(i), 16, { fill: n.value >= 0 ? C.cyan : C.pink, opacity: 0.15 + 0.85 * Math.abs(n.value), stroke: C.text, width: 1.5 })); });
+  ex.output.forEach((n, k) => {
+    const on = n.value > 0.5;
+    parts.push(circle(outX, outY(k), 18, { fill: C.yellow, opacity: on ? 1 : 0.12, stroke: C.text, width: 1.5, glow: on }));
+    parts.push(text(outX + 30, outY(k) + 9, OUTPUT_LABELS[k].toUpperCase(), { size: MID, color: on ? C.yellow : C.dim, weight: on ? 'bold' : 'normal' }));
+  });
+  parts.push(text(inX, 50, 'feels', { anchor: 'middle', size: MID, color: C.cyan, weight: 'bold' }), text(hidX, 50, 'thinks', { anchor: 'middle', size: MID, color: C.cyan, weight: 'bold' }), text(outX + 40, 50, 'presses', { anchor: 'middle', size: MID, color: C.yellow, weight: 'bold' }));
+  parts.push(text(360, 440, 'every line is one number', { anchor: 'middle', size: MID, color: C.text }));
+  save('simple-3-brain.svg', svg(720, 470, 'The brain', parts.join('\n')), 'Simple guide, ch 3: the real brain at the hairpin; BRAKE and LEFT are pressed.');
+}
+{
+  // chapter 4: a real generation (seed 3, gen 4): 100 cars ranked, the best 10 get children
+  const ranked = [...gen4.cars].sort((a, b) => fitness(b) - fitness(a));
+  const parts = [];
+  parts.push(text(360, 50, '100 cars, best to worst', { anchor: 'middle', size: MID, color: C.text, weight: 'bold' }));
+  ranked.forEach((c, i) => {
+    const col = i % 20, row = Math.floor(i / 20);
+    parts.push(drawBug({ x0: 0, y0: 0, scale: 0.8, ox: 60 + col * 31.5, oy: 92 + row * 36 }, { x: 0, y: 0, angle: 0 }, { opacity: i < 10 ? 1 : 0.3, color: i < 10 ? C.yellow : C.cyan }));
+  });
+  parts.push(text(60, 300, 'the best 10', { size: MID, color: C.yellow, weight: 'bold' }));
+  parts.push(line(360, 320, 360, 360, C.dim, 4, { arrow: true }));
+  parts.push(rect(60, 372, 600, 74, { fill: C.road, stroke: C.green, width: 3, rx: 18 }));
+  parts.push(text(360, 405, 'their copies, with tiny changes,', { anchor: 'middle', size: 22, color: C.green }), text(360, 433, 'are the next 100 cars', { anchor: 'middle', size: 22, color: C.green }));
+  save('simple-4-evolution.svg', svg(720, 470, 'Evolution', parts.join('\n')), 'Simple guide, ch 4: a real generation ranked; the best 10 become the parents of the next 100.');
+}
+{
+  // chapter 5: generation 1 vs generation 80 through the hairpin
+  const v = { x0: 190, y0: 52, scale: 1.75, ox: 20, oy: 14 };
+  const parts = [drawTrack(v, { clip: { w: 720, h: 500 } })];
+  const pass = (brain) => { const pts = []; solo(brain, (c) => pts.push({ x: c.world.car.x, y: c.world.car.y }), 1200); const out = []; for (const p of pts) { if (p.x < 520 && p.y < 330 && p.y > 40) out.push(p); else if (out.length > 40) break; } return out; };
+  parts.push(poly(pass(champs[3]['1'].brain).map((p) => at(v, p)), { stroke: C.pink, width: 5, glow: true }));
+  parts.push(poly(pass(champs[3]['80'].brain).map((p) => at(v, p)), { stroke: C.yellow, width: 5, glow: true }));
+  parts.push(text(290, 232, 'gen 1: down the middle', { size: 22, color: C.pink, weight: 'bold' }));
+  parts.push(text(290, 270, 'gen 80: hugs the inside', { size: 22, color: C.yellow, weight: 'bold' }));
+  save('simple-5-inside-line.svg', svg(720, 500, 'Nobody taught it the inside line', parts.join('\n')), 'Simple guide, ch 5: generation 1 drives the hairpin down the middle; generation 80 hugs the inside.');
 }
 
 // ---------- tables the guide quotes ----------

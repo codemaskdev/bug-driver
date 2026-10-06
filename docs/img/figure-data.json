@@ -863,6 +863,30 @@
   {
    "name": "05-family-line.svg",
    "about": "The unbroken family line of the gen 80 champion, back to car 1-85: mutated children and unchanged elite copies."
+  },
+  {
+   "name": "simple-0-big-idea.svg",
+   "about": "Simple guide, ch 0: eyes → brain → keys, and the best cars get children."
+  },
+  {
+   "name": "simple-1-track.svg",
+   "about": "Simple guide, ch 1: the track, the start and the hairpin."
+  },
+  {
+   "name": "simple-2-eyes.svg",
+   "about": "Simple guide, ch 2: the 5 eyes at the hairpin; the left one sees the wall about 23 px away."
+  },
+  {
+   "name": "simple-3-brain.svg",
+   "about": "Simple guide, ch 3: the real brain at the hairpin; BRAKE and LEFT are pressed."
+  },
+  {
+   "name": "simple-4-evolution.svg",
+   "about": "Simple guide, ch 4: a real generation ranked; the best 10 become the parents of the next 100."
+  },
+  {
+   "name": "simple-5-inside-line.svg",
+   "about": "Simple guide, ch 5: generation 1 drives the hairpin down the middle; generation 80 hugs the inside."
   }
  ]
 }
