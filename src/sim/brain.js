@@ -59,3 +59,34 @@ export function think(brain, inputs) {
   for (let k = 0; k < OUTPUTS; k++) if (out[k] > 0.5) keys |= OUTPUT_KEYS[k];
   return keys;
 }
+
+// The whole calculation behind one decision, every number of it: for each neuron,
+// each input times its weight, the sum, the bias, the total and the squashed value.
+// Same arithmetic in the same order as neuron(), so the numbers are exactly think()'s.
+export function explainThink(brain, inputs) {
+  const hidden = explainLayer(inputs, brain, 0, HIDDEN, tanh);
+  const hiddenValues = hidden.map((n) => n.value);
+  const output = explainLayer(hiddenValues, brain, HIDDEN * (INPUTS + 1), OUTPUTS, sigmoid);
+  let keys = 0;
+  output.forEach((n, k) => { if (n.value > 0.5) keys |= OUTPUT_KEYS[k]; });
+  return { inputs: inputs.slice(), hidden, output, keys };
+}
+
+function explainLayer(inputs, brain, start, size, squash) {
+  const perNeuron = inputs.length + 1;
+  const neurons = [];
+  for (let n = 0; n < size; n++) {
+    const at = start + n * perNeuron;
+    const terms = [];
+    let sum = 0;
+    for (let i = 0; i < inputs.length; i++) {
+      const product = inputs[i] * brain[at + i];
+      terms.push({ input: inputs[i], weight: brain[at + i], product });
+      sum += product;
+    }
+    const bias = brain[at + inputs.length];
+    const total = sum + bias;
+    neurons.push({ terms, sum, bias, total, value: squash(total) });
+  }
+  return neurons;
+}

@@ -68,7 +68,45 @@ export function drawHud(hud) {
   }
 }
 
-// ai = {trackName, generation, alive, total, leaderPercent, bestLapSteps, seconds, speed, seed, flash}
+const AI_KEYS = '1 2 3 speed   R restart   E eyes   B brain   F explain one decision   N 70 numbers   click a car   TAB drive';
+
+function drawFrozen() {
+  ctx.textAlign = 'right';
+  glowText('FROZEN · F to go on', VIEW_W - 16, 48, YELLOW, 'bold 12px monospace', 8);
+}
+
+// ch = {trackName, name, id, laps, bestLapSteps, recordedLapSteps, over, out, percent, seconds, speed, frozen}
+export function drawChampionHud(ch) {
+  ctx.textBaseline = 'top';
+  ctx.textAlign = 'left';
+  glowText('BUG DRIVER', 16, 14, DIM, '14px monospace', 0);
+  glowText(`${ch.trackName.toUpperCase()}  ·  CHAMPION, ALONE`, 16, 32, 'rgba(0, 240, 255, 0.35)', '11px monospace', 0);
+
+  ctx.textAlign = 'center';
+  const lapList = ch.laps.length ? ch.laps.map(formatSteps).join('  ') : 'no lap yet';
+  glowText(`CHAMPION ${ch.name.toUpperCase()}`, VIEW_W / 2, 8, TEXT, 'bold 20px monospace');
+  glowText(`car ${ch.id}  ·  laps: ${lapList}  ·  ${ch.percent.toFixed(1)}% · ${ch.seconds.toFixed(1)} s`, VIEW_W / 2, 36, DIM, '12px monospace', 0);
+
+  ctx.textAlign = 'right';
+  glowText(ch.speed === 'max' ? 'MAX' : `x${ch.speed}`, VIEW_W - 16, 12, YELLOW, 'bold 18px monospace', 8);
+
+  ctx.textAlign = 'left';
+  glowText(AI_KEYS, 16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
+  if (ch.frozen) drawFrozen();
+
+  if (ch.over) {
+    ctx.textAlign = 'center';
+    const recorded = ch.recordedLapSteps == null ? 'no lap' : formatSteps(ch.recordedLapSteps);
+    const now = ch.bestLapSteps == null ? 'no lap' : formatSteps(ch.bestLapSteps);
+    const match = ch.bestLapSteps === ch.recordedLapSteps;
+    // in the empty infield, clear of the brain panels
+    glowText(`best lap ${now} · recorded ${recorded} · ${match ? 'EXACT MATCH' : 'MISMATCH'}`,
+      500, 330, match ? YELLOW : PINK, 'bold 15px monospace', 10);
+    glowText(`out by ${ch.out}  ·  R to run it again`, 500, 354, TEXT, '12px monospace', 0);
+  }
+}
+
+// ai = {trackName, generation, alive, total, leaderPercent, bestLapSteps, seconds, speed, seed, flash, frozen}
 export function drawAiHud(ai) {
   ctx.textBaseline = 'top';
 
@@ -86,8 +124,8 @@ export function drawAiHud(ai) {
   glowText(`seed ${ai.seed}`, VIEW_W - 16, 34, 'rgba(0, 240, 255, 0.35)', '11px monospace', 0);
 
   ctx.textAlign = 'left';
-  glowText('1 2 3  speed x1 / x10 / max     R  restart evolution     E  explain     TAB  drive yourself',
-    16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
+  glowText(AI_KEYS, 16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
+  if (ai.frozen) drawFrozen();
 
   if (ai.flash) {
     ctx.textAlign = 'center';

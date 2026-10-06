@@ -5,7 +5,7 @@
 
 import { STEPS_PER_SECOND } from './constants.js';
 import { createWorld, stepWorld } from './world.js';
-import { getInputs } from './sensors.js';
+import { readSensors, inputsFromView } from './sensors.js';
 import { think, randomBrain } from './brain.js';
 
 export const POPULATION = 100;
@@ -36,7 +36,10 @@ export function createGeneration(track, brains, number = 1, family = []) {
       outStep: 0,
       lastProgressStep: 0,       // when it last passed a new checkpoint
       progressSeen: 0,
-      keys: 0,                   // the keys its brain pressed on the last step
+      // its last decision, kept so the brain panels can show exactly what was computed:
+      view: null,                // the 5 distances (px) it saw
+      inputs: null,              // the 6 numbers its brain got
+      keys: 0,                   // the keys its brain pressed
     })),
   };
 }
@@ -75,7 +78,9 @@ export function stepGeneration(gen) {
   let driving = 0;
   gen.cars.forEach((c, index) => {
     if (c.out) return;
-    c.keys = think(c.brain, getInputs(c.world.car, gen.track.walls));
+    c.view = readSensors(c.world.car, gen.track.walls);
+    c.inputs = inputsFromView(c.view, c.world.car.speed);
+    c.keys = think(c.brain, c.inputs);
     for (const e of stepWorld(c.world, c.keys)) {
       if (e.type === 'lap' && (c.bestLapSteps === null || e.steps < c.bestLapSteps)) c.bestLapSteps = e.steps;
       events.push({ ...e, index });

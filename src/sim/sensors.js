@@ -45,9 +45,13 @@ export function eyePosition(car, i) {
 // The brain's input: the only 6 numbers the car will ever know.
 // 5 eyes, each 0..1 (1 = wall touching the car, 0 = nothing in range), then speed 0..1 (reversing counts as 0).
 export function getInputs(car, walls) {
-  const view = readSensors(car, walls).map((d) => 1 - d / SENSOR_RANGE);
-  const speed = Math.max(0, Math.min(1, car.speed / CAR.maxSpeed));
-  return [...view, speed];
+  return inputsFromView(readSensors(car, walls), car.speed);
+}
+
+// The same 6 numbers, from 5 distances already measured with readSensors() and the car's speed.
+export function inputsFromView(view, speed) {
+  const eyes = view.map((d) => 1 - d / SENSOR_RANGE);
+  return [...eyes, Math.max(0, Math.min(1, speed / CAR.maxSpeed))];
 }
 
 // Distance from the car's center to its hitbox outline in direction (dx, dy), in the car's own frame.
