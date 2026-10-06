@@ -5,19 +5,19 @@
 // lists, quotes, tables, images, links, bold, italic, code). No dependencies.
 // Run with: node tools/guide-page.js   (again whenever either Markdown file changes)
 //
-// The pages must work when double-clicked (file://). Safari only lets a local page
-// read files in its own folder and below, so every figure the pages use is copied
-// into docs/guide/img/ and linked as img/... (never ../img/...). The build fails if
-// any <img> in a page, or any image path in the Markdown, doesn't exist on disk.
+// The pages must work however they're opened: double-clicked in any browser,
+// or in an app's built-in HTML preview, and some of those won't let a local page
+// load any other file at all. So every figure is embedded in the page itself
+// (a data: URL made from the SVG file). The build fails if an image path in the
+// Markdown doesn't exist on disk, or if a page still points an <img> at a file.
 
-import { readFileSync, writeFileSync, mkdirSync, copyFileSync, rmSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 
 const root = new URL('../', import.meta.url);
 const OUT = new URL('docs/guide/', root);
 mkdirSync(OUT, { recursive: true });
-rmSync(new URL('img/', OUT), { recursive: true, force: true });
-mkdirSync(new URL('img/', OUT), { recursive: true });
-const copied = new Set(); // files from docs/img/ the pages use, copied next to them
+rmSync(new URL('img/', OUT), { recursive: true, force: true }); // older builds copied the figures here
+const embedded = new Set(); // figures built into the pages
 
 const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -33,23 +33,22 @@ function href(url) {
   const tail = hash ? `#${hash}` : '';
   if (path === 'HOW-IT-WORKS.md') return `index.html${tail}`;
   if (path === 'DEEP-DIVE.md') return `deep-dive.html${tail}`;
-  if (path.startsWith('docs/img/')) {
-    // copied into the page's own folder, so file:// pages in any browser can load it
-    const name = path.slice('docs/img/'.length);
-    if (!copied.has(name)) {
-      copyFileSync(new URL(path, root), new URL(`img/${name}`, OUT));
-      copied.add(name);
-    }
-    return `img/${name}${tail}`;
-  }
   return `../../${path}${tail}`;
+}
+
+// An image, built into the page: the SVG file itself as a data: URL
+function imageSrc(path) {
+  const file = new URL(path, root);
+  if (!existsSync(file)) throw new Error(`image ${path} does not exist`);
+  embedded.add(path);
+  return `data:image/svg+xml;base64,${readFileSync(file).toString('base64')}`;
 }
 
 function inline(s) {
   const codes = [];
   s = s.replace(/`([^`]+)`/g, (_, c) => `\u0000${codes.push(escapeHtml(c)) - 1}\u0000`);
   s = escapeHtml(s);
-  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => `<img src="${href(src)}" alt="${alt}">`);
+  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => `<img src="${imageSrc(src)}" alt="${alt}">`);
   s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => `<a href="${href(u)}">${t}</a>`);
   s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   s = s.replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\w)/g, '$1<em>$2</em>');
@@ -164,10 +163,10 @@ for (const [md, [html, title, here]] of Object.entries(sources)) {
   try {
     const out = page(title, markdownToHtml(text), here);
     writeFileSync(new URL(html, OUT), out);
-    // every <img> in the generated page must exist on disk, relative to the page
+    // every <img> in the generated page must be built in, never a file the viewer might not be allowed to open
     for (const [, src] of out.matchAll(/<img src="([^"]+)"/g)) {
       images++;
-      if (src.includes('..') || !existsSync(new URL(src, new URL(html, OUT)))) problems.push(`docs/guide/${html}: <img src="${src}"> does not exist (or leaves the page's folder)`);
+      if (!src.startsWith('data:image/svg+xml;base64,')) problems.push(`docs/guide/${html}: <img src="${src.slice(0, 60)}"> points at a file instead of being built in`);
     }
   } catch (e) {
     problems.push(`${md}: ${e.message}`);
@@ -178,4 +177,4 @@ if (problems.length) {
   console.error(`\nBuild failed:\n${problems.map((p) => `  ${p}`).join('\n')}`);
   process.exit(1);
 }
-console.log(`ok: every image exists; ${copied.size} files copied into docs/guide/img/`);
+console.log(`ok: every image exists and is built into the pages (${embedded.size} figures)`);
