@@ -1,0 +1,491 @@
+{
+ "preRegistered": "DEVLOG.md, Step 7a pre-registration (commit fa2a3a1)",
+ "results": [
+  {
+   "track": "neon-loop-mirrored",
+   "seed": 3,
+   "generation": 1,
+   "id": "1-85",
+   "neonLoopLap": null,
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 10.5,
+   "out": "crash",
+   "outSeconds": 1.98,
+   "where": {
+    "x": 158,
+    "y": 656,
+    "checkpoint": 8
+   }
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "seed": 3,
+   "generation": 5,
+   "id": "5-41",
+   "neonLoopLap": 30.02,
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 50.4,
+   "out": "crash",
+   "outSeconds": 14.93,
+   "where": {
+    "x": 216,
+    "y": 196,
+    "checkpoint": 41
+   }
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "seed": 3,
+   "generation": 10,
+   "id": "10-60",
+   "neonLoopLap": 13.17,
+   "lapSeconds": 13.33,
+   "lapSteps": 800,
+   "laps": 4,
+   "progress": 438.2,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 529,
+    "y": 252,
+    "checkpoint": 35
+   }
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "seed": 3,
+   "generation": 20,
+   "id": "20-27",
+   "neonLoopLap": 12.65,
+   "lapSeconds": 13.2,
+   "lapSteps": 792,
+   "laps": 4,
+   "progress": 444.3,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 299,
+    "y": 231,
+    "checkpoint": 40
+   }
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "seed": 3,
+   "generation": 40,
+   "id": "40-69",
+   "neonLoopLap": 12.53,
+   "lapSeconds": 13.92,
+   "lapSteps": 835,
+   "laps": 1,
+   "progress": 149.2,
+   "out": "stall",
+   "outSeconds": 23.62,
+   "where": {
+    "x": 276,
+    "y": 197,
+    "checkpoint": 41
+   }
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "seed": 3,
+   "generation": 80,
+   "id": "80-0",
+   "neonLoopLap": 12.47,
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 49.8,
+   "out": "crash",
+   "outSeconds": 7.63,
+   "where": {
+    "x": 320,
+    "y": 205,
+    "checkpoint": 41
+   }
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "seed": 2,
+   "generation": 80,
+   "id": "80-0",
+   "neonLoopLap": 12.58,
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 50,
+   "out": "stall",
+   "outSeconds": 9.95,
+   "where": {
+    "x": 286,
+    "y": 212,
+    "checkpoint": 41
+   }
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "seed": 4,
+   "generation": 80,
+   "id": "80-50",
+   "neonLoopLap": 13.28,
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 53,
+   "out": "crash",
+   "outSeconds": 7.88,
+   "where": {
+    "x": 305,
+    "y": 70,
+    "checkpoint": 44
+   }
+  },
+  {
+   "track": "neon-loop-mirrored",
+   "seed": 5,
+   "generation": 80,
+   "id": "80-0",
+   "neonLoopLap": 12.57,
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 51.5,
+   "out": "crash",
+   "outSeconds": 7.78,
+   "where": {
+    "x": 306,
+    "y": 175,
+    "checkpoint": 42
+   }
+  },
+  {
+   "track": "zigzag",
+   "seed": 3,
+   "generation": 1,
+   "id": "1-85",
+   "neonLoopLap": null,
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 0.1,
+   "out": "stall",
+   "outSeconds": 3,
+   "where": {
+    "x": 490,
+    "y": 642,
+    "checkpoint": 0
+   }
+  },
+  {
+   "track": "zigzag",
+   "seed": 3,
+   "generation": 5,
+   "id": "5-41",
+   "neonLoopLap": 30.02,
+   "lapSeconds": 19.77,
+   "lapSteps": 1186,
+   "laps": 2,
+   "progress": 296.6,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 519,
+    "y": 628,
+    "checkpoint": 0
+   }
+  },
+  {
+   "track": "zigzag",
+   "seed": 3,
+   "generation": 10,
+   "id": "10-60",
+   "neonLoopLap": 13.17,
+   "lapSeconds": 9.37,
+   "lapSteps": 562,
+   "laps": 6,
+   "progress": 610.6,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 1030,
+    "y": 621,
+    "checkpoint": 12
+   }
+  },
+  {
+   "track": "zigzag",
+   "seed": 3,
+   "generation": 20,
+   "id": "20-27",
+   "neonLoopLap": 12.65,
+   "lapSeconds": 9.25,
+   "lapSteps": 555,
+   "laps": 6,
+   "progress": 623.8,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 1178,
+    "y": 342,
+    "checkpoint": 20
+   }
+  },
+  {
+   "track": "zigzag",
+   "seed": 3,
+   "generation": 40,
+   "id": "40-69",
+   "neonLoopLap": 12.53,
+   "lapSeconds": 9.83,
+   "lapSteps": 590,
+   "laps": 6,
+   "progress": 593.3,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 562,
+    "y": 622,
+    "checkpoint": 1
+   }
+  },
+  {
+   "track": "zigzag",
+   "seed": 3,
+   "generation": 80,
+   "id": "80-0",
+   "neonLoopLap": 12.47,
+   "lapSeconds": 9.38,
+   "lapSteps": 563,
+   "laps": 6,
+   "progress": 619.7,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 1187,
+    "y": 458,
+    "checkpoint": 17
+   }
+  },
+  {
+   "track": "zigzag",
+   "seed": 2,
+   "generation": 80,
+   "id": "80-0",
+   "neonLoopLap": 12.58,
+   "lapSeconds": 9.65,
+   "lapSteps": 579,
+   "laps": 6,
+   "progress": 596.2,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 642,
+    "y": 610,
+    "checkpoint": 3
+   }
+  },
+  {
+   "track": "zigzag",
+   "seed": 4,
+   "generation": 80,
+   "id": "80-50",
+   "neonLoopLap": 13.28,
+   "lapSeconds": 9.3,
+   "lapSteps": 558,
+   "laps": 6,
+   "progress": 618,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 1159,
+    "y": 504,
+    "checkpoint": 16
+   }
+  },
+  {
+   "track": "zigzag",
+   "seed": 5,
+   "generation": 80,
+   "id": "80-0",
+   "neonLoopLap": 12.57,
+   "lapSeconds": 9.88,
+   "lapSteps": 593,
+   "laps": 5,
+   "progress": 586.3,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 389,
+    "y": 603,
+    "checkpoint": 56
+   }
+  },
+  {
+   "track": "wide-sweepers",
+   "seed": 3,
+   "generation": 1,
+   "id": "1-85",
+   "neonLoopLap": null,
+   "lapSeconds": null,
+   "lapSteps": null,
+   "laps": 0,
+   "progress": 60.2,
+   "out": "crash",
+   "outSeconds": 7.43,
+   "where": {
+    "x": 480,
+    "y": 201,
+    "checkpoint": 34
+   }
+  },
+  {
+   "track": "wide-sweepers",
+   "seed": 3,
+   "generation": 5,
+   "id": "5-41",
+   "neonLoopLap": 30.02,
+   "lapSeconds": 20.47,
+   "lapSteps": 1228,
+   "laps": 2,
+   "progress": 287.3,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 313,
+    "y": 633,
+    "checkpoint": 52
+   }
+  },
+  {
+   "track": "wide-sweepers",
+   "seed": 3,
+   "generation": 10,
+   "id": "10-60",
+   "neonLoopLap": 13.17,
+   "lapSeconds": 8.23,
+   "lapSteps": 494,
+   "laps": 7,
+   "progress": 709,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 1087,
+    "y": 576,
+    "checkpoint": 12
+   }
+  },
+  {
+   "track": "wide-sweepers",
+   "seed": 3,
+   "generation": 20,
+   "id": "20-27",
+   "neonLoopLap": 12.65,
+   "lapSeconds": 8.17,
+   "lapSteps": 490,
+   "laps": 7,
+   "progress": 714.8,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 1172,
+    "y": 454,
+    "checkpoint": 15
+   }
+  },
+  {
+   "track": "wide-sweepers",
+   "seed": 3,
+   "generation": 40,
+   "id": "40-69",
+   "neonLoopLap": 12.53,
+   "lapSeconds": 8.25,
+   "lapSteps": 495,
+   "laps": 7,
+   "progress": 708.4,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 1073,
+    "y": 580,
+    "checkpoint": 11
+   }
+  },
+  {
+   "track": "wide-sweepers",
+   "seed": 3,
+   "generation": 80,
+   "id": "80-0",
+   "neonLoopLap": 12.47,
+   "lapSeconds": 8.33,
+   "lapSteps": 500,
+   "laps": 7,
+   "progress": 697.1,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 768,
+    "y": 638,
+    "checkpoint": 5
+   }
+  },
+  {
+   "track": "wide-sweepers",
+   "seed": 2,
+   "generation": 80,
+   "id": "80-0",
+   "neonLoopLap": 12.58,
+   "lapSeconds": 8.08,
+   "lapSteps": 485,
+   "laps": 7,
+   "progress": 720.4,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 1168,
+    "y": 310,
+    "checkpoint": 18
+   }
+  },
+  {
+   "track": "wide-sweepers",
+   "seed": 4,
+   "generation": 80,
+   "id": "80-50",
+   "neonLoopLap": 13.28,
+   "lapSeconds": 8.47,
+   "lapSteps": 508,
+   "laps": 6,
+   "progress": 682,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 358,
+    "y": 637,
+    "checkpoint": 53
+   }
+  },
+  {
+   "track": "wide-sweepers",
+   "seed": 5,
+   "generation": 80,
+   "id": "80-0",
+   "neonLoopLap": 12.57,
+   "lapSeconds": 8.23,
+   "lapSteps": 494,
+   "laps": 7,
+   "progress": 708.4,
+   "out": "time",
+   "outSeconds": 60,
+   "where": {
+    "x": 1072,
+    "y": 579,
+    "checkpoint": 11
+   }
+  }
+ ]
+}

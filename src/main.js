@@ -15,7 +15,9 @@
 // The brain panels (E, B, F, N) only read the simulation; they never change it.
 
 import { STEP, PHYSICS_VERSION } from './sim/constants.js';
-import { TRACKS, buildTrack } from './sim/track.js';
+import { TRACKS, buildTrack, trackDef } from './sim/track.js';
+import { emptyExamRecord, countExamLap, bestExamLap, examGhost, COUNTED_LAPS } from './sim/exam.js';
+import { encodeInputs } from './game/best-lap.js';
 import { createWorld, stepWorld, restartWorld } from './sim/world.js';
 import { readSensors, getInputs } from './sim/sensors.js';
 import { explainThink } from './sim/brain.js';
@@ -34,25 +36,74 @@ import { drawDecisionPanel, strongestHidden } from './render/decision-panel.js';
 import { drawWeightsGrid, GRID_BLOCK_W } from './render/weights-grid.js';
 import { readInput, takePress, clearPresses } from './game/keyboard.js';
 import { loadBestLap, saveBestLap } from './game/best-lap.js';
-import { AUTOPLAY, SEED, CHAMPION, COMPARE, RACE, SCOREBOARD } from './game/params.js';
+import { AUTOPLAY, SEED, CHAMPION, COMPARE, RACE, SCOREBOARD, TRACK } from './game/params.js';
 import { loadChampion, loadChampionsFile, loadGhost, parseChampionName } from './game/champions.js';
 import { createRace, stepRace, raceGap, raceResult, progressShare } from './sim/race.js';
 import { buildScoreboard } from './sim/scoreboard.js';
 import { drawRaceHud, drawScoreboard, drawTag, drawOutMark } from './render/race-view.js';
 import { setupPicker, showPicker } from './game/picker.js';
 
-const track = buildTrack(TRACKS[0]);
-const trackImage = renderTrack(track);
+// Every track, built (walls, checkpoints) and drawn once, the first time it's needed
+const views = {};
+function view(id) {
+  if (!views[id]) { const t = buildTrack(trackDef(id)); views[id] = { track: t, image: renderTrack(t) }; }
+  return views[id];
+}
+// The live evolution and the races against my ghost always run on Neon Loop
+const neon = view(TRACKS[0].id);
+const track = neon.track;
+// Exam is held out: no AI ever drives it here (only I do, in manual mode)
+const HELD_OUT = 'exam';
 
 // 'drive', 'ai', 'race', 'scoreboard', or 'loading' while the race files load
 let mode = RACE || SCOREBOARD ? 'loading' : AUTOPLAY || CHAMPION ? 'ai' : 'drive';
 let explain = false; // E: show the real sensor (and brain) numbers
 
 // ---------- I drive ----------
-const world = createWorld(track);
-let best = loadBestLap(track);
+// T cycles through the tracks (or ?track=exam). Each track keeps its own best lap.
+let drive = view(trackDef(TRACK).id);
+let world = createWorld(drive.track);
+let best = loadBestLap(drive.track);
 let lastSteps = null;
 let newBestFor = 0; // seconds left to show "NEW BEST LAP"
+let exam = loadExamRecord(drive.track);
+
+function setDriveTrack(id) {
+  drive = view(id);
+  world = createWorld(drive.track);
+  best = loadBestLap(drive.track);
+  lastSteps = null;
+  exam = loadExamRecord(drive.track);
+  clearSparks();
+}
+
+// On Exam, my first 3 completed laps are kept (in this browser) until they're saved as ghosts/me-exam.json
+function examKey(t) {
+  return `bug-driver:exam-first-laps:${t.key}:physics-${PHYSICS_VERSION}`;
+}
+function loadExamRecord(t) {
+  if (t.id !== HELD_OUT) return null;
+  try {
+    const saved = JSON.parse(localStorage.getItem(examKey(t)) ?? 'null');
+    if (saved && saved.track === t.key) return saved;
+  } catch {
+    // no storage: the record lasts until the page is closed
+  }
+  return emptyExamRecord(t.key);
+}
+function saveExamRecord() {
+  try { localStorage.setItem(examKey(drive.track), JSON.stringify(exam)); } catch { /* no storage */ }
+}
+// G on Exam, after 3 counted laps: download ghosts/me-exam.json (the browser saves it to Downloads)
+function downloadExamGhost() {
+  if (!exam || exam.laps.length < COUNTED_LAPS) return;
+  const blob = new Blob([JSON.stringify(examGhost(exam, PHYSICS_VERSION), null, 2) + '\n'], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'me-exam.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
 
 function handleDriveEvents(events) {
   for (const e of events) {
@@ -61,9 +112,10 @@ function handleDriveEvents(events) {
       lastSteps = e.steps;
       if (!best || e.steps < best.steps) {
         best = { steps: e.steps, start: e.start, inputs: e.inputs };
-        saveBestLap(track, best);
+        saveBestLap(drive.track, best);
         newBestFor = 2;
       }
+      if (exam && countExamLap(exam, { steps: e.steps, start: e.start, inputs: encodeInputs(e.inputs) })) saveExamRecord();
     }
   }
 }
@@ -100,9 +152,11 @@ async function startChampion(name) {
   const which = parseChampionName(name);
   const record = which && await loadChampion(which);
   if (!record) { ai.champion = null; return; }
-  const gen = createGeneration(track, [record.brain], which.generation);
+  // ?track= runs it on another track (never on the held-out Exam)
+  const where = TRACK && trackDef(TRACK).id !== HELD_OUT ? view(trackDef(TRACK).id) : neon;
+  const gen = createGeneration(where.track, [record.brain], which.generation);
   gen.cars[0].id = record.id; // the id it had during evolution
-  ai.champion = { ...which, record, gen, laps: [] };
+  ai.champion = { ...which, record, gen, laps: [], where };
   ai.selected = null;
   ai.frozen = false;
   acc = 0;
@@ -122,6 +176,7 @@ setupPicker({
 
 // The generation on screen: the champion's solo run, or the live evolution's current generation.
 const currentGen = () => (ai.champion ? ai.champion.gen : ai.evo.gen);
+const currentView = () => (ai.champion ? ai.champion.where : neon);
 const championDone = () => ai.champion && ai.champion.gen.over;
 
 function stepAi() {
@@ -183,8 +238,8 @@ canvas.addEventListener('mousedown', (e) => {
 // Before its first step it hasn't decided anything yet, so show what it sees right now.
 function decisionOf(c) {
   const car = c.world.car;
-  const view = c.view ?? readSensors(car, track.walls);
-  const inputs = c.inputs ?? getInputs(car, track.walls);
+  const view = c.view ?? readSensors(car, currentView().track.walls);
+  const inputs = c.inputs ?? getInputs(car, currentView().track.walls);
   return { view, ex: explainThink(c.brain, inputs) };
 }
 
@@ -211,7 +266,7 @@ function drawAi(alpha) {
   // its last decision (smoothPose at 0 = the pose before its last move), with the rays it saw then.
   const { view, ex } = decisionOf(subject);
   const pose = looking && subject.view ? smoothPose(subject.world.car, 0) : at(subject);
-  drawRays(pose, looking ? view : readSensors(pose, track.walls), explain || ai.frozen);
+  drawRays(pose, looking ? view : readSensors(pose, currentView().track.walls), explain || ai.frozen);
   drawCar(pose, subject.out === 'crash', { scale: 1.2, glow: 14 });
   if (subject === ai.selected) drawSelectionRing(pose);
 
@@ -274,12 +329,13 @@ function championHudState() {
   const ch = ai.champion;
   const car = ch.gen.cars[0];
   return {
-    trackName: track.name,
+    trackName: ch.where.track.name,
     name: `seed ${ch.seed} · gen ${ch.generation}`,
     id: ch.record.id,
     laps: ch.laps,
     bestLapSteps: car.bestLapSteps,
-    recordedLapSteps: ch.record.lapSteps,
+    // its recorded lap is from Neon Loop: only comparable there
+    recordedLapSteps: ch.where === neon ? ch.record.lapSteps : undefined,
     over: ch.gen.over,
     out: car.out,
     percent: progressPercent(car.world),
@@ -410,22 +466,29 @@ function frame(now) {
       clearSparks();
       acc = 0;
     }
+    if (takePress('KeyT')) {
+      const ids = TRACKS.map((t) => t.id);
+      setDriveTrack(ids[(ids.indexOf(drive.track.id) + 1) % ids.length]);
+      acc = 0;
+    }
+    if (takePress('KeyG')) downloadExamGhost();
     while (acc >= STEP) {
       handleDriveEvents(stepWorld(world, readInput()));
       acc -= STEP;
     }
     newBestFor = Math.max(0, newBestFor - dt);
 
-    drawTrack();
+    drawTrack(drive);
     // With the explain overlay on, draw the exact simulation pose (no smoothing),
     // so the numbers on screen are exactly what the brain would get this step.
     const pose = smoothPose(world.car, explain ? 1 : acc / STEP);
-    drawRays(pose, readSensors(pose, track.walls), explain);
+    drawRays(pose, readSensors(pose, drive.track.walls), explain);
     drawCar(pose, world.car.crashed);
-    if (explain) drawExplainPanel(getInputs(world.car, track.walls));
+    if (explain) drawExplainPanel(getInputs(world.car, drive.track.walls));
     drawSparks(dt);
     drawHud({
-      trackName: track.name,
+      exam: exam && { counted: exam.laps.length, of: COUNTED_LAPS, best: bestExamLap(exam)?.steps ?? null },
+      trackName: drive.track.name,
       laps: world.laps.laps,
       lapSteps: world.laps.lapSteps,
       started: world.laps.started,
@@ -465,7 +528,7 @@ function frame(now) {
         let steps = 0;
         while (acc >= STEP && steps < 20 * speed && !championDone()) { stepAi(); acc -= STEP; steps++; }
       }
-      drawTrack();
+      drawTrack(currentView());
       if (!ai.champion) drawChart(ai.evo.history);
       drawAi(ai.frozen ? 1 : Math.min(1, acc / STEP));
       drawSparks(ai.frozen ? 0 : dt);
@@ -476,9 +539,9 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
-function drawTrack() {
+function drawTrack(v = neon) {
   ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(trackImage, 0, 0, trackImage.width * 2, trackImage.height * 2);
+  ctx.drawImage(v.image, 0, 0, v.image.width * 2, v.image.height * 2);
 }
 
 if (CHAMPION) startChampion(CHAMPION);
@@ -492,4 +555,4 @@ if (COMPARE) setCompare(COMPARE);
 requestAnimationFrame(frame);
 
 // For in-browser checks and autoplay tooling
-export { world, track, ai, versus };
+export { world, track, ai, versus, drive };

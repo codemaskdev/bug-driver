@@ -49,7 +49,19 @@ export function drawHud(hud) {
   glowText('laps done', VIEW_W - 16, 34, 'rgba(0, 240, 255, 0.35)', '11px monospace', 0);
 
   ctx.textAlign = 'left';
-  glowText('ARROWS / WASD  drive     R  restart     E  explain     TAB  let the AI drive', 16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
+  glowText('ARROWS / WASD  drive     R  restart     E  explain     T  change track     TAB  let the AI drive', 16, VIEW_H - 24, 'rgba(0, 240, 255, 0.4)', '12px monospace', 0);
+
+  // On Exam: only my first 3 completed laps count
+  if (hud.exam) {
+    const e = hud.exam;
+    ctx.textAlign = 'center';
+    const bestText = e.best == null ? '--' : formatSteps(e.best);
+    const line = e.counted < e.of
+      ? `EXAM · counted laps ${e.counted}/${e.of} · best so far ${bestText} · crashes don't count`
+      : `EXAM · my first ${e.of} laps are in · best ${bestText} · G saves ghosts/me-exam.json`;
+    ctx.textAlign = 'right';
+    glowText(line, VIEW_W - 16, 50, e.counted < e.of ? YELLOW : CYAN, 'bold 12px monospace', 6);
+  }
 
   if (!hud.started && !hud.crashed) {
     ctx.textAlign = 'center';
@@ -96,12 +108,18 @@ export function drawChampionHud(ch) {
 
   if (ch.over) {
     ctx.textAlign = 'center';
-    const recorded = ch.recordedLapSteps == null ? 'no lap' : formatSteps(ch.recordedLapSteps);
     const now = ch.bestLapSteps == null ? 'no lap' : formatSteps(ch.bestLapSteps);
-    const match = ch.bestLapSteps === ch.recordedLapSteps;
-    // in the empty infield, clear of the brain panels
-    glowText(`best lap ${now} · recorded ${recorded} · ${match ? 'EXACT MATCH' : 'MISMATCH'}`,
-      500, 330, match ? YELLOW : PINK, 'bold 15px monospace', 10);
+    if (ch.recordedLapSteps === undefined) {
+      // on a track it never trained on there's nothing to compare with: just what happened
+      const text = ch.bestLapSteps == null ? `never finished a lap: out by ${ch.out} at ${ch.percent.toFixed(1)}% of a lap` : `best lap ${now} on a track it has never seen`;
+      glowText(text, 500, 330, ch.bestLapSteps == null ? PINK : YELLOW, 'bold 15px monospace', 10);
+    } else {
+      const recorded = ch.recordedLapSteps == null ? 'no lap' : formatSteps(ch.recordedLapSteps);
+      const match = ch.bestLapSteps === ch.recordedLapSteps;
+      // in the empty infield, clear of the brain panels
+      glowText(`best lap ${now} · recorded ${recorded} · ${match ? 'EXACT MATCH' : 'MISMATCH'}`,
+        500, 330, match ? YELLOW : PINK, 'bold 15px monospace', 10);
+    }
     glowText(`out by ${ch.out}  ·  R to run it again`, 500, 354, TEXT, '12px monospace', 0);
   }
 }

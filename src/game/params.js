@@ -6,6 +6,7 @@
 //   ?race=3-10      my ghost lap against the seed 3 generation 10 champion's best lap
 //   ?scoreboard=3   my ghost lap against seed 3's champions of generations 1, 5, 10, 20, 40, 80
 //   (with &autoplay=1 the race starts, and the scoreboard reveals itself, right away)
+//   ?track=zigzag   drive that track yourself; with ?champion=3-80 the champion runs there instead (never on Exam)
 
 const params = new URLSearchParams(location.search);
 const seed = Number.parseInt(params.get('seed') ?? '', 10);
@@ -14,5 +15,7 @@ export const SEED = Number.isFinite(seed) ? seed : 1;
 export const CHAMPION = params.get('champion');
 export const COMPARE = params.get('compare');
 export const RACE = params.get('race');
+// ?track=exam (or zigzag, wide-sweepers, neon-loop-mirrored): the track I drive, or a champion runs on
+export const TRACK = params.get('track');
 const board = Number.parseInt(params.get('scoreboard') ?? '', 10);
 export const SCOREBOARD = Number.isFinite(board) ? board : null;

@@ -11,7 +11,7 @@ const KEYS = {
 const held = new Set();
 // Keys that act once per press (R restart, E explain, Tab mode, 1/2/3 speed, B brain, F freeze, N numbers, ← → pick)
 const ONCE = new Set(['KeyR', 'KeyE', 'Tab', 'Digit1', 'Digit2', 'Digit3', 'KeyB', 'KeyF', 'KeyN', 'ArrowLeft', 'ArrowRight',
-  'ArrowUp', 'ArrowDown', 'KeyS', 'Space', 'Enter', 'Escape']);
+  'ArrowUp', 'ArrowDown', 'KeyS', 'Space', 'Enter', 'Escape', 'KeyT', 'KeyG']);
 const pressed = new Set();
 
 window.addEventListener('keydown', (e) => {
