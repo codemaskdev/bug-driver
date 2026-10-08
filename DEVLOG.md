@@ -627,3 +627,14 @@ Commits 41039bd (pre-registration, before any training), 9f3ea61 (training), b72
 - 69 tests pass; the replay check is unchanged (7 of 7).
 
 **Correction to the Step 7c entry above:** "the first lap on all four tracks came in generation 5" was wrong. The first laps came earlier and track by track: Wide Sweepers in gen 2 (3 cars), Mirrored and Zigzag in gen 3, Neon Loop in gen 4 (runs/seed-3-multi4.json). Gen 5 is the first generation whose champion finished a lap on all four.
+
+## 2026-10-08 — The guides, matched to the video (b8de5ad, 593ecf5, 498ae81, 21beabb)
+
+Prompt 20. Docs and guide tools only; no simulation code, track, physics or training changed (69 tests pass, the replay check is unchanged).
+
+- **tools/guide-page.js (b8de5ad):** builds WebP and PNG figures into the pages as data: URLs, like the SVGs, and keeps `VIDEO_URL&t=` links as written. Both pages still open with no other file next to them: checked by copying each page alone into an empty folder (25 and 32 images, none broken).
+- **HOW-IT-WORKS.md rewritten (593ecf5):** the video's 14 chapters in its order, each with its watch link (t = 51, 171, 242, 325, 378, 597, 686, 742, 823, 894, 975, 1022, 1114, 1146 s). About 2,700 words of text, plus 355 in captions and 819 in the four code boxes (neuron, fitness, mutate, think). 25 stills from the video (docs/img/guide-*.webp, 1.1 MB in all), cropped to their content.
+- **DEEP-DIVE.md updated (498ae81):** chapter 6 reframed: my lap is one of four benchmarks, and the first generation under each is 6 (19.25 s), 8 (15.43 s), 19 (12.67 s) and never (centre-line floor 11.93 s; best of the run 12.43 s). Generation 1 now says how every car went out: seed 3, 76 stalled and 24 crashed (seeds 1, 2, 4, 5: 67/33, 60/40, 70/30, 60/40). The other script corrections, three new sections, and glossary entries.
+- **The fact check (21beabb):** `node tools/guide-facts.js` works out 50 facts again (the 980 rule settings take about 8 s) and checks both guides say them: 50 of 50 confirmed. It writes guide-facts.md, with every other deep-dive number listed by section with that section's sources.
+
+Nothing broke in the game. One draft claim was wrong and never committed: "weights from about −3 to +3" (the champions' are −1.96 to +2.28).

@@ -491,3 +491,52 @@ Then run it, report the table (all 4 training tracks + Exam), race my Exam ghost
 
 Built: the Step 7c pre-registration, committed before any training (41039bd). Then the four-track training, the one Exam test, the race, and chapter 7 in both guides.
 What broke: nothing in the training. Two small things: the race HUD's lap times ran off the screen with a long name like "GEN 100 ×4 TRACKS" (fixed). And a check of the new exam tool, run on the Step 7b champions, also put their gens 1, 5 and 40 on Exam, which the 7b exam hadn't included.
+
+## 20. The guides for the video
+
+````text
+Guides for episode 2, in the bug-driver repo. This time you may edit bug-driver (docs only + guide tools), commit as CodeMask.
+Do NOT make the repo public and do NOT enable Pages yet — I'll decide that separately.
+
+Source of truth: the final video script episodes/02-bug-driver/script.en.md (hash a0f308022b781b95) + the data in bug-driver.
+The guides must match the video: same story, same numbers, same wording on every claim we corrected.
+
+1. Beginner guide — REWRITE from scratch (replace HOW-IT-WORKS.md and docs/guide/index.html)
+   - For someone who just watched the video. ~2,500–3,000 words, readable in ~15 minutes. English.
+   - Same chapters and order as the video (Three words → The World → Eyes → Generation 1 → The Brain → Evolution → Stuck →
+     Reading the Brain → How well did it learn? → Learned or memorized? → The exam → The fix → Retro → Your turn: the track editor).
+   - Each chapter starts with a "▶ watch this part" link: VIDEO_URL&t=<seconds> using chapters.txt times
+     (keep the literal placeholder VIDEO_URL; I'll replace it after upload).
+   - The water-pipe analogy exactly as in the video (taps fill/drain, tanks, halfway mark = pressed, 70 numbers), with the honest
+     caveat that inside the middle tanks the numbers can be negative.
+   - Pictures: reuse our rendered stills (water network states, determinism, rays, ranking, hill, lap chart, exam cards, retro board)
+     exported to docs/img/ as PNG/WebP; every picture gets one plain-English caption.
+   - Code: at most one short "Look at the code" box per chapter (neuron(), think(), fitness(), mutate()), pulled from the real source
+     by name with the existing code-boxes tool, each line explained in one sentence.
+   - No "me vs the AI" framing: my lap is one benchmark.
+
+2. Deep-dive guide — UPDATE (DEEP-DIVE.md and docs/guide/deep-dive.html), don't rewrite
+   - Rename "6. Me vs the AI" to "6. How well did it learn?" and reframe: benchmarks (me 26.40, careful rule 17.25,
+     best of 980 rule settings 12.68, centre-line floor 11.93), first gen under each (gen 6, gen 19), plateau 12.65 -> 12.47.
+   - Apply every wording fix we made in the script: 76 stalled / 24 crashed (not 61/20); "around generation twenty"; the h6 example
+     (ahead fills +0.730, left 60° drains −0.987); "biggest contribution" not "raises"; "a turn to the right this tight" with the
+     radii (r 62 vs 49/45); "better chances to have children" with the real child counts; 3-multi-100 passes the hairpin and crashes
+     at 11.60 s; the speed sensor reads 0 when reversing (blind spot) and why it keeps braking is a hypothesis; the exam stopped being
+     independent once we adjusted training after it.
+   - Add sections: "Why this kind of network and this kind of training" (MLP vs CNN/RNN/transformers in plain words; supervised vs
+     reinforcement learning vs neuroevolution — why we need only a score); "The same neuron in 4 languages" (JS / Python / C++ / NumPy,
+     same code as the video); "Where the water-pipe picture simplifies".
+   - Keep the glossary; add: overfitting, held-out test, calibration-free note if relevant, bias, activation (tanh/sigmoid).
+
+3. Both
+   - README: link both guides and PROMPTS.md.
+   - Regenerate the HTML pages with tools/guide-page.js; images must load from docs/guide/img (Safari file:// issue we fixed before).
+   - Fact check: produce guide-facts.md — every number and claim in both guides with its source (file/run/commit). A claim with no source
+     gets removed or rewritten, and listed in your report.
+   - Anonymity: nothing personal; English only.
+
+Report: word counts, list of chapters with their watch-links, pictures used, the fact-check table summary, anything you removed.
+````
+
+Built: HOW-IT-WORKS.md rewritten for the video (its 14 chapters, a watch-this-part link each, the video's numbers and wording, 25 of its rendered stills as WebP, four code boxes); DEEP-DIVE.md updated (chapter 6 reframed as How well did it learn?, every script correction, three new sections, glossary); tools/guide-facts.js and guide-facts.md, which work out every number again from the code, the runs and the simulation (50 of 50 confirmed); README links; the pages regenerated, still self-contained.
+What broke: the first draft said the champions' weights run "from about −3 to +3"; the data says −1.96 to +2.28, so it was corrected before committing. One sentence of the beginner guide had drifted from the video's wording, and the fact check caught it. The pages embed the images (data: URLs) rather than loading them from docs/guide/img, because that was the fix for the Safari file:// problem; the "calibration-free note" wasn't added, as nothing in the project calibrates.
