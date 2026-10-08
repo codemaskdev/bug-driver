@@ -25,7 +25,7 @@ The [beginner guide](HOW-IT-WORKS.md) explains *why* everything works. This one 
 
 ### What you need
 
-- **A computer** with macOS, Windows or Linux. Claude Code lists its exact requirements (operating system versions, memory) on its [official setup page](https://code.claude.com/docs/en/setup). Check there before you start.
+- **A computer** with macOS, Windows or Linux. Claude Code lists its exact requirements (operating system versions, memory) on its [official setup page](https://code.claude.com/docs/en/setup). Check there before you start. This guide was tested on macOS. <!-- confirm after the Stage 2 dry run -->
 - **An internet connection.** Claude Code runs on Anthropic's servers, so it needs to be online.
 - **Node.js, version 18 or newer.** Node.js is a program that runs JavaScript (the language of web pages) outside the browser. Claude Code will use it to test your game.
 - **Claude Code, with a plan or account that includes it.** Claude Code needs a Claude subscription or an Anthropic API key. An API key is a password that lets a program use Claude, billed by how much you use. Which plans include Claude Code changes over time, so check the [Claude Code overview](https://code.claude.com/docs/en/overview) and the [pricing page](https://claude.com/pricing). We don't quote prices here, because we can't promise they're still right when you read this.
@@ -432,6 +432,12 @@ Press G in the game, then tell Claude Code where the file went, the way we did i
 '~/Downloads/me-ghost.json'
 ```
 
+On Windows, something like this (with your own user name):
+
+```text
+'C:\Users\YourName\Downloads\me-ghost.json'
+```
+
 **Why this prompt is different:** our original ([entry 7](PROMPTS.md#7-export-my-ghost-then-step-4-evolution), its last paragraph) said "export my current best lap … from localStorage into a file". Our Claude Code then read the lap straight out of the browser's own storage files on disk. That depends on your browser and your system, so here the game gets a download key instead. It's the same idea we used later for the Exam track (entry 10, "a ghost download (G)"). The rest of the sentence ("From now on … to the step") is word for word.
 
 > **Checkpoint 6a:** ghosts/me.json exists, and Claude Code says that replaying it gives exactly your lap time.
@@ -686,12 +692,31 @@ Now you drive the Exam track yourself. Then the AI trains on three tracks instea
 
 ### 10a. Your Exam lap
 
-Drive Exam (press T, pick Exam). Your first 3 completed laps count. When you're done, the game lets you download your Exam ghost. Then:
+Drive Exam (press T, pick Exam). Your first 3 completed laps count. When you're done, paste the prompt below. Its first line makes sure the game can download your Exam ghost with G, like your first ghost in 6a.
 
 ### Paste this *(adapted from [PROMPTS.md entry 11](PROMPTS.md#11-my-exam-lap-step-7b-and-the-exam))*
 
 ```text
-I drove Exam: 3 counted laps, best <your time> s.  ## 1. My Exam ghost Move it to ghosts/me-exam.json, check it's from my first 3 counted laps, and replay it headless to the step. Commit. From now on that's my official Exam time. ## 2. Step 7b, exactly as pre-registered - Train my official seed from scratch for 100 generations on 3 tracks: my first track + Zigzag + Wide Sweepers. Every car drives all 3 tracks; its fitness is the sum of its 3 single-track fitness scores. Everything else (population, top 10, elitism, mutation 10% / sigma 0.3) unchanged. Save champions at gens 1, 5, 10, 20, 40, 80, 100 to a multi-track champions file. - Don't change the training set, the method or the Exam track based on any result. If it fails, that's the result. ## 3. The exam (only now, after my lap is saved) Run on Exam and on Mirrored, and report lap time or how far it got and how it got out: - the old single-track champions of my official seed (gens 10, 20, 80) - the new multi-track champions (gens 10, 20, 80, 100) Then race my Exam ghost (<your time> s) against the best of them: ?race=exam&champion=..., same "best lap vs best lap" rules. ## 4. Write-up - DEVLOG: the results, plainly. If multi-track training doesn't help on Exam, say why it plausibly didn't as "our best explanation". - Update PROMPTS.md.
+If the game can't download my Exam ghost yet, add a key G on Exam that downloads it as me-exam.json; I'll press G and tell you where the file went.
+
+I drove Exam: 3 counted laps, best <your time> s.
+
+## 1. My Exam ghost
+Move it to ghosts/me-exam.json, check it's from my first 3 counted laps, and replay it headless to the step. Commit. From now on that's my official Exam time.
+
+## 2. Step 7b, exactly as pre-registered
+- Train my official seed from scratch for 100 generations on 3 tracks: my first track + Zigzag + Wide Sweepers. Every car drives all 3 tracks; its fitness is the sum of its 3 single-track fitness scores. Everything else (population, top 10, elitism, mutation 10% / sigma 0.3) unchanged. Save champions at gens 1, 5, 10, 20, 40, 80, 100 to a multi-track champions file.
+- Don't change the training set, the method or the Exam track based on any result. If it fails, that's the result.
+
+## 3. The exam (only now, after my lap is saved)
+Run on Exam and on Mirrored, and report lap time or how far it got and how it got out:
+- the old single-track champions of my official seed (gens 10, 20, 80)
+- the new multi-track champions (gens 10, 20, 80, 100)
+Then race my Exam ghost (<your time> s) against the best of them: ?race=exam&champion=..., same "best lap vs best lap" rules.
+
+## 4. Write-up
+- DEVLOG: the results, plainly. If multi-track training doesn't help on Exam, say why it plausibly didn't as "our best explanation".
+- Update PROMPTS.md.
 ```
 
 **Changes from the original:**
@@ -703,7 +728,8 @@ I drove Exam: 3 counted laps, best <your time> s.  ## 1. My Exam ghost Move it t
 - "the old single-track seed 3 champions" → "the old single-track champions of my official seed".
 - In the write-up, removed the example "(e.g. none of the 3 training tracks has a right-hand hairpin)" and "and that we noticed this risk after Step 7a but kept the pre-registered plan". Both were about our own results.
 - Removed "Guide chapter 7 in both levels: add the exam results and the race." and the 🎬 note.
-- Our prompt is all on one line (that's how it was sent), so it's kept that way.
+- Added the first line (a G key to download your Exam ghost, as in 6a). Our game already had one by then; yours may not.
+- Line breaks added, words unchanged: our prompt was sent all on one line.
 
 **A real mistake, kept in on purpose.** When we sent this prompt, the "21.37 s" was actually a lap on Zigzag, not on Exam. Claude Code noticed this, because there was no Exam ghost file anywhere, and stopped. So the exam waited until a real Exam lap existed. Claude Code checks what you tell it. Make sure your Exam lap really is on Exam.
 
@@ -711,6 +737,12 @@ If your Exam file is in your Downloads folder, tell Claude Code its path, the wa
 
 ```text
 '~/Downloads/me-exam.json'
+```
+
+On Windows, something like:
+
+```text
+'C:\Users\YourName\Downloads\me-exam.json'
 ```
 
 > **Checkpoint 10a:**
@@ -761,8 +793,6 @@ Last step: a track editor, so you (and anyone you send a link to) can build new 
 ### Paste this *(adapted from [PROMPTS.md entry 12](PROMPTS.md#12-step-8-things-for-viewers))*
 
 ```text
-Exam rule first: until my ghosts/me-exam.json exists, nothing in this step may run any AI car on the Exam track, and Exam must not appear in the editor, in share links or in any test that runs a brain on it.
-
 Step 8: things for viewers.
 
 1. Track editor (key T opens a picker, plus an "Edit / new track" button):
@@ -785,6 +815,7 @@ Update PROMPTS.md and DEVLOG.md.
 ```
 
 **Changes from the original:**
+- Removed the first paragraph, "Exam rule first: until my ghosts/me-exam.json exists, nothing in this step may run any AI car on the Exam track, and Exam must not appear in the editor, in share links or in any test that runs a brain on it." By this chapter your Exam ghost already exists (chapter 10). Our editor came before our Exam lap.
 - Removed the "Small guide fixes" paragraph (it fixed wording in our guide).
 - "the road width is fixed at 90 px" → "the road width is fixed".
 - "(my Neon Loop ghost, three champion laps, 3 generations of seed 3 evolution, …)" → "(my ghost, three champion laps, 3 generations of my official seed's evolution, …)".
