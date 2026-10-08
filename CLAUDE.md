@@ -88,9 +88,18 @@ material for the video and the guides.
 - DEVLOG/PROMPTS updates go in a separate commit: `docs: devlog for <hash>`.
 
 ## PROMPTS.md
-- After every prompt the user sends, append an entry: the prompt copied
-  verbatim in full, then 2–3 lines on what was built and what broke.
+- PROMPTS.md holds only the prompts that change the game, the AI or the
+  experiments (track, car, sensors, neural network, evolution, tests, runs,
+  races). Prompts about the guides, the docs or making the video don't go
+  in it: they go, verbatim with the same 2–3 lines, in the CodeMask repo's
+  episodes/02-bug-driver/production-prompts.md. A prompt that does both is
+  split: its game part here, the rest there, each with a one-line note.
+- After every such prompt, append an entry: the prompt copied verbatim in
+  full, then 2–3 lines on what was built and what broke.
 - Never edit earlier entries.
+- The deep dive links to entries by anchor (PROMPTS.md#<n>-<title>);
+  tools/guide-page.js fails if a PROMPTS.md anchor in the guides or the
+  README is broken.
 - PROMPTS.md is public and English-only: if a prompt isn't in English,
   log a faithful English version of it, with no translation marker.
 
@@ -106,7 +115,7 @@ material for the video and the guides.
   figures. Code + tests + DEVLOG + both chapters + figures, or the step
   isn't done.
 - HOW-IT-WORKS.md is the main guide, for someone who just watched the video (rewritten for the video,
-  prompt 20): the video's chapters in the video's order, the video's story, numbers and wording on every
+  production prompt 20): the video's chapters in the video's order, the video's story, numbers and wording on every
   claim; ~2,500–3,000 words. An "In 30 seconds" box at the top. Each chapter starts with a
   "▶ watch this part" link (`https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=<seconds>`, the video's chapter times) and
   ends with "For the curious: [Deep dive →](DEEP-DIVE.md#...)". Short sentences and everyday words; the

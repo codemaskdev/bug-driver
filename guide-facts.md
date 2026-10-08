@@ -105,19 +105,19 @@ Sources named in this section: `node tools/figures.js` (`frame` in `docs/img/fig
 
 ### 6. How well did it learn?
 
-Numbers (51): 6 · 3 · 19 · 26.40 s · 17.25 s · 980 · 12.68 s · 11.93 s · 19.25 s · 5 · 30.02 s · 8 · 15.43 s · 12.67 s · 12.43 s · 100 · 20 · 80 · 12.65 s · 12.47 s · 0.18 s · 60 · 7 · 1584 · 142 px · 30 px · 40 · 12.78 s · 12.53 s · 1 · 65% · 3.62 s · 10 · 13.17 s · 13.23 s · 13.75 s · 13.87 s · 13.93 s · 1801 · 790 · 759 · 752 · 748 · 40% · 8.28 s · 4.65 s · 8.12 s · 3.58 s · 35% · 9.98 s · 4.92 s
+Numbers (52): 6 · 3 · 19 · 26.40 s · 17.25 s · 980 · 12.68 s · 11.93 s · 19.25 s · 5 · 30.02 s · 8 · 15.43 s · 12.67 s · 12.43 s · 100 · 20 · 80 · 12.65 s · 12.47 s · 0.18 s · 60 · 7 · 1584 · 142 px · 30 px · 40 · 12.78 s · 12.53 s · 1 · 65% · 3.62 s · 10 · 13.17 s · 13.23 s · 13.75 s · 13.87 s · 13.93 s · 1801 · 790 · 759 · 752 · 748 · 40% · 8.28 s · 4.65 s · 8.12 s · 3.58 s · 35% · 9.98 s · 4.92 s · 9
 
 Sources named in this section: `node tools/reference-lap.js` for the three program laps; my lap replays with `node --test tests/ghost.test.js`.; `node --test tests/step6.test.js`, or in the game `index.html?race=3-10&autoplay=1` (any seed-generation pair), and `index.html?scoreboard=3&autoplay=1`.; `node tools/figures.js` (`raceGen5` in `docs/img/figure-data.json`); the split times come from the same race, gen 10 against me.
 
 ### 7. Did it learn, or memorize?
 
-Numbers (86): 7 · 543436 · 90 px · 256 · 4 · 6 · 2 · 9 · 3 s · 60 s · 5 · 10 · 9.25 · 9.88 s · 8.08 · 8.47 s · 1 · 60% · 20 · 13.33 s · 13.20 s · 13.17 s · 12.65 s · 40 · 13.92 s · 80 · 3 · 30.02 s · 12.47 s · 330 px · 7.10 s · 7.63 s · 0 · 0.000 · 70 · 54.03 s · 44.30 s · 32.02 s · 1921 · 100 · 10% · 0.3 · 8.15 s · 8.17 s · 13.87 s · 13.83 s · 5.60 s · 6.17 s · 38.4% · 5.80 · 5.95 s · 38.9 · 40.2% · 173 · 195 px · 11.60 s · 75.8% · 7.52 · 7.62 s · 2.27 s · 12.3% · 18.18 s · 150 · 8 px · 62 px · 49 px · 45 px · 8 · 1073 s · 22.95 · 16.42 · 14.72 · 13.72 · 13.33 · 13.25 s · 13.3% · 35.65 s · 19.87 s · 22.35 s · 12.63 s · 12.68 s · 18.77 s · 14 · 15 · 18 · 19
+Numbers (85): 7 · 543436 · 90 px · 256 · 4 · 6 · 2 · 9 · 3 s · 60 s · 5 · 10 · 9.25 · 9.88 s · 8.08 · 8.47 s · 1 · 60% · 20 · 13.33 s · 13.20 s · 13.17 s · 12.65 s · 40 · 13.92 s · 80 · 3 · 30.02 s · 12.47 s · 330 px · 7.10 s · 7.63 s · 0 · 0.000 · 70 · 54.03 s · 44.30 s · 32.02 s · 1921 · 100 · 10% · 0.3 · 8.15 s · 8.17 s · 13.87 s · 13.83 s · 5.60 s · 6.17 s · 38.4% · 5.80 · 5.95 s · 38.9 · 40.2% · 173 · 195 px · 11.60 s · 75.8% · 7.52 · 7.62 s · 2.27 s · 12.3% · 18.18 s · 150 · 8 px · 62 px · 49 px · 45 px · 8 · 1073 s · 22.95 · 16.42 · 14.72 · 13.72 · 13.33 · 13.25 s · 13.3% · 35.65 s · 19.87 s · 22.35 s · 12.63 s · 12.68 s · 18.77 s · 11 · 13 · 14
 
 Sources named in this section: `node tools/generalization-report.js` (writes `runs/step7a.json`; `tests/step7.test.js` checks it), or in the game `index.html?champion=3-80&track=neon-loop-mirrored`.; `node tools/exam-report.js` (writes `runs/exam.json`; `tests/exam.test.js` checks every result and the race).; `node tools/multi-train.js multi4` (champions/seed-3-multi4.json, runs/seed-3-multi4.json), then `node tools/exam-7c-report.js` (runs/exam-7c.json). `tests/step7c.test.js` checks the training rules, every recorded lap, every Exam result and the race.
 
 ### 8. Make your own track
 
-Numbers (57): 8 · 3 · 80 · 1 · 14.17 s · 2 · 90 px · 48 px · 60 · 1280 · 720 · 4 · 16 px · 10 px · 45 px · 8 px · 19.5 px · 3.6 · 180 px · 100 px · 46.2 px · 53.4 px · 55.2 px · 220 · 100 · 0 · 63 · 4095 · 64s · 64 · 18 · 73 · 2000 · 30 · 5 · 10 · 20 · 40 · 7 · 0.0000001 · 6 · 1584 · 60 s · 7 px · 22.48 s · 23.00 s · 155.8% · 14.32 s · 14.08 s · 11.20 s · 3.00 s · 19.88 s · 14.38 s · 8.57 · 8.58 · 8.48 s · 17
+Numbers (57): 8 · 3 · 80 · 1 · 14.17 s · 2 · 90 px · 48 px · 60 · 1280 · 720 · 4 · 16 px · 10 px · 45 px · 8 px · 19.5 px · 3.6 · 180 px · 100 px · 46.2 px · 53.4 px · 55.2 px · 220 · 100 · 0 · 63 · 4095 · 64s · 64 · 18 · 73 · 2000 · 30 · 5 · 10 · 20 · 40 · 7 · 0.0000001 · 6 · 1584 · 60 s · 7 px · 22.48 s · 23.00 s · 155.8% · 14.32 s · 14.08 s · 11.20 s · 3.00 s · 19.88 s · 14.38 s · 8.57 · 8.58 · 8.48 s · 12
 
 No "Reproduce it" note in this section: its numbers are definitions from the code (constants and functions it names) or repeat numbers sourced in earlier sections.
 

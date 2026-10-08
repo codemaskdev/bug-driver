@@ -5,7 +5,7 @@ A small bug-shaped car that teaches itself to drive in your browser, using a tin
 ## Read about it
 - **[How it works](HOW-IT-WORKS.md)**: the beginner guide, chapter by chapter with the video, about 15 minutes. Web version: [docs/guide/index.html](docs/guide/index.html).
 - **[Deep dive](DEEP-DIVE.md)**: every detail, table and number, with how to reproduce each one. Web version: [docs/guide/deep-dive.html](docs/guide/deep-dive.html).
-- **[Every prompt](PROMPTS.md)** sent to Claude Code while building it, verbatim, with what was built and what broke.
+- **[Every prompt](PROMPTS.md)** sent to Claude Code to build the game, the AI and the experiments, verbatim, with what was built and what broke.
 - **[Fact check](guide-facts.md)**: every number in the two guides and where it comes from.
 
 ## Run it

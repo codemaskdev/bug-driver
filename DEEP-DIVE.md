@@ -876,7 +876,7 @@ Where do I lose to generation 10? Everywhere, by about half. From the start to 4
   - The "crashed here" label hid under the generation 1 car.
 - Generation 10's 13.17 s lap is half of mine.
 
-**The prompt:** [entry 10: the guide in two levels, then Step 6](PROMPTS.md#10-the-guide-in-two-levels-then-step-6-me-vs-the-ai) (the prompt's own title, from before we reframed the chapter).
+**The prompt:** [entry 9: Step 6, the race](PROMPTS.md#9-step-6-the-race) (the prompt still says "me vs the AI", from before we reframed the chapter).
 
 **In the code**
 - `createRace()` in `src/sim/race.js`: my ghost and one champion, each at the start of its best lap.
@@ -1031,7 +1031,7 @@ The exam: the one-track champions of generations 10, 20 and 80, and the three-tr
 - **After registering**, nothing changed. The results are as they came out.
 - **The prediction was wrong in an interesting way.** We expected the best car to crash "in the first corner of a track it has never seen". It never did. It handled the first corners of every new track; it was the mirrored hairpin that broke it.
 
-**The prompt:** [entry 14: did it learn, or memorize?](PROMPTS.md#14-step-7a-did-it-learn-or-memorize), [entry 15: my Exam lap, Step 7b, and the exam](PROMPTS.md#15-my-exam-lap-step-7b-and-the-exam), [entry 18: my Exam ghost](PROMPTS.md#18-my-exam-ghost) and [entry 19: Step 7c](PROMPTS.md#19-step-7c-one-more-try-decided-after-the-exam).
+**The prompt:** [entry 10: did it learn, or memorize?](PROMPTS.md#10-step-7a-did-it-learn-or-memorize), [entry 11: my Exam lap, Step 7b, and the exam](PROMPTS.md#11-my-exam-lap-step-7b-and-the-exam), [entry 13: my Exam ghost](PROMPTS.md#13-my-exam-ghost) and [entry 14: Step 7c](PROMPTS.md#14-step-7c-one-more-try-decided-after-the-exam).
 
 **In the code**
 - `trackDef()` in `src/sim/track.js`: a track's data by its id (Neon Loop, Mirrored, Zigzag, Wide Sweepers, Exam).
@@ -1149,7 +1149,7 @@ It doesn't only compare lap times. Every car's path is kept as a fingerprint of 
 - **An old bug turned up:** pressing R on a multi-track champion restarted the one-track champion of the same generation. Fixed, because the game now remembers each champion by its full name.
 - **Small layout fixes:** the editor's buttons first covered the start point, and on a crowded track the chart landed on the start line. Both moved.
 
-**The prompt:** [entry 17: make your own track](PROMPTS.md#17-step-8-things-for-viewers).
+**The prompt:** [entry 12: make your own track](PROMPTS.md#12-step-8-things-for-viewers).
 
 **In the code**
 - `openEditor()` and `customTrack()` in `src/game/editor.js`: the editor. `drawEditor()` in `src/render/editor-view.js` draws it.

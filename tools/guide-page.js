@@ -12,6 +12,7 @@
 // in the Markdown doesn't exist on disk, or if a page still points an <img> at a file.
 // Video links are the full https://www.youtube.com/watch?v=<ID>&t=<seconds> form; the build fails on a left-over
 // VIDEO_URL placeholder or a youtu.be link (its &t= doesn't work).
+// Every PROMPTS.md#anchor in the guides and the README must match a PROMPTS.md heading, or the build fails.
 
 import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import { syncCode, boxPlaceholders, boxHtml } from './code-boxes.js';
@@ -27,6 +28,28 @@ const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace
 // The same heading ids GitHub makes, so #links work in both places
 export function slug(text) {
   return text.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^\p{L}\p{N}\s-]/gu, '').trim().replace(/\s/g, '-');
+}
+
+// The heading ids GitHub gives PROMPTS.md (a "## 1." inside a ```` block is prompt text, not a heading)
+function promptAnchors() {
+  const ids = new Set();
+  const seen = new Map();
+  let fence = null;
+  for (const line of readFileSync(new URL('PROMPTS.md', root), 'utf8').split('\n')) {
+    const mark = line.match(/^(`{3,}|~{3,})/);
+    if (mark && !fence) { fence = mark[1]; continue; }
+    if (fence) {
+      if (new RegExp(`^${fence[0]}{${fence.length},}\\s*$`).test(line)) fence = null;
+      continue;
+    }
+    const heading = line.match(/^#{1,6}\s+(.*?)\s*$/);
+    if (!heading) continue;
+    const base = slug(heading[1]);
+    const n = seen.get(base) ?? 0;
+    seen.set(base, n + 1);
+    ids.add(n ? `${base}-${n}` : base);
+  }
+  return ids;
 }
 
 // Where a link in the Markdown should point from docs/guide/
@@ -218,6 +241,14 @@ for (const [md, [html, title, here]] of Object.entries(sources)) {
     problems.push(`${md}: ${e.message}`);
   }
   console.log(`docs/guide/${html}: ${images} images, ${boxes.length} code boxes`);
+}
+// every link to a PROMPTS.md entry must land on a heading that exists (entries get renumbered when prompts move out)
+const promptIds = promptAnchors();
+for (const md of ['HOW-IT-WORKS.md', 'DEEP-DIVE.md', 'README.md']) {
+  const text = readFileSync(new URL(md, root), 'utf8');
+  for (const [, id] of text.matchAll(/\]\((?:\.\/)?PROMPTS\.md#([^)\s]+)\)/g)) {
+    if (!promptIds.has(id)) problems.push(`${md}: link to PROMPTS.md#${id}, but PROMPTS.md has no such heading`);
+  }
 }
 if (problems.length) {
   console.error(`\nBuild failed:\n${problems.map((p) => `  ${p}`).join('\n')}`);
