@@ -2,6 +2,12 @@
 
 A small bug-shaped car that teaches itself to drive in your browser, using a tiny neural network and a genetic algorithm written from scratch in plain JavaScript, no ML libraries. Built on camera for the CodeMask video "How to Build a Self-Driving Car AI Without Knowing AI".
 
+## Links
+- ▶ Play in your browser: https://codemaskdev.github.io/bug-driver/
+- 📖 Guides: [the beginner guide](https://codemaskdev.github.io/bug-driver/docs/guide/) · [the deep dive](https://codemaskdev.github.io/bug-driver/docs/guide/deep-dive.html)
+- 🎬 Video: https://www.youtube.com/watch?v=xQIbVdU7Gn8
+- 💬 Prompts: [PROMPTS.md](PROMPTS.md)
+
 ## Read about it
 - **[How it works](HOW-IT-WORKS.md)**: the beginner guide, chapter by chapter with the video, about 15 minutes. Web version: [docs/guide/index.html](docs/guide/index.html).
 - **[Deep dive](DEEP-DIVE.md)**: every detail, table and number, with how to reproduce each one. Web version: [docs/guide/deep-dive.html](docs/guide/deep-dive.html).
