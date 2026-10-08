@@ -655,3 +655,17 @@ Prompt 22. Docs and the page build only (69 tests pass, guide-facts.js: 52 of 52
 - tools/guide-page.js fails the build on a left-over `VIDEO_URL` or a youtu.be link; checked by putting one placeholder back.
 - The chapter 6 numbers (generation 1 to 2: 15, 16, …, 1 children) were already fixed in f2bdda1.
 
+## 2026-10-08 — The history rewritten, PROMPTS.md about the game only (a93b040, e6addec)
+
+Before the repo goes public. No game, simulation or training code changed.
+
+- **The history, rewritten** (git filter-repo, in a fresh clone). A home-folder path in an old prompt became `~/`, everywhere in the history. The macOS folder files that were committed by mistake are gone from every commit. Every commit's time zone is now +0000, at the same moment in UTC. All 83 commits stay, with new hashes; git filter-repo updated the hashes quoted in commit messages itself.
+- **The hashes the files quote (a93b040):** they now name the new commits. That covers the Step 7a and 7c pre-registrations in the report tools, in their saved runs (runs/step7a.json, runs/exam-7c.json) and in the deep dive; the old road width that tools/guide-facts.js reads from git; and every hash in this DEVLOG. In PROMPTS.md they are changed only outside the verbatim prompts. The pre-registrations are the same commits as before, with the same content, order and time, under their new hashes.
+- **PROMPTS.md (e6addec):**
+  - It keeps the 14 prompts that built the game, the AI and the experiments, renumbered 1 to 14. Old entries 1 and 10 are split, each with a one-line note.
+  - The prompts about making the episode moved verbatim to the CodeMask repo's episodes/02-bug-driver/production-prompts.md, under their old numbers.
+  - The deep dive's links to renumbered entries are updated.
+  - tools/guide-page.js now fails on a broken PROMPTS.md#anchor. On the old deep dive it found 6.
+- 69 tests pass and guide-facts confirms 52 of 52, both under Node 18.18.
+- **What broke:** nothing in the rewrite or the cleanup. Running the tests turned up something else: tools/replay-check.js passes only under Node 18.18. Under Node 20 and 24, 2 of its 7 scenarios (the me-v3 ghost path and the seed 3 nextBrains) don't match the golden results. The code is unchanged, and the same happens at ff47d26.
+
