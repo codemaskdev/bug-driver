@@ -8,8 +8,9 @@
 // The pages must work however they're opened: double-clicked in any browser,
 // or in an app's built-in HTML preview, and some of those won't let a local page
 // load any other file at all. So every figure is embedded in the page itself
-// (a data: URL made from the SVG file). The build fails if an image path in the
-// Markdown doesn't exist on disk, or if a page still points an <img> at a file.
+// (a data: URL made from the SVG, WebP or PNG file). The build fails if an image path
+// in the Markdown doesn't exist on disk, or if a page still points an <img> at a file.
+// "VIDEO_URL&t=…" links stay exactly as written: VIDEO_URL is replaced once the video is up.
 
 import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import { syncCode, boxPlaceholders, boxHtml } from './code-boxes.js';
@@ -29,7 +30,7 @@ export function slug(text) {
 
 // Where a link in the Markdown should point from docs/guide/
 function href(url) {
-  if (url.startsWith('#') || /^[a-z]+:/.test(url)) return url;
+  if (url.startsWith('#') || /^[a-z]+:/.test(url) || url.startsWith('VIDEO_URL')) return url;
   const [path, hash = ''] = url.split('#');
   const tail = hash ? `#${hash}` : '';
   if (path === 'HOW-IT-WORKS.md') return `index.html${tail}`;
@@ -37,12 +38,15 @@ function href(url) {
   return `../../${path}${tail}`;
 }
 
-// An image, built into the page: the SVG file itself as a data: URL
+// An image, built into the page: the file itself as a data: URL
+const MIME = { svg: 'image/svg+xml', webp: 'image/webp', png: 'image/png' };
 function imageSrc(path) {
   const file = new URL(path, root);
   if (!existsSync(file)) throw new Error(`image ${path} does not exist`);
+  const type = MIME[path.split('.').pop().toLowerCase()];
+  if (!type) throw new Error(`image ${path}: only .svg, .webp and .png can be built in`);
   embedded.add(path);
-  return `data:image/svg+xml;base64,${readFileSync(file).toString('base64')}`;
+  return `data:${type};base64,${readFileSync(file).toString('base64')}`;
 }
 
 function inline(s) {
@@ -205,7 +209,7 @@ for (const [md, [html, title, here]] of Object.entries(sources)) {
     // every <img> in the generated page must be built in, never a file the viewer might not be allowed to open
     for (const [, src] of out.matchAll(/<img src="([^"]+)"/g)) {
       images++;
-      if (!src.startsWith('data:image/svg+xml;base64,')) problems.push(`docs/guide/${html}: <img src="${src.slice(0, 60)}"> points at a file instead of being built in`);
+      if (!/^data:image\/(svg\+xml|webp|png);base64,/.test(src)) problems.push(`docs/guide/${html}: <img src="${src.slice(0, 60)}"> points at a file instead of being built in`);
     }
   } catch (e) {
     problems.push(`${md}: ${e.message}`);
