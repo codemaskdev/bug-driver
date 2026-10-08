@@ -673,3 +673,19 @@ Before the repo goes public. No game, simulation or training code changed.
 
 The repo is public and GitHub Pages serves it from main: the game at https://codemaskdev.github.io/bug-driver/, the guides at docs/guide/. The README now opens with a Links block (the game, the two guides on Pages, the video, PROMPTS.md). The repo's About panel has the website, a one-line description and topics. No game code changed.
 
+## 2026-10-08 — The same numbers on every Node version (8c719eb, cafe258, f0eaf7e)
+
+- **npm test on Node 22+ (8c719eb).** `node --test tests/` ran no tests at all on Node 24: a bare folder argument is no longer accepted. tools/run-tests.js lists tests/*.test.js and hands them to `node --test`. That works on every Node from 18 up, Windows included. package.json says `node >= 18`.
+- **Why the replay check failed on Node 20+, exactly.** `Math.log`, `cos`, `sin`, `exp`, `tanh`, `atan2` (and `pow`) return a different last bit for some inputs on V8 11.3+ (Node 20, 22, 24) than on V8 10.2 (Node 18). JavaScript allows that; `Math.sqrt` and `hypot` are exact and the same everywhere. Sort stability and the RNG were not the cause.
+  - In seed 3's generation 4, 5 of the 7000 brain numbers came out one bit apart, through `gaussian()` (log and cos).
+  - My Neon Loop ghost's path moved by a bit somewhere, with the same lap time.
+- **Did the official numbers survive?** Yes, before any fix: seed 3 re-run for 100 generations on Node 20, 22 and 24 gave the same first lap (generation 4, 38.18 s), the same best lap in every generation, and the same champions' laps (1801, 790, 759, 752, 748 steps). Only the average fitness from generation 20 on and one brain number of the gen 40 and 80 champions (5.6e-17 apart) differed.
+- **The fix (cafe258).** src/sim/fmath.js is a port of fdlibm's sin, cos, exp, log, tanh and atan2, the code V8 itself used up to 10.x. The simulation now uses it instead of `Math.*`.
+  - It matches Node 18 bit for bit on 720 017 test inputs.
+  - With it, every scenario of the replay check matches on Node 18, 20, 22 and 24, and the golden results didn't change.
+  - Seed 3's 100 generations re-run on Node 20, 22 and 24 give runs/seed-3.json (but its timing) and champions/seed-3.json identical to the official files.
+  - It is the same in the browser: in Chrome 154 the new code matches the replay check's golden results, and the old `Math.*` code didn't.
+  - PHYSICS_VERSION stays 3: no result changed.
+- **Tests:** 71 of 71 pass on Node 18.18, 20.19, 22.23 and 24.15. That's 69 plus tests/fmath.test.js: the exact bits, and no rounding `Math.*` call left in src/sim. guide-facts confirms 52 of 52 on Node 18 and 24.
+- **README (f0eaf7e).** The video's real title. A GIF at the top: 8 s, 800×450, 0.9 MB. It shows generation 1 (frames 0–239 of the evo-seed3-g1-g20 recording) and then generation 80's lap (frames 790–1029 of champ-3-80-lap), at 20 fps. Both are the episode's renders of this game, step by step on a virtual clock. The README also says which Node versions reproduce the numbers: all from 18 up.
+
