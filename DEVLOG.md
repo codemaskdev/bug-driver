@@ -669,3 +669,7 @@ Before the repo goes public. No game, simulation or training code changed.
 - 69 tests pass and guide-facts confirms 52 of 52, both under Node 18.18.
 - **What broke:** nothing in the rewrite or the cleanup. Running the tests turned up something else: tools/replay-check.js passes only under Node 18.18. Under Node 20 and 24, 2 of its 7 scenarios (the me-v3 ghost path and the seed 3 nextBrains) don't match the golden results. The code is unchanged, and the same happens at ff47d26.
 
+## 2026-10-08 — Public, with links (345df01)
+
+The repo is public and GitHub Pages serves it from main: the game at https://codemaskdev.github.io/bug-driver/, the guides at docs/guide/. The README now opens with a Links block (the game, the two guides on Pages, the video, PROMPTS.md). The repo's About panel has the website, a one-line description and topics. No game code changed.
+
