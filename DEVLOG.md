@@ -689,3 +689,7 @@ The repo is public and GitHub Pages serves it from main: the game at https://cod
 - **Tests:** 71 of 71 pass on Node 18.18, 20.19, 22.23 and 24.15. That's 69 plus tests/fmath.test.js: the exact bits, and no rounding `Math.*` call left in src/sim. guide-facts confirms 52 of 52 on Node 18 and 24.
 - **README (f0eaf7e).** The video's real title. A GIF at the top: 8 s, 800×450, 0.9 MB. It shows generation 1 (frames 0–239 of the evo-seed3-g1-g20 recording) and then generation 80's lap (frames 790–1029 of champ-3-80-lap), at 20 fps. Both are the episode's renders of this game, step by step on a virtual clock. The README also says which Node versions reproduce the numbers: all from 18 up.
 
+
+## 2026-10-08 — CLAUDE.md: the video's real title (7ea9321)
+
+CLAUDE.md still named the video by its working title; it now says "How to Build a Neural Network with AI (Beginner Friendly)", as the README does. No code changed; 71 of 71 tests pass on Node 24.15. Nothing broke.
