@@ -1,289 +1,125 @@
 # How a little car taught itself to drive
 
 > **In 30 seconds**
-> - A tiny ladybug car drives around a race track in your web browser.
-> - It can't see the track. It only feels how far away the walls are.
-> - Its brain is just 70 numbers. They turn what it feels into gas, brake, left and right.
-> - We start with 100 cars with random numbers. The ones that get furthest become the parents of the next 100.
-> - After 4 rounds a car finishes a lap. Later the best car is about 14 seconds faster than me.
+> - A tiny ladybug car drives a race track in your web browser. Its "brain" is a neural network of just 70 numbers.
+> - Nobody wrote it any driving rules. It feels the walls with 5 invisible whiskers and presses the same 4 keys you would.
+> - Evolution found the 70 numbers: 100 cars drive, the best become parents, their children get a few numbers nudged, and it all repeats.
+> - It got fast: faster than me, and faster than the best setting of a hand-written driving program.
+> - Then we tested it on tracks it had never seen. The fastest car failed. That's the most useful lesson in the whole project.
 
-Want every detail, table and number? Read the [deep dive](DEEP-DIVE.md).
-
----
-
-## Start here: what is all this?
-
-**What "AI" means here.** A program that gets better at a job by trying, instead of being told the rules. Nobody tells our car "brake before a corner". It finds that out.
-
-**What a "neural network" is.** A small calculator full of adjustable numbers. Ours has 70 of them. What the car feels goes in, a few multiplications and additions happen, and out come the keys to press. Change the numbers and you change how it drives.
-
-**What "learning" means here.** Not studying. The car never gets better during a drive. Instead, we keep the numbers of the cars that drove furthest, copy them with tiny random changes, and try again. Over many rounds, the numbers get good. That's evolution.
-
-**What Claude Code is.** An AI assistant that writes code. I describe what I want in plain English, and it writes the program, runs it and checks it. Every line of this project was made that way, and every prompt I wrote is published with it.
-
-**What you need to do it yourself:** a computer with a web browser, Claude Code, and one evening.
-
-**How to run it on your computer.** Type these in a terminal, the text window where you give your computer commands:
-- `git clone https://github.com/codemaskdev/bug-driver.git` copies the project to your computer (once the project is public).
-- `cd bug-driver` steps into the project's folder.
-- `npx serve` starts a tiny web server on your computer. The game needs one; double-clicking the file won't work.
-- Open `http://localhost:3000` in your browser. That's the game. Press Tab to let the AI drive.
-- `npm test` runs all the checks that prove the numbers in this guide. You don't have to.
-
-### How to read the code in this guide
-Every chapter has a "Look at the code" box. It shows the real code from the game, never a simplified copy, and explains every line. These few symbols are all you need:
-- `function think(brain, inputs) { … }` is a **function**: a named recipe. What it needs goes in the round brackets `( )`, and its steps go in the curly brackets `{ }`.
-- `export` in front of a function means other files may use this recipe.
-- `const total = 0;` gives a value a name. `let` does the same for a value that will change later. The `;` just ends the step.
-- `total += 5;` adds 5 to total.
-- `[1, 2, 3]` is a **list**. `list[0]` is its first item, because counting starts at 0. `list.push(x)` adds x at the end.
-- `car.speed` means "the speed that belongs to the car".
-- `for (const eye of eyes) { … }` is a **loop**: do the steps once for every item in the list. `for (let i = 0; i < 6; i++)` counts i from 0 up to 5.
-- `if (speed > 100) { … } else { … }` does the first part only if the condition is true, and the second part otherwise.
-- `return answer;` hands the answer back to whoever asked.
-- `// a note` is a note for humans. The computer skips it.
-- `>` is "more than", `<` is "less than", `===` is "exactly the same as", and `!` means "not".
+This guide follows the video chapter by chapter, with the same numbers. Each chapter links to its part of the video and to the [deep dive](DEEP-DIVE.md), where every detail lives. Claude Code, an AI that writes programs, wrote all the code; the car itself is driven by a separate, tiny neural network.
 
 ---
 
-## 0. The big idea
+## 1. Three words
 
-**A car learns to drive with no teacher. It only has trial and error, over many generations.** (A generation is one round of 100 cars.)
+[▶ watch this part](VIDEO_URL&t=51)
 
-Imagine 100 blindfolded drivers on a race track. Nobody tells them how to drive. Nobody gets better during a drive, either. But the ones who get furthest pass their habits on to their children, with small copying mistakes. Some of those mistakes happen to help.
+**Artificial intelligence.** A regular program does exactly what it's told: "if there's a wall ahead, slow down". Here we don't write any driving rules at all. We give the car sensors, four buttons and a score: who got the furthest. How to actually drive gets found on its own, by trial and error.
 
-![Eyes feed the brain, the brain presses keys, and the best cars get children](docs/img/simple-0-big-idea.svg)
+![A regular program follows rules written by hand; a program that learns gets only sensors, buttons and a score](docs/img/guide-01-ai-blocks.webp)
 
-Each car has eyes that feel the walls. It has a brain that decides. And it has the same 4 keys I use when I drive myself.
+*Left: a rule written by hand. Right: what our car gets instead, and nothing more.*
 
-**What really happened:** nobody wrote a single rule like "brake before a corner". The program only says: drive, and the ones who got furthest have children. In our main run, the first car finished a full lap in the 4th round.
+**Neural network.** Picture a set of water pipes. A pipe runs from each of the car's sensors: the closer the wall, the stronger the flow. The pipes lead into four tanks: gas, brake, left and right. Every pipe has a tap. Some taps fill the tank. Others do the opposite and drain it: the stronger the signal, the more water flows out. If the water in a tank rises above the halfway mark, that button is pressed. That's the whole decision. And the setting of every tap is just a number. Our car has 70 of them.
 
-<!-- look-at-the-code
-file: src/sim/generation.js
-function: stepGeneration
-title: what happens 60 times a second
-intro: This runs once every tick, for all 100 cars. It's the whole idea in a few lines.
-export function stepGeneration(gen) { => One tick of the race, for a whole generation of cars.
-... => First it counts the tick and gets ready to collect what happens.
-  for (let index = 0; index < gen.cars.length; index++) { => Now go through the cars one by one.
-    const c = gen.cars[index]; => Call the car we're looking at `c`.
-    if (c.out) continue; => If it has crashed or got stuck, skip it: it just stands where it stopped.
-    c.view = readSensors(c.world.car, gen.track.walls); => Look: the 5 eyes measure how far away the walls are.
-    c.inputs = inputsFromView(c.view, c.world.car.speed); => Turn those distances, plus the speed, into the brain's 6 numbers.
-    c.keys = think(c.brain, c.inputs); => Think: the brain decides which keys to press.
-    const happened = stepWorld(c.world, c.keys); => Drive: move the car one tick with those keys, and note what happened (a crash, a lap).
-... => Then it keeps score: a finished lap, a new checkpoint, or whether the car is now out (crashed, stuck for 3 seconds, or out of time).
-  } => That's every car done for this tick.
-... => If no car is still driving, this generation is over.
-} => The end of the recipe. Then the screen draws everything, and it all happens again.
--->
-> **Look at the code: what happens 60 times a second**
-> This runs once every tick, for all 100 cars. It's the whole idea in a few lines.
->
-> ```js
-> export function stepGeneration(gen) {
->   …
->   for (let index = 0; index < gen.cars.length; index++) {
->     const c = gen.cars[index];
->     if (c.out) continue;
->     c.view = readSensors(c.world.car, gen.track.walls);
->     c.inputs = inputsFromView(c.view, c.world.car.speed);
->     c.keys = think(c.brain, c.inputs);
->     const happened = stepWorld(c.world, c.keys);
->     …
->   }
->   …
-> }
-> ```
->
-> 1. `export function stepGeneration(gen) {` — One tick of the race, for a whole generation of cars.
-> 2. `…` — First it counts the tick and gets ready to collect what happens.
-> 3. `for (let index = 0; index < gen.cars.length; index++) {` — Now go through the cars one by one.
-> 4. `const c = gen.cars[index];` — Call the car we're looking at `c`.
-> 5. `if (c.out) continue;` — If it has crashed or got stuck, skip it: it just stands where it stopped.
-> 6. `c.view = readSensors(c.world.car, gen.track.walls);` — Look: the 5 eyes measure how far away the walls are.
-> 7. `c.inputs = inputsFromView(c.view, c.world.car.speed);` — Turn those distances, plus the speed, into the brain's 6 numbers.
-> 8. `c.keys = think(c.brain, c.inputs);` — Think: the brain decides which keys to press.
-> 9. `const happened = stepWorld(c.world, c.keys);` — Drive: move the car one tick with those keys, and note what happened (a crash, a lap).
-> 10. `…` — Then it keeps score: a finished lap, a new checkpoint, or whether the car is now out (crashed, stuck for 3 seconds, or out of time).
-> 11. `}` — That's every car done for this tick.
-> 12. `…` — If no car is still driving, this generation is over.
-> 13. `}` — The end of the recipe. Then the screen draws everything, and it all happens again.
-<!-- /look-at-the-code -->
+**Training** is the search for the right tap settings. We take a hundred cars with random taps, keep the ones that got the furthest, and give them "children" with a few taps nudged at random. Then again and again, just like in nature: that's why it's called evolution.
 
 For the curious: [Deep dive →](DEEP-DIVE.md#0-what-were-building)
 
 ---
 
-## 1. The track
+## 2. The World
 
-**Before anything can learn, it needs a world whose rules never change.**
+[▶ watch this part](VIDEO_URL&t=171)
 
-Think of a board game. If two players make exactly the same moves, the game ends exactly the same way. Our track works like that.
+To learn anything you need a place to learn: a track, some walls, and a little bug of a car you can also drive yourself.
 
-![The race track with its hairpin](docs/img/simple-1-track.svg)
+This world runs in **ticks**: sixty times a second, the car takes one small step, the same way on every computer. Every tick is the same four things: read the buttons, move the car, check for a wall, check for a checkpoint line. Drive it twice with the same key presses, and you get exactly the same run, down to the pixel.
 
-The walls glow pink. Touching one is a crash, and that car is out. Invisible lines across the road check that a car really drives the whole lap, in the right direction. No shortcuts.
+![Ticks of time, and two runs with the same key presses that match exactly](docs/img/guide-02-determinism.webp)
 
-The world moves in tiny ticks, 60 per second, the same on every computer. So the same key presses always give exactly the same lap. That matters later, when we race.
+*Same key presses, same run, every time. If the world were even slightly random, evolution would be picking the lucky cars instead of the skilled ones.*
 
-I drove it myself with the arrow keys. My best lap: about 26 seconds.
-
-**What really happened:** the road was too narrow at first. On a test drive it felt too tight, so we made it wider and redrew the tight hairpin turn. Then we froze the rules for good.
-
-<!-- look-at-the-code
-file: src/sim/laps.js
-function: crossedCheckpoint
-title: no shortcuts, no driving backwards
-intro: Every tick, the game asks this about the next checkpoint.
-export function crossedCheckpoint(car, cp) { => Did this car just cross this checkpoint line, going the right way?
-  const movedX = car.x - car.prevX; => How far the car moved sideways on the screen during the last tick...
-  const movedY = car.y - car.prevY; => ...and how far up or down.
-  const forward = movedX * cp.tx + movedY * cp.ty; => How much of that movement went along the track's direction. A positive number means forwards.
-  if (forward <= 0) return false; => Standing still or going backwards never counts.
-  return segmentHit(car.prevX, car.prevY, car.x, car.y, cp.ax, cp.ay, cp.bx, cp.by) >= 0; => Does the little line from where the car was to where it is now cross the checkpoint line? Then yes.
-} => End.
--->
-> **Look at the code: no shortcuts, no driving backwards**
-> Every tick, the game asks this about the next checkpoint.
->
-> ```js
-> export function crossedCheckpoint(car, cp) {
->   const movedX = car.x - car.prevX;
->   const movedY = car.y - car.prevY;
->   const forward = movedX * cp.tx + movedY * cp.ty;
->   if (forward <= 0) return false;
->   return segmentHit(car.prevX, car.prevY, car.x, car.y, cp.ax, cp.ay, cp.bx, cp.by) >= 0;
-> }
-> ```
->
-> 1. `export function crossedCheckpoint(car, cp) {` — Did this car just cross this checkpoint line, going the right way?
-> 2. `const movedX = car.x - car.prevX;` — How far the car moved sideways on the screen during the last tick...
-> 3. `const movedY = car.y - car.prevY;` — ...and how far up or down.
-> 4. `const forward = movedX * cp.tx + movedY * cp.ty;` — How much of that movement went along the track's direction. A positive number means forwards.
-> 5. `if (forward <= 0) return false;` — Standing still or going backwards never counts.
-> 6. `return segmentHit(car.prevX, car.prevY, car.x, car.y, cp.ax, cp.ay, cp.bx, cp.by) >= 0;` — Does the little line from where the car was to where it is now cross the checkpoint line? Then yes.
-> 7. `}` — End.
-<!-- /look-at-the-code -->
+**What broke:** at first the road was too narrow, only 64 pixels; even I felt cramped. We widened it to 90. Then we froze the rules of the world, because if the physics changed later, old results couldn't be compared any more. On that final track I drove it myself. My best lap: 26.40 seconds.
 
 For the curious: [Deep dive →](DEEP-DIVE.md#1-the-world)
 
 ---
 
-## 2. Eyes
+## 3. Eyes
 
-**The car can't see. It only knows how far away the wall is in 5 directions, and how fast it's going.**
+[▶ watch this part](VIDEO_URL&t=242)
 
-It's like the parking sensors on a real car. They don't show a picture. They only beep: something is close, over there.
+What does the car actually see? Nothing. It has no camera and no map. All it has are five invisible whiskers, like a cat. Each one reaches forward until it hits a wall, up to 200 pixels, and reports how far away that wall is. It's like the parking sensors on a real car: they don't show you a picture, they just beep, close or far.
 
-![Five eyes reach out from the car until they hit a wall](docs/img/simple-2-eyes.svg)
+![Five whiskers reach out from the car until they touch a wall](docs/img/guide-03-rays.webp)
 
-Five invisible lines go out from the car, like whiskers. Each one stops at the first wall it meets. The closer the wall, the bigger the number that eye sends. Add the speed, and that's 6 numbers.
+*The five whiskers at a real moment in the hairpin, with the real distance each one measured.*
 
-Those 6 numbers are everything the car will ever know. It has no map. It has no idea where the finish line is.
+Five distances plus the speed: six numbers, sixty times a second. That's everything the car knows. It doesn't know where the finish is, or that it's in a race.
 
-**What really happened:** we froze one moment in the tight hairpin turn. The car's left eye saw the wall only about 23 pixels away. That's less than its own width.
+All six are squeezed between 0 and 1 first: a wall right up close is 1, no wall in sight is 0; standing still is 0, flat out is 1. A distance can be 200 and the speed 330, and fed in as they are, the big numbers would drown out the small ones. This way every sensor gets an equal voice.
 
-<!-- look-at-the-code
-file: src/sim/sensors.js
-function: getInputs
-title: the 6 numbers, part 1
-intro: What the brain gets, every tick.
-export function getInputs(car, walls) { => Everything the car will ever know, worked out from the car and the walls.
-  return inputsFromView(readSensors(car, walls), car.speed); => Measure the 5 distances with the eyes, then turn them, plus the speed, into 6 numbers (below).
-} => End.
--->
-> **Look at the code: the 6 numbers, part 1**
-> What the brain gets, every tick.
->
-> ```js
-> export function getInputs(car, walls) {
->   return inputsFromView(readSensors(car, walls), car.speed);
-> }
-> ```
->
-> 1. `export function getInputs(car, walls) {` — Everything the car will ever know, worked out from the car and the walls.
-> 2. `return inputsFromView(readSensors(car, walls), car.speed);` — Measure the 5 distances with the eyes, then turn them, plus the speed, into 6 numbers (below).
-> 3. `}` — End.
-<!-- /look-at-the-code -->
+![Raw numbers of different sizes, then the same numbers squeezed between 0 and 1](docs/img/guide-03-zero-to-one.webp)
 
-<!-- look-at-the-code
-file: src/sim/sensors.js
-function: inputsFromView
-title: the 6 numbers, part 2
-intro: This is where distances turn into numbers between 0 and 1.
-export function inputsFromView(distances, speed) { => It gets the 5 distances and the car's speed.
-  const inputs = []; => Start an empty list for the brain's numbers.
-  for (const distance of distances) { => For each of the 5 eyes:
-    inputs.push(1 - distance / SENSOR_RANGE); => 200 pixels or more becomes 0, touching becomes 1, and the closer the wall, the bigger the number.
-  } => All 5 eyes done.
-  const speedShare = speed / CAR.maxSpeed; => The speed as a share of top speed: 0 is standing still, 1 is flat out.
-  inputs.push(Math.max(0, Math.min(1, speedShare))); => Keep it between 0 and 1 (driving backwards counts as 0), and add it as number 6.
-  return inputs; => Hand the 6 numbers to the brain.
-} => End.
--->
-> **Look at the code: the 6 numbers, part 2**
-> This is where distances turn into numbers between 0 and 1.
->
-> ```js
-> export function inputsFromView(distances, speed) {
->   const inputs = [];
->   for (const distance of distances) {
->     inputs.push(1 - distance / SENSOR_RANGE);
->   }
->   const speedShare = speed / CAR.maxSpeed;
->   inputs.push(Math.max(0, Math.min(1, speedShare)));
->   return inputs;
-> }
-> ```
->
-> 1. `export function inputsFromView(distances, speed) {` — It gets the 5 distances and the car's speed.
-> 2. `const inputs = [];` — Start an empty list for the brain's numbers.
-> 3. `for (const distance of distances) {` — For each of the 5 eyes:
-> 4. `inputs.push(1 - distance / SENSOR_RANGE);` — 200 pixels or more becomes 0, touching becomes 1, and the closer the wall, the bigger the number.
-> 5. `}` — All 5 eyes done.
-> 6. `const speedShare = speed / CAR.maxSpeed;` — The speed as a share of top speed: 0 is standing still, 1 is flat out.
-> 7. `inputs.push(Math.max(0, Math.min(1, speedShare)));` — Keep it between 0 and 1 (driving backwards counts as 0), and add it as number 6.
-> 8. `return inputs;` — Hand the 6 numbers to the brain.
-> 9. `}` — End.
-<!-- /look-at-the-code -->
+*Squeezed between 0 and 1, a distance and a speed can finally be compared fairly.*
+
+**The real moment:** in the hairpin, the left whisker sees a wall 23 pixels away. That's less than the width of the car itself. The flow is almost at maximum: 0.88.
 
 For the curious: [Deep dive →](DEEP-DIVE.md#2-eyes)
 
 ---
 
-## 3. The brain
+## 4. Generation 1
 
-**The brain is 70 numbers. They turn the 6 things the car feels into 4 key presses.**
+[▶ watch this part](VIDEO_URL&t=325)
 
-Picture a mixing desk full of knobs. The car's 6 feelings come in on one side. The knobs decide how much each one counts. The keys come out on the other side.
+What does the brain do when every tap is set at random? A hundred cars, a hundred random brains. They pass through each other; only the walls matter. Hit a wall and you're out. Sit for three seconds without progress, and you're out too, so cars spinning in place don't drive forever.
 
-![The real brain at the hairpin: BRAKE and LEFT are on](docs/img/simple-3-brain.svg)
+![Where each of the hundred random cars ended up](docs/img/guide-04-generation-1.webp)
 
-The brain is made of small parts called **neurons**. A neuron takes some numbers in, gives each one a weight, adds it all up, and keeps the result between two limits. A **weight** is how much the neuron cares about one input. A big weight means a lot. A negative weight means it pushes the other way.
+*Generation 1 at the end: who stalled, who crashed, who drove off backwards, and the one lucky car.*
 
-The last neurons are the keys: one for gas, one for brake, one for left, one for right. When a key's neuron ends up past halfway, that key is pressed. Count every weight, plus one extra number per neuron, and you get exactly 70 numbers.
+**What happened:** 76 cars barely went anywhere, and the three-second rule took them out. 24 drove into a wall. Some even drove off backwards. But one of them, car 1-85, by pure luck made it almost two-thirds of the way around: 65% of a lap. No training at all, just lucky random taps.
 
-**What really happened:** the first brains got random numbers, and it was chaos. In one run, more than a quarter of the cars crashed in the first couple of seconds, and almost half barely moved at all.
+Nobody in the first generation finished a lap. To get better, the cars need evolution.
+
+For the curious: [Deep dive →](DEEP-DIVE.md#generation-1-random-brains-glorious-chaos)
+
+---
+
+## 5. The Brain
+
+[▶ watch this part](VIDEO_URL&t=378)
+
+One tank with its pipes is a **neuron**, the smallest part of the brain. A neuron does just four things, always the same four:
+
+1. It takes the signal from each pipe.
+2. It runs that signal through a tap. The tap is the **weight**: how much this pipe matters. Wide open, the signal counts a lot. A drain tap works against it.
+3. It adds one more number of its own: the **bias**. Every tank has its own, and it doesn't depend on the sensors.
+4. It squeezes the result into a narrow range, so the numbers can't grow forever.
+
+![One tank with three pipes, each with its own tap](docs/img/guide-05-one-tank.webp)
+
+*One neuron: signals in, taps, one number of its own, and a squeeze.*
 
 <!-- look-at-the-code
 file: src/sim/brain.js
 function: neuron
-title: one neuron
-intro: The smallest part of the brain. The whole brain is just this, done 10 times.
-export function neuron(inputs, brain, start, squash) { => A neuron gets the numbers coming in, the brain's 70 numbers, where its own weights start in that list, and how to squash the result.
-  let sum = 0; => Start a running total at zero.
-  for (let i = 0; i < inputs.length; i++) { => Go through what comes in, one number at a time.
-    const weight = brain[start + i]; => Look up how much this neuron cares about this input: its weight.
-    sum += inputs[i] * weight; => Multiply what comes in by how much it matters, and add that to the total.
-  } => Every input has had its say.
-  const bias = brain[start + inputs.length]; => Right after the weights comes one more number, the bias...
-  sum += bias; => ...which is added on top, whatever the inputs were.
-  return squash(sum); => Squash the total (keep it within small limits, as explained above) and pass it on.
-} => End.
+title: one neuron, the real function from the game
+export function neuron(inputs, brain, start, squash) { => A neuron gets the signals, the car's 70 numbers, where its own taps start in that list, and how to squeeze.
+  let sum = 0; => Start at zero.
+  for (let i = 0; i < inputs.length; i++) { => For each pipe, one at a time…
+    const weight = brain[start + i]; => …look at how far its tap is open…
+    sum += inputs[i] * weight; => …and add the signal times the tap; a drain tap is a negative number, so the total goes down.
+  } => That was the last pipe.
+  const bias = brain[start + inputs.length]; => The next number in the list is this tank's own number, the bias.
+  sum += bias; => Add the bias.
+  return squash(sum); => Squeeze the total into range and hand it on.
+} => Nine lines: that's an entire neuron.
 -->
-> **Look at the code: one neuron**
-> The smallest part of the brain. The whole brain is just this, done 10 times.
+> **Look at the code: one neuron, the real function from the game**
 >
 > ```js
 > export function neuron(inputs, brain, start, squash) {
@@ -298,91 +134,64 @@ export function neuron(inputs, brain, start, squash) { => A neuron gets the numb
 > }
 > ```
 >
-> 1. `export function neuron(inputs, brain, start, squash) {` — A neuron gets the numbers coming in, the brain's 70 numbers, where its own weights start in that list, and how to squash the result.
-> 2. `let sum = 0;` — Start a running total at zero.
-> 3. `for (let i = 0; i < inputs.length; i++) {` — Go through what comes in, one number at a time.
-> 4. `const weight = brain[start + i];` — Look up how much this neuron cares about this input: its weight.
-> 5. `sum += inputs[i] * weight;` — Multiply what comes in by how much it matters, and add that to the total.
-> 6. `}` — Every input has had its say.
-> 7. `const bias = brain[start + inputs.length];` — Right after the weights comes one more number, the bias...
-> 8. `sum += bias;` — ...which is added on top, whatever the inputs were.
-> 9. `return squash(sum);` — Squash the total (keep it within small limits, as explained above) and pass it on.
-> 10. `}` — End.
+> 1. `export function neuron(inputs, brain, start, squash) {` — A neuron gets the signals, the car's 70 numbers, where its own taps start in that list, and how to squeeze.
+> 2. `let sum = 0;` — Start at zero.
+> 3. `for (let i = 0; i < inputs.length; i++) {` — For each pipe, one at a time…
+> 4. `const weight = brain[start + i];` — …look at how far its tap is open…
+> 5. `sum += inputs[i] * weight;` — …and add the signal times the tap; a drain tap is a negative number, so the total goes down.
+> 6. `}` — That was the last pipe.
+> 7. `const bias = brain[start + inputs.length];` — The next number in the list is this tank's own number, the bias.
+> 8. `sum += bias;` — Add the bias.
+> 9. `return squash(sum);` — Squeeze the total into range and hand it on.
+> 10. `}` — Nine lines: that's an entire neuron.
 <!-- /look-at-the-code -->
 
-<!-- look-at-the-code
-file: src/sim/brain.js
-function: think
-title: from numbers to keys
-intro: After the neurons have done their sums, this decides what to press.
-export function think(brain, inputs) { => Given its 70 numbers and the 6 things it feels, which keys does the car press?
-  const [gas, brake, left, right] = outputs(brain, inputs); => Run the numbers through all the neurons. Four numbers come out; call them gas, brake, left and right.
-  let keys = 0; => Start with no keys pressed.
-  if (gas > 0.5) keys += UP; => If the gas number is past halfway, press gas.
-  if (brake > 0.5) keys += DOWN; => Same for brake...
-  if (left > 0.5) keys += LEFT; => ...for left...
-  if (right > 0.5) keys += RIGHT; => ...and for right. Gas and brake can both be on, just like with my fingers.
-  return keys; => These are the keys held down for this tick.
-} => End.
--->
-> **Look at the code: from numbers to keys**
-> After the neurons have done their sums, this decides what to press.
->
-> ```js
-> export function think(brain, inputs) {
->   const [gas, brake, left, right] = outputs(brain, inputs);
->   let keys = 0;
->   if (gas > 0.5) keys += UP;
->   if (brake > 0.5) keys += DOWN;
->   if (left > 0.5) keys += LEFT;
->   if (right > 0.5) keys += RIGHT;
->   return keys;
-> }
-> ```
->
-> 1. `export function think(brain, inputs) {` — Given its 70 numbers and the 6 things it feels, which keys does the car press?
-> 2. `const [gas, brake, left, right] = outputs(brain, inputs);` — Run the numbers through all the neurons. Four numbers come out; call them gas, brake, left and right.
-> 3. `let keys = 0;` — Start with no keys pressed.
-> 4. `if (gas > 0.5) keys += UP;` — If the gas number is past halfway, press gas.
-> 5. `if (brake > 0.5) keys += DOWN;` — Same for brake...
-> 6. `if (left > 0.5) keys += LEFT;` — ...for left...
-> 7. `if (right > 0.5) keys += RIGHT;` — ...and for right. Gas and brake can both be on, just like with my fingers.
-> 8. `return keys;` — These are the keys held down for this tick.
-> 9. `}` — End.
-<!-- /look-at-the-code -->
+**The real car has more tanks.** The six sensor signals first gather in six middle tanks, and only from there flow into the four button tanks. The middle tanks mix signals. One of them listens mostly to two things: the wall ahead fills it, and the left whisker drains it. No single pipe can tell you that.
+
+![One middle tank filled by the wall ahead and drained by the left whisker](docs/img/guide-05-middle-tank.webp)
+
+*A middle tank at a real moment: the wall ahead pushes it up, the left whisker pulls it down.*
+
+**One honest caveat.** The water pipes are a simplification. What really flows through them is numbers, and in the middle tanks those numbers can be negative. A drain tap simply flips the sign: a negative going through a drain tap becomes a positive.
+
+![A negative number in a middle tank becomes positive through a drain tap](docs/img/guide-05-caveat.webp)
+
+*Where the water picture stops working: numbers can go below zero.*
+
+**Count the taps.** From six sensors to six middle tanks: 36 taps, plus 6 biases. From six tanks to four buttons: another 24, plus 4. That's 70 in total. In the code it's literally one list of 70 numbers, everything training is allowed to change.
+
+![All 70 tap settings, counted group by group: 36 + 6 + 24 + 4](docs/img/guide-05-seventy.webp)
+
+*The whole brain: 70 numbers, nothing else.*
+
+Networks for images or text (ChatGPT and Claude run on a kind called transformers) are far bigger. We only need the simplest kind, six numbers in and four buttons out, so we can show you every single tap.
 
 For the curious: [Deep dive →](DEEP-DIVE.md#3-brain)
 
 ---
 
-## 4. Evolution
+## 6. Evolution
 
-**Keep the cars that got furthest, copy their numbers with tiny changes, and repeat.**
+[▶ watch this part](VIDEO_URL&t=597)
 
-It's like breeding. A farmer doesn't design a faster horse. They let the fastest horses have foals, again and again.
+You could train a network by showing it thousands of correct answers: "in this situation, press left". But where would those come from? Recorded from me, it would learn my mistakes too. Evolution needs no correct answers, only a score, and it's just three steps, repeated many times.
 
-![100 cars ranked; the best 10 become the parents of the next 100](docs/img/simple-4-evolution.svg)
-
-One round of 100 cars driving together is a **generation**. Each car gets a score, its **fitness**: how far it got, plus a bonus for a fast lap. The best 10 become parents. The very best one is copied exactly, so the best can never get worse. Every other child is a copy of a parent with a few numbers nudged a little. That nudge is a **mutation**.
-
-**What really happened:** the first full lap came in generation 4, and it was slower than mine. But one of our runs never learned at all. For 95 generations it was stuck at the same spot. In one of those generations, not a single car ever touched the brake. Its best car drove flat out all the way, and the hairpin is far too tight to take flat out. Our best guess: it got stuck on a hill that isn't the top. Every small change made things worse, and the real top was too far away to reach in tiny steps.
+**Step one: score.** Every car gets a score. Got further, more points. If it finished a whole lap, it gets a bonus, and the faster the lap, the bigger the bonus.
 
 <!-- look-at-the-code
 file: src/sim/generation.js
 function: fitness
-title: the score
-intro: Every car gets a score when its run ends.
-export function fitness(car) { => How good was this car's run?
-  let score = trackProgress(car.world); => Start with how far along the track it got: checkpoints passed, plus part of the way to the next.
-  if (car.bestLapSteps !== null) { => If it finished at least one lap...
-    const lapSeconds = car.bestLapSteps / STEPS_PER_SECOND; => ...work out its best lap time in seconds...
-    score += LAP_BONUS / lapSeconds; => ...and add a bonus: 6000 divided by that time. The faster the lap, the bigger the bonus.
+title: the score, called fitness
+export function fitness(car) { => How good was this car?
+  let score = trackProgress(car.world); => How many checkpoint lines it crossed, in order, plus how close it got to the next one.
+  if (car.bestLapSteps !== null) { => If it finished a lap…
+    const lapSeconds = car.bestLapSteps / STEPS_PER_SECOND; => …turn its best lap into seconds…
+    score += LAP_BONUS / lapSeconds; => …and add a bonus: 6000 divided by the lap time, so a faster lap means a bigger bonus.
   } => No lap, no bonus.
-  return score; => That's its fitness.
-} => End.
+  return score; => That's the car's score.
+} => The end of the recipe.
 -->
-> **Look at the code: the score**
-> Every car gets a score when its run ends.
+> **Look at the code: the score, called fitness**
 >
 > ```js
 > export function fitness(car) {
@@ -395,64 +204,71 @@ export function fitness(car) { => How good was this car's run?
 > }
 > ```
 >
-> 1. `export function fitness(car) {` — How good was this car's run?
-> 2. `let score = trackProgress(car.world);` — Start with how far along the track it got: checkpoints passed, plus part of the way to the next.
-> 3. `if (car.bestLapSteps !== null) {` — If it finished at least one lap...
-> 4. `const lapSeconds = car.bestLapSteps / STEPS_PER_SECOND;` — ...work out its best lap time in seconds...
-> 5. `score += LAP_BONUS / lapSeconds;` — ...and add a bonus: 6000 divided by that time. The faster the lap, the bigger the bonus.
+> 1. `export function fitness(car) {` — How good was this car?
+> 2. `let score = trackProgress(car.world);` — How many checkpoint lines it crossed, in order, plus how close it got to the next one.
+> 3. `if (car.bestLapSteps !== null) {` — If it finished a lap…
+> 4. `const lapSeconds = car.bestLapSteps / STEPS_PER_SECOND;` — …turn its best lap into seconds…
+> 5. `score += LAP_BONUS / lapSeconds;` — …and add a bonus: 6000 divided by the lap time, so a faster lap means a bigger bonus.
 > 6. `}` — No lap, no bonus.
-> 7. `return score;` — That's its fitness.
-> 8. `}` — End.
+> 7. `return score;` — That's the car's score.
+> 8. `}` — The end of the recipe.
 <!-- /look-at-the-code -->
 
-<!-- look-at-the-code
-file: src/sim/evolution.js
-function: selection
-title: picking the parents
-intro: When all 100 cars are out, this picks who gets to have children.
-export function selection(cars, score = fitness) { => It gets all the cars. Unless told otherwise, it scores them by fitness.
-  const ranked = cars.slice(); => Make a copy of the list, so the original order isn't touched.
-  ranked.sort((a, b) => score(b) - score(a)); => Sort the copy: for any two cars, the one with the higher score goes first.
-  return ranked.slice(0, PARENTS); => Keep the first 10. Those are the parents.
-} => End.
--->
-> **Look at the code: picking the parents**
-> When all 100 cars are out, this picks who gets to have children.
->
-> ```js
-> export function selection(cars, score = fitness) {
->   const ranked = cars.slice();
->   ranked.sort((a, b) => score(b) - score(a));
->   return ranked.slice(0, PARENTS);
-> }
-> ```
->
-> 1. `export function selection(cars, score = fitness) {` — It gets all the cars. Unless told otherwise, it scores them by fitness.
-> 2. `const ranked = cars.slice();` — Make a copy of the list, so the original order isn't touched.
-> 3. `ranked.sort((a, b) => score(b) - score(a));` — Sort the copy: for any two cars, the one with the higher score goes first.
-> 4. `return ranked.slice(0, PARENTS);` — Keep the first 10. Those are the parents.
-> 5. `}` — End.
-<!-- /look-at-the-code -->
+**Step two: select.** The top ten become parents. The other ninety, that's it for them. The very best car is copied into the next generation exactly as it is. That's why the best result on the training track can never get worse.
+
+**Step three: children with typos.** The other 99 cars are copies of the parents, with a few taps nudged at random. The better the parent, the better its chances to have children. Chances, not a fixed share: in one real generation the best parent got 20 of the 99 children and the tenth got 1.
+
+![All 100 cars ranked by score, the top ten kept, and their children](docs/img/guide-06-ranking.webp)
+
+*Score, select, copy: one real step from generation 1 to generation 2.*
+
+![A child next to its parent: a few taps turned slightly](docs/img/guide-06-mutation.webp)
+
+*A real child and its parent: most taps are exact copies, a few are nudged.*
+
+**What happened:** generation after generation, the cars got further and further. In generation four, one of them finished a full lap for the first time: 38 seconds, slower than me. By generation six, the best lap was 19.25 seconds. Faster.
+
+For the curious: [Deep dive →](DEEP-DIVE.md#4-evolution)
+
+---
+
+## 7. Stuck
+
+[▶ watch this part](VIDEO_URL&t=686)
+
+Evolution doesn't always work. We ran it five times, each with a different random start. Four learned to drive. One got stuck: 95 generations in a row with exactly the same result.
+
+![Best score by generation for five runs; one stays flat](docs/img/guide-07-five-seeds.webp)
+
+*Five runs, five random starts. Four climb, one stays flat for 95 generations.*
+
+Generation after generation, its best car crashes in the very same spot: the exit of the hairpin, flat out. In one of those generations, not one of the hundred cars ever pressed the brake.
+
+**Our best explanation** (an explanation, not a measurement): early on, the top car was one that never brakes. Fast, lots of points. Every descendant came from it. But getting through this hairpin means learning to brake, and that's a big step, not a small typo. Evolution got stuck on a hill that looks like the summit, and small steps can't get you off it.
+
+![A small hill where the cars are stuck, and a bigger mountain further away](docs/img/guide-07-hill.webp)
+
+*Every small step from the top of the small hill goes down, so evolution stays there.*
+
+Why are the steps so small? Here is how a child is made:
 
 <!-- look-at-the-code
 file: src/sim/evolution.js
 function: mutate
-title: tiny copying mistakes
-intro: Every child starts as a copy of one parent, made by this.
-export function mutate(brain, rand) { => It gets a parent's 70 numbers, and the game's random number maker.
-  const child = []; => Start the child's list of numbers, empty.
-  for (const number of brain) { => Go through the parent's 70 numbers, one by one.
-    if (rand() < MUTATION_RATE) { => Roll a die. 1 time in 10 (a 10% chance)...
-      child.push(number + gaussian(rand) * MUTATION_SIZE); => ...the child gets this number nudged up or down a little: usually by about 0.3 or less, now and then by more.
-    } else { => The other 9 times in 10...
-      child.push(number); => ...the child gets the number exactly as it was.
-    } => One number done.
+title: children with typos
+export function mutate(brain, rand) { => Make a child from a parent's 70 numbers.
+  const child = []; => Start with an empty list.
+  for (const number of brain) { => Go through all 70 of the parent's taps.
+    if (rand() < MUTATION_RATE) { => For each one, roll the dice: one time in ten…
+      child.push(number + gaussian(rand) * MUTATION_SIZE); => …nudge the tap a little, usually just slightly.
+    } else { => …and the other nine times…
+      child.push(number); => …copy it as it is.
+    } => That was one tap.
   } => All 70 done.
-  return child; => The child's brain: almost the parent's, but not quite.
-} => End.
+  return child; => The result: almost the parent, but not quite.
+} => The end of the recipe.
 -->
-> **Look at the code: tiny copying mistakes**
-> Every child starts as a copy of one parent, made by this.
+> **Look at the code: children with typos**
 >
 > ```js
 > export function mutate(brain, rand) {
@@ -468,312 +284,228 @@ export function mutate(brain, rand) { => It gets a parent's 70 numbers, and the 
 > }
 > ```
 >
-> 1. `export function mutate(brain, rand) {` — It gets a parent's 70 numbers, and the game's random number maker.
-> 2. `const child = [];` — Start the child's list of numbers, empty.
-> 3. `for (const number of brain) {` — Go through the parent's 70 numbers, one by one.
-> 4. `if (rand() < MUTATION_RATE) {` — Roll a die. 1 time in 10 (a 10% chance)...
-> 5. `child.push(number + gaussian(rand) * MUTATION_SIZE);` — ...the child gets this number nudged up or down a little: usually by about 0.3 or less, now and then by more.
-> 6. `} else {` — The other 9 times in 10...
-> 7. `child.push(number);` — ...the child gets the number exactly as it was.
-> 8. `}` — One number done.
+> 1. `export function mutate(brain, rand) {` — Make a child from a parent's 70 numbers.
+> 2. `const child = [];` — Start with an empty list.
+> 3. `for (const number of brain) {` — Go through all 70 of the parent's taps.
+> 4. `if (rand() < MUTATION_RATE) {` — For each one, roll the dice: one time in ten…
+> 5. `child.push(number + gaussian(rand) * MUTATION_SIZE);` — …nudge the tap a little, usually just slightly.
+> 6. `} else {` — …and the other nine times…
+> 7. `child.push(number);` — …copy it as it is.
+> 8. `}` — That was one tap.
 > 9. `}` — All 70 done.
-> 10. `return child;` — The child's brain: almost the parent's, but not quite.
-> 11. `}` — End.
+> 10. `return child;` — The result: almost the parent, but not quite.
+> 11. `}` — The end of the recipe.
 <!-- /look-at-the-code -->
 
-<!-- look-at-the-code
-file: src/sim/evolution.js
-function: nextGeneration
-title: the next 100 cars
-intro: This puts it all together: from one generation to the next.
-export function nextGeneration(evo) { => Make the next generation.
-  const gen = evo.gen; => The generation that just finished.
-  const parents = selection(gen.cars); => Pick its 10 best cars as parents.
-  const elite = parents[0]; => The very best one...
-  const brains = [elite.brain.slice()]; => ...goes first into the new list, as an exact copy. That way the best can never get worse.
-... => (It also writes down who is whose parent, for the family tree.)
-  while (brains.length < POPULATION) { => Until there are 100 brains:
-    const parent = pickParent(parents, evo.rand); => pick a parent (the better ones are picked more often)...
-    brains.push(mutate(parent.brain, evo.rand)); => ...and add a slightly changed copy of it.
-... => (Again, it notes the parent.)
-  } => 100 brains.
-  evo.gen = createGeneration(evo.track, brains, gen.number + 1, family); => Give each brain a car on the start line: that's the new generation.
-... => (It writes the family tree down.)
-  return evo.gen; => Ready to race.
-} => End.
--->
-> **Look at the code: the next 100 cars**
-> This puts it all together: from one generation to the next.
->
-> ```js
-> export function nextGeneration(evo) {
->   const gen = evo.gen;
->   const parents = selection(gen.cars);
->   const elite = parents[0];
->   const brains = [elite.brain.slice()];
->   …
->   while (brains.length < POPULATION) {
->     const parent = pickParent(parents, evo.rand);
->     brains.push(mutate(parent.brain, evo.rand));
->     …
->   }
->   evo.gen = createGeneration(evo.track, brains, gen.number + 1, family);
->   …
->   return evo.gen;
-> }
-> ```
->
-> 1. `export function nextGeneration(evo) {` — Make the next generation.
-> 2. `const gen = evo.gen;` — The generation that just finished.
-> 3. `const parents = selection(gen.cars);` — Pick its 10 best cars as parents.
-> 4. `const elite = parents[0];` — The very best one...
-> 5. `const brains = [elite.brain.slice()];` — ...goes first into the new list, as an exact copy. That way the best can never get worse.
-> 6. `…` — (It also writes down who is whose parent, for the family tree.)
-> 7. `while (brains.length < POPULATION) {` — Until there are 100 brains:
-> 8. `const parent = pickParent(parents, evo.rand);` — pick a parent (the better ones are picked more often)...
-> 9. `brains.push(mutate(parent.brain, evo.rand));` — ...and add a slightly changed copy of it.
-> 10. `…` — (Again, it notes the parent.)
-> 11. `}` — 100 brains.
-> 12. `evo.gen = createGeneration(evo.track, brains, gen.number + 1, family);` — Give each brain a car on the start line: that's the new generation.
-> 13. `…` — (It writes the family tree down.)
-> 14. `return evo.gen;` — Ready to race.
-> 15. `}` — End.
-<!-- /look-at-the-code -->
+So from here on, we follow a run that did learn. To be honest: we picked it after seeing all five.
 
-For the curious: [Deep dive →](DEEP-DIVE.md#4-evolution)
+For the curious: [Deep dive →](DEEP-DIVE.md#seed-1-stuck-at-518-for-95-generations)
 
 ---
 
-## 5. Reading a brain
+## 8. Reading the Brain
 
-**We can freeze one moment and see exactly why the car pressed a key.**
+[▶ watch this part](VIDEO_URL&t=742)
 
-It's like a sports replay with the referee's notes. You don't just see the turn. You see what pushed the car into it.
+Back to that hairpin, with the left whisker 23 pixels from the wall. We froze time and traced how this one decision was calculated.
 
-![Generation 1 drives down the middle of the hairpin; generation 80 hugs the inside](docs/img/simple-5-inside-line.svg)
+![The frozen moment with the brain's path lit: left whisker, a middle tank, the LEFT tank](docs/img/guide-08-decision.webp)
 
-In the hairpin, the wall on the car's left was about 23 pixels away. You might expect it to steer away. Instead, the numbers flowed through the brain, and LEFT came out on. It turned toward that wall.
+*One decision, traced through the real network. Every number is what the brain calculated at that moment.*
 
-Why? That wall is the inside of the corner, and the inside is the shortest way round. The best car of generation 80 passes just a few pixels from it. The best car of generation 1 drove down the middle.
-
-Nobody taught it that. The only rule was "go far, and finish fast". It isn't a perfect racing line, though. A real racing driver swings wide before the turn, and our cars don't.
-
-**What really happened:** every number we show when we freeze a moment is checked by a test. It's exactly what the brain computed in that tick.
+Every sensor plays a part, but the biggest contribution comes from the left whisker: its path through a middle tank gives the biggest push toward the "left" tank. The LEFT tank ends at 0.66, above halfway: button pressed.
 
 <!-- look-at-the-code
 file: src/sim/brain.js
-function: outputs
-title: the whole brain in two lines
-intro: Freezing a moment means following exactly these two lines, with real numbers.
-export function outputs(brain, inputs) { => From the 6 numbers the car feels to the 4 numbers for the keys.
-  const hidden = layer(inputs, brain, 0, HIDDEN, tanh); => The first 6 neurons each look at the 6 inputs, using the first 42 of the 70 numbers. Their results are squashed between -1 and 1.
-  return layer(hidden, brain, HIDDEN * (INPUTS + 1), OUTPUTS, sigmoid); => The 4 key neurons look at those 6 results, using the last 28 numbers. Their results are squashed between 0 and 1.
-} => End.
+function: think
+title: think(): which buttons get pressed
+export function think(brain, inputs) { => The brain's whole job: six numbers in, buttons out.
+  const [gas, brake, left, right] = outputs(brain, inputs); => Push the signals through all the tanks; four button tanks come out.
+  let keys = 0; => Start with no buttons pressed.
+  if (gas > 0.5) keys += UP; => Gas tank above halfway? Press gas.
+  if (brake > 0.5) keys += DOWN; => Brake tank above halfway? Press brake.
+  if (left > 0.5) keys += LEFT; => Left tank above halfway? Steer left.
+  if (right > 0.5) keys += RIGHT; => Right tank above halfway? Steer right.
+  return keys; => Those are the buttons for this tick.
+} => Then it all happens again, sixty times a second.
 -->
-> **Look at the code: the whole brain in two lines**
-> Freezing a moment means following exactly these two lines, with real numbers.
+> **Look at the code: think(): which buttons get pressed**
 >
 > ```js
-> export function outputs(brain, inputs) {
->   const hidden = layer(inputs, brain, 0, HIDDEN, tanh);
->   return layer(hidden, brain, HIDDEN * (INPUTS + 1), OUTPUTS, sigmoid);
+> export function think(brain, inputs) {
+>   const [gas, brake, left, right] = outputs(brain, inputs);
+>   let keys = 0;
+>   if (gas > 0.5) keys += UP;
+>   if (brake > 0.5) keys += DOWN;
+>   if (left > 0.5) keys += LEFT;
+>   if (right > 0.5) keys += RIGHT;
+>   return keys;
 > }
 > ```
 >
-> 1. `export function outputs(brain, inputs) {` — From the 6 numbers the car feels to the 4 numbers for the keys.
-> 2. `const hidden = layer(inputs, brain, 0, HIDDEN, tanh);` — The first 6 neurons each look at the 6 inputs, using the first 42 of the 70 numbers. Their results are squashed between -1 and 1.
-> 3. `return layer(hidden, brain, HIDDEN * (INPUTS + 1), OUTPUTS, sigmoid);` — The 4 key neurons look at those 6 results, using the last 28 numbers. Their results are squashed between 0 and 1.
-> 4. `}` — End.
+> 1. `export function think(brain, inputs) {` — The brain's whole job: six numbers in, buttons out.
+> 2. `const [gas, brake, left, right] = outputs(brain, inputs);` — Push the signals through all the tanks; four button tanks come out.
+> 3. `let keys = 0;` — Start with no buttons pressed.
+> 4. `if (gas > 0.5) keys += UP;` — Gas tank above halfway? Press gas.
+> 5. `if (brake > 0.5) keys += DOWN;` — Brake tank above halfway? Press brake.
+> 6. `if (left > 0.5) keys += LEFT;` — Left tank above halfway? Steer left.
+> 7. `if (right > 0.5) keys += RIGHT;` — Right tank above halfway? Steer right.
+> 8. `return keys;` — Those are the buttons for this tick.
+> 9. `}` — Then it all happens again, sixty times a second.
 <!-- /look-at-the-code -->
+
+Wait. The wall is on the left, and the car turns left. Toward the wall? Yes, because that's the inside of the turn, and the inside line is shorter. The car is cutting the corner, like a racer. Nobody explained that to it. We told it only one thing: get further, and finish faster. It found the rest on its own.
+
+![How the champions of generation 1 and generation 80 drive the hairpin](docs/img/guide-08-racing-lines.webp)
+
+*Generation 1 drives down the middle; generation 80 hugs the inside wall.*
+
+To be fair, it's not a perfect racing line. A real racer swings wide before the turn; ours just hugs the inside wall. Nobody taught it that either.
+
+And the surprising part: the brain of the generation 80 champion is the same 70 taps as its random ancestor from generation 1. Nothing was added. 62 of the 70 taps are just turned differently.
 
 For the curious: [Deep dive →](DEEP-DIVE.md#5-reading-a-brain)
 
 ---
 
-## 6. Me vs the AI
+## 9. How well did it learn?
 
-**My best lap against the best car of each generation, side by side.**
+[▶ watch this part](VIDEO_URL&t=823)
 
-It's like racing your own ghost in a video game. Here, the ghost is me. The challenger is a car that taught itself.
+How well does it drive? "Fast" isn't enough; we need something to compare it to. So we set up four benchmarks:
 
-![The scoreboard: me 2, AI 4](docs/img/simple-6-scoreboard.svg)
+- **Someone driving this game for the first time** (that's me): 26.40 seconds.
+- **A regular program with no AI at all**, following the rule "stay in the middle and brake before turns". A careful setting: 17.25 seconds. The best of 980 settings: 12.68 seconds.
+- **The floor for driving down the middle**: stay in the center at full speed, no brakes: 11.93 seconds. You can't go faster down the middle. Cutting corners, you can.
 
-Both cars drive their best lap at the same moment, and they can't bump into each other. In generation 1 the AI never finishes a lap, so I win. In generation 5 it finishes, but I'm still faster, by about 4 seconds. From generation 10 on, it wins every race.
+![The best lap of each generation against the four benchmarks](docs/img/guide-09-lap-chart.webp)
 
-**Final score: me 2, AI 4.**
+*The best lap time of every generation, with the four benchmarks as lines.*
 
-**What really happened:** the first time the AI beat me, in generation 10, it won by about 13 seconds. Its lap took half as long as mine. And it's a fair fight: both cars drive their best lap, and each one starts exactly where that lap really began.
+Now watch the time drop. Generation 6 is the first faster than me. Around generation 20, it's faster than the best setting of the rule-based program; the first one under 12.68 seconds is generation 19, at 12.67. Without a single rule.
 
-<!-- look-at-the-code
-file: src/sim/race.js
-function: raceResult
-title: who won?
-intro: When both cars are done, this decides the race.
-export function raceResult(race) { => Who won this race, and by how much?
-  const { me, ai } = race; => Take my car and the AI's car out of the race.
-  if (!race.over) return null; => Still racing: no result yet.
-  if (!ai.finishSteps) { => If the AI never finished its lap...
-    return { winner: 'me', by: null, aiOut: ai.out, aiProgress: progressShare(ai), meSteps: me.finishSteps, aiSteps: null }; => ...I win by default. Note how it got out and how far it got.
-  } => Otherwise both finished:
-  const diff = me.finishSteps - ai.finishSteps; => How many more ticks my lap took than the AI's.
-  let winner = 'tie'; => Start by calling it a tie.
-  if (diff > 0) winner = 'ai'; => If my lap took longer, the AI wins.
-  if (diff < 0) winner = 'me'; => If mine was shorter, I win.
-  return { winner, by: Math.abs(diff) / STEPS_PER_SECOND, meSteps: me.finishSteps, aiSteps: ai.finishSteps }; => The winner, and the gap in seconds (60 ticks are 1 second).
-} => End.
--->
-> **Look at the code: who won?**
-> When both cars are done, this decides the race.
->
-> ```js
-> export function raceResult(race) {
->   const { me, ai } = race;
->   if (!race.over) return null;
->   if (!ai.finishSteps) {
->     return { winner: 'me', by: null, aiOut: ai.out, aiProgress: progressShare(ai), meSteps: me.finishSteps, aiSteps: null };
->   }
->   const diff = me.finishSteps - ai.finishSteps;
->   let winner = 'tie';
->   if (diff > 0) winner = 'ai';
->   if (diff < 0) winner = 'me';
->   return { winner, by: Math.abs(diff) / STEPS_PER_SECOND, meSteps: me.finishSteps, aiSteps: ai.finishSteps };
-> }
-> ```
->
-> 1. `export function raceResult(race) {` — Who won this race, and by how much?
-> 2. `const { me, ai } = race;` — Take my car and the AI's car out of the race.
-> 3. `if (!race.over) return null;` — Still racing: no result yet.
-> 4. `if (!ai.finishSteps) {` — If the AI never finished its lap...
-> 5. `return { winner: 'me', by: null, aiOut: ai.out, aiProgress: progressShare(ai), meSteps: me.finishSteps, aiSteps: null };` — ...I win by default. Note how it got out and how far it got.
-> 6. `}` — Otherwise both finished:
-> 7. `const diff = me.finishSteps - ai.finishSteps;` — How many more ticks my lap took than the AI's.
-> 8. `let winner = 'tie';` — Start by calling it a tie.
-> 9. `if (diff > 0) winner = 'ai';` — If my lap took longer, the AI wins.
-> 10. `if (diff < 0) winner = 'me';` — If mine was shorter, I win.
-> 11. `return { winner, by: Math.abs(diff) / STEPS_PER_SECOND, meSteps: me.finishSteps, aiSteps: ai.finishSteps };` — The winner, and the gap in seconds (60 ticks are 1 second).
-> 12. `}` — End.
-<!-- /look-at-the-code -->
+After that, almost nothing changes. From generation 20 to generation 80, the best lap went from 12.65 to 12.47 seconds: less than two tenths. In this run it went like this: a fast jump first, then slow polishing.
 
-For the curious: [Deep dive →](DEEP-DIVE.md#6-me-vs-the-ai)
+But every one of these measurements was on the track it trained on. That turns out to be a very important catch.
+
+For the curious: [Deep dive →](DEEP-DIVE.md#6-how-well-did-it-learn)
 
 ---
 
-## 7. Did it learn, or memorize?
+## 10. Learned or memorized?
 
-**A car that really learned to drive should handle a track it has never seen.**
+[▶ watch this part](VIDEO_URL&t=894)
 
-Think of a student who memorized last year's exam answers. They score perfectly on last year's exam, and they're lost on a new one.
+A student who memorized last year's exam gets an A on that exam. On a new one? With AI too, you have to test on something it has never seen, or you can't tell learning from memorizing.
 
-![On the exam track: trained on one track, the car reverses into the wall; trained on three, they crash; trained on four, it drives clean laps](docs/img/simple-7-exam.svg)
+![What the car trained on, and what we test it on](docs/img/guide-10-stacks.webp)
 
-We built new tracks with the same road and the same rules, and let the best cars try them with no practice. On a wiggly track and on a fast, curvy one, almost every car drove fine. Then we turned the home track around and drove it the other way. The best car of generation 80, the one that beat me by 14 seconds, reached the hairpin at full speed. It stopped dead, kept holding the brake (which in this game means reverse), and backed into the wall.
+*Train on one thing, test on another: the only way to tell learning from memorizing.*
 
-**What really happened:** some earlier champions did get round that backwards track. So the honest answer is: both. It learned to drive, and the cars that trained the longest also learned tricks that only work at home. That last part is our best guess, not something we measured.
+The simplest test: the same track, driven the other way. Now the hairpin turns right instead of left.
 
-Then came the final exam: a track nobody had ever trained on, with a hairpin that turns right. I drove it first, and my best lap took 32 seconds. Then the champions tried. The early ones drove clean laps, more than twice as fast as me, and in a race against my lap the car won easily. The champion of generation 80 did exactly what it did on the backwards track: it stopped dead in the hairpin and reversed into the wall.
+The champions of generations 10 and 20 drive it almost as fast as their home track: 13.33 and 13.20 seconds. They really did carry something over to the new track.
 
-We had also trained new cars on three different tracks at once, hoping that would make them better drivers. It didn't: every one of them crashed on the exam. Our best guess is that none of those three tracks has a hairpin that turns right, so they never learned one.
+But the champion of generation 80, the fastest of them all, flies into the hairpin, brakes to a full stop, and keeps holding the brake. From a standstill, the brake means reverse, so it backs straight into the wall.
 
-So we tried once more, and we say openly that we decided this after seeing the exam. New cars trained on four tracks, adding the backwards home track, which has a hairpin that turns right. Then they took the exam, just once. This time every champion except the very first, random one finished a lap, and the best one beat my lap by even more. But we picked this fix after seeing the exam, so this second try proves less than a first try would.
+Why it won't let go of the brake, we don't know for sure. We do know this: when the car is reversing, its speed sensor reads zero. That's how we built it, so to the car, "standing still" and "going backwards" look exactly the same. A network only knows what its sensors tell it; a bad sensor is a blind spot.
 
-<!-- look-at-the-code
-file: src/sim/exam.js
-function: countExamLap
-title: my first 3 laps, and not one more
-intro: This is how the game makes sure only my first 3 laps on Exam count.
-export function countExamLap(record, lap) { => A lap on Exam just ended. Does it count?
-  if (record.laps.length >= COUNTED_LAPS) return false; => If 3 laps have already counted, no. However fast this one was.
-  record.laps.push({ steps: lap.steps, start: lap.start, inputs: lap.inputs }); => Otherwise, save it: its time, where it started, and every key I pressed.
-  return true; => Yes, it counted.
-} => End.
--->
-> **Look at the code: my first 3 laps, and not one more**
-> This is how the game makes sure only my first 3 laps on Exam count.
->
-> ```js
-> export function countExamLap(record, lap) {
->   if (record.laps.length >= COUNTED_LAPS) return false;
->   record.laps.push({ steps: lap.steps, start: lap.start, inputs: lap.inputs });
->   return true;
-> }
-> ```
->
-> 1. `export function countExamLap(record, lap) {` — A lap on Exam just ended. Does it count?
-> 2. `if (record.laps.length >= COUNTED_LAPS) return false;` — If 3 laps have already counted, no. However fast this one was.
-> 3. `record.laps.push({ steps: lap.steps, start: lap.start, inputs: lap.inputs });` — Otherwise, save it: its time, where it started, and every key I pressed.
-> 4. `return true;` — Yes, it counted.
-> 5. `}` — End.
-<!-- /look-at-the-code -->
+And the bigger point: the longer the car trained on one track, the more it tuned itself to the turns of that one track. This is called **overfitting**: the model learned what it saw so well that it handles new things worse.
 
 For the curious: [Deep dive →](DEEP-DIVE.md#7-did-it-learn-or-memorize)
 
 ---
 
-## 8. Make your own track
+## 11. The exam
 
-**Draw any track you like. The cars can drive it, learn it, or fail on it, and a link carries it to a friend.**
+[▶ watch this part](VIDEO_URL&t=975)
 
-Think of a toy train set. You lay the rails in any shape you want, and the same little train runs on every layout.
+To make the test fair, we built one more track: the exam. And before any testing, we wrote down a rule: nobody trains on this track, ever. It's only for testing.
 
-![On a track I drew, the best car of generation 80 crawls round the hairpin once, then reverses into the wall](docs/img/simple-8-paperclip.svg)
+![The Exam track with a padlock: testing only, never trained on](docs/img/guide-11-exam-lock.webp)
 
-Press T in the game and pick "Edit / new track". Click on the screen to place points, and the road joins them into a loop. Drag a point to move it. The road is always the same width, and the car is the same car. The first point is the start line.
+*The exam track. Locked for training, open only for testing.*
 
-The game checks your track while you draw. If the road crosses itself, a turn is too tight, or the track runs off the screen, it says so in plain words, and you can't drive it until it's fixed.
+First, I drove it myself, also for the first time: 54.03 seconds, then 44.30, then 32.02. In three laps I got almost twice as fast.
 
-Then the whole track fits in a link: every point becomes 4 letters. Send the link, and a friend opens exactly your track. On it you can drive, let a saved champion try, or let new cars learn it from scratch.
+![My first three laps on the exam track](docs/img/guide-11-my-laps.webp)
 
-**What really happened:** I drew a track with a hairpin that turns right, and called it Paperclip. The best car of generation 80 crawled round that hairpin on its first lap. On the second lap it stopped in the same hairpin, kept holding the brake, and reversed into the wall. Some older champions drove it without a problem.
+*My first three laps on the exam track. I learned while I drove.*
 
-<!-- look-at-the-code
-file: src/sim/share-link.js
-function: encodeTrack
-title: how a track becomes a link
-intro: The points you clicked go in, and the letters for the link come out.
-export function encodeTrack(points) { => It gets the points you clicked. Each point is two numbers: x (how far across the screen) and y (how far down).
-  if (isExamShape(points)) throw new Error('Exam is held out: it never goes in a link'); => If these are exactly the Exam track's points, stop with an error: Exam stays secret, so it never goes in a link. (`throw` means "stop everything and report a problem".)
-  let link = LINK_VERSION; => The link starts with "1": which version of this recipe wrote it.
-  for (const [x, y] of points) { => For every point, take out its two numbers, x and y.
-    for (const n of [x, y]) { => Do the same thing for x and then for y:
-      link += LETTERS[Math.floor(n / 64)]; => How many whole 64s fit into the number? (`Math.floor` rounds down.) Add the letter at that place in the list of 64 letters...
-      link += LETTERS[n % 64]; => ...then add the letter for what's left over. (`%` means "the leftover after dividing".) Two letters can stand for any number up to 4095.
-    } => Both numbers done: 4 letters for this point.
-  } => Every point done.
-  return link; => The finished letters. In the web address they go after "?t=".
-} => End.
--->
-> **Look at the code: how a track becomes a link**
-> The points you clicked go in, and the letters for the link come out.
->
-> ```js
-> export function encodeTrack(points) {
->   if (isExamShape(points)) throw new Error('Exam is held out: it never goes in a link');
->   let link = LINK_VERSION;
->   for (const [x, y] of points) {
->     for (const n of [x, y]) {
->       link += LETTERS[Math.floor(n / 64)];
->       link += LETTERS[n % 64];
->     }
->   }
->   return link;
-> }
-> ```
->
-> 1. `export function encodeTrack(points) {` — It gets the points you clicked. Each point is two numbers: x (how far across the screen) and y (how far down).
-> 2. `if (isExamShape(points)) throw new Error('Exam is held out: it never goes in a link');` — If these are exactly the Exam track's points, stop with an error: Exam stays secret, so it never goes in a link. (`throw` means "stop everything and report a problem".)
-> 3. `let link = LINK_VERSION;` — The link starts with "1": which version of this recipe wrote it.
-> 4. `for (const [x, y] of points) {` — For every point, take out its two numbers, x and y.
-> 5. `for (const n of [x, y]) {` — Do the same thing for x and then for y:
-> 6. `link += LETTERS[Math.floor(n / 64)];` — How many whole 64s fit into the number? (`Math.floor` rounds down.) Add the letter at that place in the list of 64 letters...
-> 7. `link += LETTERS[n % 64];` — ...then add the letter for what's left over. (`%` means "the leftover after dividing".) Two letters can stand for any number up to 4095.
-> 8. `}` — Both numbers done: 4 letters for this point.
-> 9. `}` — Every point done.
-> 10. `return link;` — The finished letters. In the web address they go after "?t=".
-> 11. `}` — End.
-<!-- /look-at-the-code -->
+I was learning while I drove. The car can't: its taps don't change during a run; only its descendants learn.
 
-For the curious: [Deep dive →](DEEP-DIVE.md#8-make-your-own-track)
+Then the cars. Generations 10 and 20 pass the exam. Generation 80 backs into the wall again, the same way as on the reversed track. The more "experienced" champion failed where the "half-trained" ones made it.
+
+For the curious: [Deep dive →](DEEP-DIVE.md#the-exam-step-7b)
 
 ---
 
-*Simple, but never wrong: every number here is real and comes from the actual program. The [deep dive](DEEP-DIVE.md) has the precise values and how to check each one yourself.*
+## 12. The fix
+
+[▶ watch this part](VIDEO_URL&t=1022)
+
+The obvious fix: train on several tracks. We wrote this plan down before the exam: add two new tracks, retrain from scratch, and score each car by the sum of its scores on all three.
+
+We tested the champions of generations 10, 20, 80 and 100 from that training run on the exam. Zero out of four. Three of them crash right in the right-hand hairpin. The fourth gets through it, and crashes a few turns later.
+
+![Zero of four: the three-track champions on the exam](docs/img/guide-12-zero-of-four.webp)
+
+*Trained on three tracks, tested on the exam: none of the four finished a lap.*
+
+Why? Look at the training tracks. Not one of them has a turn to the right this tight. More tracks didn't help, because the case it needed wasn't among them.
+
+![The training tracks and the exam, with their sharp right-hand turns marked](docs/img/guide-12-training-tracks.webp)
+
+*The sharpest right-hand turn in training is wider than both of the exam's.*
+
+So we added the reversed track, the one with the right-hand hairpin, to training. We made this decision after the exam. The same four generations on the exam: four out of four. And the fastest exam lap of any car so far: 13.25 seconds.
+
+![Four of four, and the best exam lap so far](docs/img/guide-12-four-of-four.webp)
+
+*Trained on four tracks, one of them with a right-hand hairpin: all four pass.*
+
+The car didn't get smarter. It just saw the right kind of turn.
+
+To be honest: we adjusted training based on the exam results, so the exam is no longer an independent test. A real test now needs a new track nobody has seen. That's a core rule of machine learning: a test you've fixed things against isn't a test any more.
+
+![The exam crossed out, next to an empty outline of a track nobody has seen](docs/img/guide-12-exam-retired.webp)
+
+*Once we fixed things against the exam, it stopped being a fair test.*
+
+For the curious: [Deep dive →](DEEP-DIVE.md#step-7c-one-more-try-decided-after-the-exam)
+
+---
+
+## 13. Retro
+
+[▶ watch this part](VIDEO_URL&t=1114)
+
+![The sprint retro: what got done, what broke, what we learned](docs/img/guide-13-retro.webp)
+
+*Done, broke, learned: the whole project on one board.*
+
+Three things to take away:
+
+1. **A neural network isn't magic.** Ours is 70 numbers that turn sensor readings into button presses. Training finds those numbers. We did it with evolution: score, select, copy with typos.
+2. **Test on what the model hasn't seen.** The fastest car on its own track turned out to be the worst on a new one.
+3. **Train on different situations.** More tracks didn't help, until one of them had the right kind of turn.
+
+For the curious: [Deep dive →](DEEP-DIVE.md)
+
+---
+
+## 14. Your turn: the track editor
+
+[▶ watch this part](VIDEO_URL&t=1146)
+
+The game has a track editor: press T, choose "Edit / new track", and click to add points. It checks the track as you draw and says, in plain words, when a turn is too tight or the road runs into itself. A ready track can be driven, given to a champion, or shared as a link.
+
+![A finished track in the editor, ready to drive](docs/img/guide-14-editor.webp)
+
+*A drawn track that passed every check: "Ready". Its right-hand hairpin is the trap.*
+
+**The challenge:** draw a track that makes the generation 80 champion crash, and drop the link in the comments under the video.
+
+The links to the game, this guide and every prompt are in the video description. With the code on your computer, run `npx serve` in its folder and open the address it prints; press Tab to let the AI drive.
+
+For the curious: [Deep dive →](DEEP-DIVE.md#8-make-your-own-track)
