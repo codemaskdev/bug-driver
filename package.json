@@ -4,6 +4,9 @@
   "type": "module",
   "description": "No dependencies. This file only tells Node that src/ uses ES modules, so the simulation runs headless in tests.",
   "scripts": {
-    "test": "node --test tests/"
+    "test": "node tools/run-tests.js"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
