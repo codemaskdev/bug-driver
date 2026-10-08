@@ -646,3 +646,12 @@ Prompt 21. Docs and the fact-check tool only (69 tests pass).
 - HOW-IT-WORKS.md, chapter 6: the paragraph above the ranking picture said "the best parent got 20 of the 99 children and the tenth got 1": that's generation 4 to 5, while the picture shows generation 1 to 2. Now it quotes the picture's step: the best parent got 15, the second 16, the tenth 1 (worked out again by breeding seed 3's generation 1 with `nextGeneration()`). The deep dive keeps generation 4 to 5, next to its own figure of that generation.
 - tools/guide-facts.js: every fact names its step or run, every picture of HOW-IT-WORKS.md says which it shows, and a number in a picture's caption or in the paragraph right above it must come from that step or run, or be a rule of the game. Tested by putting the old sentence back: it fails with "20 comes from seed 3, gen 4→5". 52 of 52 facts confirmed.
 - Release note (CLAUDE.md): `VIDEO_URL` becomes the full `https://www.youtube.com/watch?v=<ID>`, not youtu.be, so the `&t=` links work.
+
+## 2026-10-08 — The video is up: watch links (36e3e90)
+
+Prompt 22. Docs and the page build only (69 tests pass, guide-facts.js: 52 of 52 facts confirmed).
+
+- HOW-IT-WORKS.md: the 14 `VIDEO_URL&t=` links are now `https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=` (t = 51 … 1146 s, the video's chapter times), the full watch form so the times work. DEEP-DIVE.md had no placeholder. docs/guide/index.html rebuilt (56 figures, still self-contained).
+- tools/guide-page.js fails the build on a left-over `VIDEO_URL` or a youtu.be link; checked by putting one placeholder back.
+- The chapter 6 numbers (generation 1 to 2: 15, 16, …, 1 children) were already fixed in 14c53cf.
+

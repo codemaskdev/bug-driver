@@ -555,3 +555,16 @@ Also note for release: VIDEO_URL must be replaced with the full form https://www
 
 Built: chapter 6 of HOW-IT-WORKS.md now quotes the step its picture shows (generation 1 to 2: 15, 16, …, 1 children); every fact in tools/guide-facts.js names its step or run, and a number in a picture's caption or the paragraph above it must come from the picture's own step or run; CLAUDE.md notes the full youtube.com/watch?v= form for VIDEO_URL.
 What broke: nothing. Put back on purpose, the old sentence fails the new rule ("20" comes from seed 3, gen 4→5).
+
+## 22. The video is up: the guide's watch links
+
+````text
+The video is uploaded (private). Replace the placeholder in both guides: VIDEO_URL -> https://www.youtube.com/watch?v=xQIbVdU7Gn8
+(so links become https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=51 etc.). Rebuild the guide pages, re-run guide-facts.js and tests.
+Also apply the pending guide fix (chapter 6: 15 / 16 / 1 children for the generation 1→2 step) if not done yet.
+Commit as CodeMask. Then push bug-driver to GitHub (the repo stays private for now). Report the commit hashes and the push result.
+````
+
+Built: the 14 "▶ watch this part" links of HOW-IT-WORKS.md are https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=<seconds> (36e3e90); DEEP-DIVE.md had no placeholder (it has no watch links). The chapter 6 fix (15 / 16 / 1) was already in (14c53cf). tools/guide-page.js now refuses a left-over VIDEO_URL or a youtu.be link.
+What broke: nothing. Put back on purpose, one placeholder fails the page build ("a video link is still the placeholder").
+
