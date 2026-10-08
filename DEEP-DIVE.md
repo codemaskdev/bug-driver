@@ -13,9 +13,12 @@ Every number in this guide is real. It comes from the actual program, not from a
 3. [Brain](#3-brain)
 4. [Evolution](#4-evolution)
 5. [Reading a brain](#5-reading-a-brain)
-6. [Me vs the AI](#6-me-vs-the-ai)
+6. [How well did it learn?](#6-how-well-did-it-learn)
 7. [Did it learn, or memorize?](#7-did-it-learn-or-memorize)
+8. [Make your own track](#8-make-your-own-track)
 - [Glossary](#glossary)
+
+The video's chapters and these line up: Three words is chapter 0, The World 1, Eyes 2, Generation 1 and The Brain 3, Evolution and Stuck 4, Reading the Brain 5, How well did it learn? 6, Learned or memorized?, The exam and The fix 7, and the track editor 8.
 
 ---
 
@@ -314,12 +317,80 @@ A sum can be any size: 0.2, or 40, or −300. **Squashing** turns any number int
 
 A group of neurons that all look at the same inputs is called a **layer**. So this brain has two layers.
 
+**Why the hidden layer?** Its neurons mix the inputs together. Take h6 at the hairpin moment (the table above): of its six terms, two are much bigger than the rest. The wall **ahead** fills it, +0.730, and the **left 60°** eye drains it, −0.987. So h6 rises when there's a wall straight ahead, and a wall close on the left pulls it back down. A single input can't express "ahead, but not on the left"; a hidden neuron can.
+
 **The whole brain is 70 numbers.** Count them:
 - hidden layer: 6 neurons × (6 weights + 1 bias) = 42
 - output layer: 4 neurons × (6 weights + 1 bias) = 28
 - 42 + 28 = **70**
 
 In the code, it's literally one list of 70 numbers. Nothing else is stored. Everything a car "knows" about driving is in those 70 numbers.
+
+### Where the water-pipe picture simplifies
+The video explains the network as water pipes: a pipe from every sensor, a tap on every pipe, tanks that fill and drain, a button pressed when its tank is above halfway. It's a good picture, and here is exactly where it stops being true:
+- **Numbers can be negative; water can't.** The inputs are 0 to 1, but the hidden neurons (the middle tanks) give −1 to 1 (tanh), and the weights (taps) can be negative too: the seed 3 champions' weights run from −1.96 to +2.28. A "drain tap" is a negative weight. A negative number through a drain tap becomes positive: h6's −0.914 times LEFT's weight −0.615 is **+0.562**, the biggest push toward LEFT at the hairpin.
+- **Nothing flows over time.** Every tank is recomputed from scratch on every step, from that step's 6 inputs. There's no water left over from the step before: the brain has no memory at all.
+- **The "halfway mark" is the sigmoid's 0.5.** The button tanks give 0 to 1, and above 0.5 means pressed. The middle tanks don't have a halfway mark; their value just passes on.
+- **The bias is a tank's own fixed inflow or outflow.** It's added whatever the sensors say.
+- **The squeeze isn't a tank shape.** It's a function (tanh or sigmoid, above) applied to the total.
+
+### The same neuron in 4 languages
+The video shows one neuron in four languages. JavaScript is what the game is written in, because it runs in the browser. The JavaScript version here is simplified for comparison: it takes its weights as their own list instead of reading them out of the brain's 70 numbers like the real `neuron()` above. All four do the same steps: multiply, add up, add the bias, squeeze.
+
+```js
+function neuron(inputs, weights, bias) {
+  let sum = bias;
+  for (let i = 0; i < inputs.length; i++)
+    sum += inputs[i] * weights[i];
+  return Math.tanh(sum);
+}
+```
+
+Python, the main language of machine learning:
+
+```python
+import math
+def neuron(inputs, weights, bias):
+    total = bias
+    for x, w in zip(inputs, weights):
+        total += x * w
+    return math.tanh(total)
+```
+
+C++, where speed matters:
+
+```cpp
+#include <cmath>
+#include <vector>
+double neuron(const std::vector<double>& inputs,
+              const std::vector<double>& weights, double bias) {
+    double sum = bias;
+    for (size_t i = 0; i < inputs.size(); ++i)
+        sum += inputs[i] * weights[i];
+    return std::tanh(sum);
+}
+```
+
+And Python with the NumPy library, where nobody writes the loop by hand: the whole neuron is one line.
+
+```python
+np.tanh(np.dot(weights, inputs) + bias)
+```
+
+`np.dot` multiplies each input by its weight and adds them all up in one go. These are the same code windows as in the video, and they use tanh, the squash of the hidden neurons; the game's output neurons use sigmoid instead.
+
+### Why this kind of network and this kind of training
+**The kind of network.** Ours is the simplest kind there is: every input connected to every hidden neuron, every hidden neuron to every output, the signal going one way only. It's often called a *multilayer perceptron* (MLP) or a *fully connected* network. Other kinds are built for other jobs:
+- **Image networks** (convolutional networks, CNNs) look at small patches of a picture at a time, so they can find the same shape anywhere in it.
+- **Networks for sequences** (recurrent networks, RNNs) keep a little memory from one step to the next.
+- **Transformers**, the kind ChatGPT and Claude run on, look at every word of a text at once and work out which words matter to which.
+
+Our car has 6 numbers in and needs 4 decisions out, with no picture and no text, so the simplest kind is enough. The upside: it's small enough to show every one of its 70 numbers.
+
+**The kind of training.** There are three common ways to find a network's numbers:
+- **Supervised learning:** show it many examples with the correct answer ("in this situation, press left") and adjust the numbers until it gives those answers. It needs the correct answers. Where would they come from? Recording my driving would teach it to drive like me, mistakes included.
+- **Reinforcement learning:** let it act, give it rewards and penalties along the way, and adjust the numbers a little after each experience, usually with calculus (gradients). It needs no correct answers, but a lot more machinery.
+- **Neuroevolution**, what we use: try whole brains, give each one a score at the end of its run, keep the best and copy them with small random changes (chapter 4). It needs only a score. No correct answers, no calculus.
 
 ### Generation 1: random brains, glorious chaos
 At the start, nobody knows good numbers. So the first 100 brains get 70 random numbers each, between −1 and 1, from the seed. These 100 cars together are **generation 1**. They start together, and they can't hit each other, only the walls.
@@ -330,18 +401,20 @@ A car is out when it crashes, or when it goes 3 seconds without reaching a new c
 
 *Seed 2, generation 1, 1.5 seconds in: 26 of the 100 cars have already crashed (pink), 74 are still going, mostly nowhere.*
 
+**How generation 1 ended, in the official run (seed 3): 76 cars were out by the 3-second rule (they stalled) and 24 crashed into a wall.** Every car is out in exactly one of these two ways, so 76 + 24 = 100. Some drove off backwards first. One, car 1-85, got 65.1% of the way round before it crashed.
+
 Generation 1 for 5 different seeds:
 
-| seed | barely moved | went backwards | crashed in the first 2 s | best car got | best car was out by |
-| --- | --- | --- | --- | --- | --- |
-| 1 | 57 | 16 | 25 | 14.5% of a lap | a crash at 2.97 s |
-| 2 | 46 | 17 | 28 | 20.6% | a stall at 6.97 s |
-| 3 | 61 | 20 | 14 | 65.1% | a crash at 11.40 s |
-| 4 | 68 | 5 | 22 | 49.6% | a crash at 6.52 s |
-| 5 | 48 | 23 | 28 | 50.6% | a crash at 6.62 s |
+| seed | out: stalled | out: crashed | barely moved | went backwards | crashed in the first 2 s | best car got | best car was out by |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 67 | 33 | 57 | 16 | 25 | 14.5% of a lap | a crash at 2.97 s |
+| 2 | 60 | 40 | 46 | 17 | 28 | 20.6% | a stall at 6.97 s |
+| 3 | 76 | 24 | 61 | 20 | 14 | 65.1% | a crash at 11.40 s |
+| 4 | 70 | 30 | 68 | 5 | 22 | 49.6% | a crash at 6.52 s |
+| 5 | 60 | 40 | 48 | 23 | 28 | 50.6% | a crash at 6.62 s |
 
-"Barely moved" means never got one car length (36 px) away from the start. "Went backwards" means it ended more than 36 px behind the start. A car can be in more than one column. No car finished a lap.
-*Reproduce it: `node tools/generation-report.js`.*
+The first two columns say how each car got out, and they add up to 100. The next three measure something else, so don't add them to those: "barely moved" means never got one car length (36 px) away from the start, "went backwards" means it ended more than 36 px behind the start, and a car can be in several of these at once (in seed 3, 58 of the 61 cars that barely moved were then taken out by the 3-second rule). No car finished a lap.
+*Reproduce it: `node tools/generation-report.js` for the last five columns; `node tools/guide-facts.js` counts how every car got out (`out: stalled` and `out: crashed`).*
 
 Seed 3's best random brain got 65% of the way round on pure luck. Random numbers can sometimes drive a bit. They just can't drive well.
 
@@ -460,7 +533,7 @@ A car that finished a lap always beats one that didn't.
 ### Four steps from one generation to the next
 1. **Selection:** rank all 100 by fitness and keep the top 10 as **parents**.
 2. **Elitism:** the single best brain goes into the next generation unchanged. The simulation always plays out the same way, so this copy drives exactly the same run again. That means the best can never get worse.
-3. **Mutation:** each of the other 99 **children** is a copy of one parent's 70 numbers. Better parents are picked more often: the best of the 10 ten times as often as the 10th. Then each of the 70 numbers has a 10% chance of a small random nudge. Most nudges are small, a few are bigger; a typical one is about 0.3.
+3. **Mutation:** each of the other 99 **children** is a copy of one parent's 70 numbers. The better the parent, the better its chances to have children: each child's parent is drawn at random, with the best of the 10 ten times as likely as the 10th (tickets 10 : 9 : … : 1). Chances, not a fixed share: from generation 4 to 5 the ten parents, best first, got 20, 17, 17, 11, 10, 11, 4, 4, 4 and 1 children. Then each of the 70 numbers has a 10% chance of a small random nudge. Most nudges are small, a few are bigger; a typical one is about 0.3.
 4. **Next generation:** 1 elite + 99 children = 100 new cars. Run them, and repeat.
 
 There is no "crossover" (mixing two parents). One parent per child keeps it simple.
@@ -481,7 +554,7 @@ There is no "crossover" (mixing two parents). One parent per child keeps it simp
 - **Generation 4:** the first lap ever, by car 4-78, in 38.18 s. Slower than me. 2 cars finished a lap that generation.
 - **Generation 6:** the best lap is 19.25 s, already faster than my 26.40 s.
 - **Generation 10:** 13.17 s, and 40 of the 100 cars finish a lap.
-- **Generation 20:** 12.65 s, faster than the best hand-written test driver (12.68 s).
+- **Around generation 20:** faster than the best hand-written test driver (12.68 s). The first lap under it is generation 19's, 12.67 s, by one step; generation 20 drives 12.65 s.
 - **Generation 100:** 12.43 s, about half a second off the theoretical floor (11.93 s).
 
 The average fitness keeps jumping around. That's because most children are a bit worse than their parents: mutation is mostly a gamble that doesn't pay. The best line only goes up, thanks to the elite copy.
@@ -521,7 +594,7 @@ This is called a **local optimum**: a dead end that looks like the top. From whe
 
 We picked **seed 3** as the official one for the video, and we picked it after seeing this table. That's a choice, and we say so:
 - It learned first.
-- At generation 5 it already finished a lap but was still slower than me (30.02 s against 26.40 s). That's a real "I'm still winning" moment before it overtakes me.
+- At generation 5 it already finished a lap, still slower than my 26.40 s benchmark (30.02 s), so the moment it gets faster than a first-time human driver is visible, at generation 6.
 - From generation 10 on, it's the fastest of the five at every checkpoint generation.
 
 Four of the five seeds learned to drive. One never did.
@@ -634,7 +707,7 @@ export function nextGeneration(evo) {
 1. **The eye.** The left 60° eye sees the hairpin's inner wall 23.3 px away.
 2. **The input.** A close wall becomes a big number: 0.883.
 3. **Hidden neuron h6.** Its biggest term is that eye: 0.883 × −1.117 = −0.987. With the other 5 terms and the bias, its total is −1.554. Squashed, that's −0.914.
-4. **The LEFT key.** Of LEFT's 6 terms, h6's is the biggest push: −0.914 × −0.615 = +0.562. A negative times a negative is a positive, so a strongly negative h6 pushes LEFT up. LEFT's sum is 1.758, plus its bias −1.086, total 0.672. Squashed: 0.662.
+4. **The LEFT key.** Every input plays a part, but the biggest contribution comes from the left 60° eye, through h6: of LEFT's 6 terms, h6's is the biggest push, −0.914 × −0.615 = +0.562. A negative times a negative is a positive, so a strongly negative h6 pushes LEFT up. LEFT's sum is 1.758, plus its bias −1.086, total 0.672. Squashed: 0.662.
 5. **The decision.** 0.662 is more than 0.5, so **LEFT is pressed**. BRAKE is pressed too (0.549). GAS (0.486) and RIGHT (0.356) are not.
 
 Every number here is exactly what the brain computed in that step. A test checks this on 100 random moments, down to the 9th decimal.
@@ -726,38 +799,60 @@ export function outputs(brain, inputs) {
 
 ---
 
-## 6. Me vs the AI
+## 6. How well did it learn?
 
-**The one idea:** my best lap and the AI's best lap drive at the same time, side by side, and the clock decides.
+**The one idea:** "fast" means nothing on its own, so we measure the cars against fixed benchmarks: a first-time human driver, a regular program with no AI, and the floor for driving down the middle.
 
-**Analogy:** racing your own ghost in a video game. Here the ghost is my recorded lap, and the challenger is a car that taught itself.
+**Analogy:** a stopwatch with marks on it. A runner's time only means something next to the school record, the club record and the world record.
 
 **Key figure**
 
-![The scoreboard: me 2, AI 4](docs/img/06-scoreboard.svg)
+![The best lap of each generation against the four benchmarks](docs/img/guide-09-lap-chart.webp)
 
-*My best lap (26.40 s) against the best car (the champion) of each of the six fixed generations of seed 3. I win generations 1 and 5; the AI wins 10, 20, 40 and 80. Final score 2 : 4 to the AI. Built only from the saved files: my ghost lap and the champions file.*
+*Seed 3's best lap time, generation by generation, against the four benchmarks. Marked: generation 6, the first faster than my lap, and generation 19, the first faster than the best rule setting.*
 
-### The rules of a race
+**The four benchmarks** (all on Neon Loop, the training track):
+
+| benchmark | lap | what it is |
+| --- | --- | --- |
+| me | 26.40 s | my best lap, driving the game for the first time (`ghosts/me-v3.json`) |
+| careful rule | 17.25 s | a regular program: "stay in the middle, brake before turns", careful settings |
+| best of 980 rule settings | 12.68 s | the same program, the fastest of the 980 settings we tried |
+| centre-line floor | 11.93 s | flat out down the middle line all the way round, no brakes: you can't go faster down the middle |
+
+*Reproduce it: `node tools/reference-lap.js` for the three program laps; my lap replays with `node --test tests/ghost.test.js`.*
+
+**Real numbers: the first generation under each benchmark** (seed 3, best lap of each generation, `runs/seed-3.json`):
+- **Me (26.40 s):** generation 6, 19.25 s. Generation 5 was still slower, 30.02 s.
+- **Careful rule (17.25 s):** generation 8, 15.43 s.
+- **Best of 980 rule settings (12.68 s):** generation 19, 12.67 s, by one step. "Around generation twenty", as the video puts it.
+- **Centre-line floor (11.93 s):** never. The best lap of the whole run is 12.43 s (generation 100): cutting the corners gets it close, not under.
+
+**Then the plateau.** From generation 20 to generation 80 the best lap went from 12.65 s to 12.47 s: 0.18 s in 60 generations, less than two tenths. In this run it went like this: a fast jump first, then slow polishing.
+
+**The catch:** every one of these laps was on Neon Loop, the track it trained on. That's what chapter 7 tests.
+
+### Comparing laps: the race mode
+The game can also drive my lap and a champion's at the same time, so the comparison can be watched instead of read. It's the same benchmark, my lap, shown as a race.
 - My car (cyan) replays my ghost: the exact keys I held on each of my 1584 steps.
 - The AI's car (yellow) is driven live by the champion's brain, step by step, exactly as in chapter 3.
 - They start together and don't collide: each drives in its own copy of the world.
 - **Best lap vs best lap.** My 26.40 s lap was a *flying lap*: I crossed the start line already moving, at 142 px/s. So the AI also drives its best lap, from exactly where that lap really began, at the speed it really had. A champion's first lap is a *standing start*: from rest, 30 px behind the line. It's always a little slower. For example, the gen 40 champion's first lap is 12.78 s and its best is 12.53 s; it races with the 12.53 s.
-- A champion that never finished a lap starts from the normal start spot and drives until it crashes or stalls. I win that row by default.
+- A champion that never finished a lap starts from the normal start spot and drives until it crashes or stalls; that row has no lap to compare.
 - During the race the screen shows the live gap. That's the answer to "when did the leading car pass the spot where the other car is now?"
 
-**Real numbers**
+**Real numbers:** my lap against the champions of the six generations that were fixed in advance.
 
-| gen | me | AI | winner | by | score |
-| --- | --- | --- | --- | --- | --- |
-| 1 | 26.40 s | no lap (crashes at 65% of a lap) | me | by default | 1 : 0 |
-| 5 | 26.40 s | 30.02 s | me | 3.62 s | 2 : 0 |
-| 10 | 26.40 s | 13.17 s | AI | 13.23 s | 2 : 1 |
-| 20 | 26.40 s | 12.65 s | AI | 13.75 s | 2 : 2 |
-| 40 | 26.40 s | 12.53 s | AI | 13.87 s | 2 : 3 |
-| 80 | 26.40 s | 12.47 s | AI | 13.93 s | 2 : 4 |
+| gen | me | champion | difference |
+| --- | --- | --- | --- |
+| 1 | 26.40 s | no lap (crashes at 65% of a lap) | — |
+| 5 | 26.40 s | 30.02 s | 3.62 s slower than me |
+| 10 | 26.40 s | 13.17 s | 13.23 s faster |
+| 20 | 26.40 s | 12.65 s | 13.75 s faster |
+| 40 | 26.40 s | 12.53 s | 13.87 s faster |
+| 80 | 26.40 s | 12.47 s | 13.93 s faster |
 
-Every race was actually driven, and each one ends with exactly the lap times recorded during evolution, to the step: 1584 steps for me, and 1801, 790, 759, 752 and 748 steps for the AI.
+Every race was actually driven, and each one ends with exactly the lap times recorded during evolution, to the step: 1584 steps for me, and 1801, 790, 759, 752 and 748 steps for the champions.
 *Reproduce it: `node --test tests/step6.test.js`, or in the game `index.html?race=3-10&autoplay=1` (any seed-generation pair), and `index.html?scoreboard=3&autoplay=1`.*
 
 ![Generation 5 vs me, the moment I finish](docs/img/06-race-gen5.svg)
@@ -779,9 +874,9 @@ Where do I lose to generation 10? Everywhere, by about half. From the start to 4
   - The live gap sat on top of the top wall.
   - At the finish, the "ME" and "GEN 10" tags covered each other.
   - The "crashed here" label hid under the generation 1 car.
-- Generation 10 is the first time the AI beats me. It does it by 13.23 s, and its 13.17 s lap is half of mine.
+- Generation 10's 13.17 s lap is half of mine.
 
-**The prompt:** [entry 10: the guide in two levels, then me vs the AI](PROMPTS.md#10-the-guide-in-two-levels-then-step-6-me-vs-the-ai).
+**The prompt:** [entry 10: the guide in two levels, then Step 6](PROMPTS.md#10-the-guide-in-two-levels-then-step-6-me-vs-the-ai) (the prompt's own title, from before we reframed the chapter).
 
 **In the code**
 - `createRace()` in `src/sim/race.js`: my ghost and one champion, each at the start of its best lap.
@@ -789,8 +884,8 @@ Where do I lose to generation 10? Everywhere, by about half. From the start to 4
 - `stepRace()` and `runRace()` in `src/sim/race.js`: one step, or a whole race, for both cars.
 - `raceGap()` in `src/sim/race.js`: who's ahead right now, and by how many seconds.
 - `raceResult()` in `src/sim/race.js`: who won and by how much, or how the AI got out.
-- `buildScoreboard()` in `src/sim/scoreboard.js`: the six rows and the running score, from the saved files only.
-- `drawRaceHud()` and `drawScoreboard()` in `src/render/race-view.js`: the race screen and the scoreboard.
+- `buildScoreboard()` in `src/sim/scoreboard.js`: the six fixed-generation rows, from the saved files only.
+- `drawRaceHud()` and `drawScoreboard()` in `src/render/race-view.js`: the race screen and the six-row table.
 
 
 **The full code**
@@ -852,14 +947,18 @@ The test: each champion drives alone, from the track's normal start, under the s
 
 ![The gen 80 champion reverses into the wall](docs/img/07-mirror-crash.svg)
 
-*The most telling failure: the seed 3, generation 80 champion, the one that beat me by 13.93 s on its home track. It reaches the mirrored hairpin at full speed (330 px/s) and brakes to a dead stop by 7.10 s. Then it keeps holding BRAKE. From a standstill that means reverse, so it backs into the inner wall at 7.63 s.*
+*The most telling failure: the seed 3, generation 80 champion, the fastest of them on its home track (12.47 s). It reaches the mirrored hairpin at full speed (330 px/s) and brakes to a dead stop by 7.10 s. Then it keeps holding BRAKE. From a standstill that means reverse, so it backs into the inner wall at 7.63 s.*
 
 *Reproduce it: `node tools/generalization-report.js` (writes `runs/step7a.json`; `tests/step7.test.js` checks it), or in the game `index.html?champion=3-80&track=neon-loop-mirrored`.*
+
+**The blind spot.** Why it won't let go of the brake, we don't know for sure; that part is a hypothesis. But one thing is measured: when the car reverses, its speed input reads 0, because `inputsFromView()` keeps the speed between 0 and 1 and a backwards speed comes out as 0. So to the car, "standing still" and "going backwards" look exactly the same: in the frame where it's reversing, the E panel shows speed 0.000. A network only knows what its sensors tell it, and a sensor that can't tell those two apart is a blind spot.
 
 **So, learned or memorized? Both.** Our best explanation, which is an inference and not a measurement:
 - The general skills transfer: follow the road, slow down for corners, take the inside. That's why Zigzag and Wide Sweepers are no problem, even though they look nothing like Neon Loop.
 - But Neon Loop has one hairpin, and it always turns left. The champions that trained longest seem to have tuned their 70 numbers to that one corner, in a way that falls apart when the corner turns the other way.
 - We only tested one seed at every generation, and three more seeds at generation 80. So "longer training means more specialized" is a pattern in this data, not a proof.
+
+This is called **overfitting**: the model learned what it saw so well that it handles new things worse. The longer the car trained on one track, the more it tuned itself to the turns of that one track.
 
 ### The exam (Step 7b)
 **My lap first.** No AI drove Exam before I did. My first 3 completed laps there took 54.03 s, 44.30 s and 32.02 s; the best, 32.02 s (1921 steps), is my official Exam time, saved as `ghosts/me-exam.json`. It is the best of exactly those 3 laps, and it replays headless to the step (`tests/exam-ghost.test.js`). (An earlier message said 21.37 s. That lap was on Zigzag, not Exam; see DEVLOG.md.) Only then was Exam opened for the saved champions: `unlockExam()` checks the ghost first. Training on Exam is still refused, always.
@@ -884,11 +983,11 @@ The exam: the one-track champions of generations 10, 20 and 80, and the three-tr
 
 *Exam from the start. Cyan: the one-track generation 20 champion's first lap. Yellow, then pink: the one-track generation 80 champion stops dead in the hairpin and reverses into the wall. ✕: where the four three-track champions crashed.*
 
-**The race.** My Exam lap (32.02 s) against the best of them on Exam, the one-track generation 20 champion (13.83 s), best lap against best lap as in every race: **the AI wins by 18.18 s.** Watch it: `index.html?race=exam&champion=3-20`.
+**Against my Exam lap.** My lap (32.02 s) is the benchmark here too. The best of them on Exam, the one-track generation 20 champion (13.83 s), drives it 18.18 s faster, best lap against best lap. Watch it: `index.html?race=exam&champion=3-20`.
 
 **Did training on three tracks help? No.** On Exam none of the four three-track champions finished a lap, and two of the three one-track champions did.
 
-**Our best explanation** (an inference, not a measurement): none of the three training tracks has a hairpin that turns right. Neon Loop's only hairpin turns left, and Zigzag and Wide Sweepers have none. Training on more tracks taught the cars to go faster through the turns they already knew, not to handle a turn none of them had. We saw this risk after Step 7a and wrote it down before running the exam (DEVLOG.md, the Step 7b entry), but kept the pre-registered plan. So this result is the plan's honest outcome. It's one seed, so it's a pattern, not a proof. Chapter 8's Paperclip, a drawn track with a right-hand hairpin, shows the same thing.
+**Our best explanation** (an inference, not a measurement): not one of the three training tracks has a turn to the right this tight. Measured as the tightest radius of every right-hand turn of 150° or more (the circle through three neighbouring points of the road's middle line, 8 px apart): Neon Loop has one, r 62 px; Zigzag and Wide Sweepers have none. Exam has two, r 49 px and r 45 px, both tighter than anything in training. Training on more tracks taught the cars to go faster through the turns they already knew, not to handle a turn none of them had. We saw this risk after Step 7a and wrote it down before running the exam (DEVLOG.md, the Step 7b entry), but kept the pre-registered plan. So this result is the plan's honest outcome. It's one seed, so it's a pattern, not a proof. Chapter 8's Paperclip, a drawn track with a right-hand hairpin, shows the same thing.
 
 *Reproduce it: `node tools/exam-report.js` (writes `runs/exam.json`; `tests/exam.test.js` checks every result and the race).*
 
@@ -916,11 +1015,11 @@ The exam: the one-track champions of generations 10, 20 and 80, and the three-tr
   - On Neon Loop, generation 100 drives 12.63 s: between the one-track champion (12.47 s) and the three-track one (13.17 s).
   - On Mirrored, which is now a training track, it drives 12.68 s.
 
-**The race.** My Exam lap (32.02 s) against the best of them on Exam, the four-track generation 100 champion (13.25 s), best lap against best lap: **the AI wins by 18.77 s.** Watch it: `index.html?race=exam&champion=3-multi4-100`.
+**Against my Exam lap.** The best of them on Exam, the four-track generation 100 champion (13.25 s), drives it 18.77 s faster than my 32.02 s. Watch it: `index.html?race=exam&champion=3-multi4-100`.
 
 **What it means, and what it doesn't.**
 - It fits our best explanation: once a right-hand hairpin was in the training, the cars learned to drive one, including Exam's, which they had never seen.
-- But we chose this fix after seeing the exam. Exam is no longer an untouched test: this was its second use, and the change was picked because of the first. So the pass counts for less than a first pass would have. It's also one seed, and two of the champions still failed the hairpin on a later lap.
+- But we chose this fix after seeing the exam. **Exam stopped being an independent test once we adjusted training after it:** this was its second use, and the change was picked because of the first. A real test now needs a new track nobody has seen. That's one of the core rules of machine learning: a test you've fixed things against isn't a test any more. So the pass counts for less than a first pass would have. It's also one seed, and two of the champions still failed the hairpin on a later lap.
 - Mirrored is now a training track, so its results here are training results, not a test.
 
 *Reproduce it: `node tools/multi-train.js multi4` (champions/seed-3-multi4.json, runs/seed-3-multi4.json), then `node tools/exam-7c-report.js` (runs/exam-7c.json). `tests/step7c.test.js` checks the training rules, every recorded lap, every Exam result and the race.*
@@ -1119,10 +1218,11 @@ export function decodeTrack(text) {
 
 ## Glossary
 
-- **Activation function:** another name for a squash function. See *squash*.
+- **Activation function:** another name for a squash function: what a neuron does to its total before passing it on. Ours are *tanh* (hidden neurons, −1 to 1) and *sigmoid* (the 4 keys, 0 to 1). See *squash*.
 - **Apex:** the innermost point of a curve.
 - **Best lap:** a car's fastest lap. In races, both sides drive their best lap.
-- **Bias:** one extra number a neuron adds after summing up. It shifts the neuron's result up or down, whatever the inputs are.
+- **Benchmark:** a fixed result to compare against. Here: my lap (26.40 s), the careful rule (17.25 s), the best of 980 rule settings (12.68 s) and the centre-line floor (11.93 s).
+- **Bias:** one extra number a neuron adds after summing up. It shifts the neuron's result up or down, whatever the inputs are. In the water-pipe picture, a tank's own fixed inflow or outflow.
 - **Brain:** here, a neural network of 70 numbers that turns 6 inputs into 4 key presses.
 - **Champion:** the car with the highest fitness in its generation.
 - **Checkpoint:** an invisible line across the road. There are 82, and a lap only counts if the car crosses them all, in order.
@@ -1139,25 +1239,31 @@ export function decodeTrack(text) {
 - **Golden results:** the stored, known-good results the replay check compares against (`tools/replay-golden.json`).
 - **Ghost:** a recorded lap: the starting position plus the keys held on every step. Replaying it drives exactly the same lap.
 - **Held out:** kept aside on purpose and never used for training, so it can be a fair test later. The Exam track is held out.
+- **Held-out test:** a test on something held out. It only stays fair while nothing is changed because of its results; Exam stopped being one when Step 7c changed the training after it.
 - **Hidden neuron:** a neuron between the inputs and the outputs. It's "hidden" because you never see it from outside.
 - **Hitbox:** the shape the program uses to decide whether the car touched a wall.
 - **Input:** one of the 6 numbers the brain gets: 5 eyes and the speed, each between 0 and 1.
 - **Layer:** a group of neurons that all look at the same inputs.
 - **Local optimum:** a dead end that looks like the top. Every small change makes things worse, even though something much better exists.
+- **MLP (multilayer perceptron):** the simplest kind of neural network: layers of neurons, each one connected to every neuron of the layer before, the signal going one way. Ours is one.
 - **Mutation:** a small random change to some of a child's numbers. Here, each number has a 10% chance.
 - **Neural network:** many neurons connected in layers. Ours has 6 inputs, 6 hidden neurons and 4 outputs.
+- **Neuroevolution:** training a neural network with evolution: whole brains are scored, the best are copied with small random changes. It needs only a score, no correct answers.
 - **Neuron:** multiplies each input by its weight, adds them up, adds the bias, and squashes the result.
 - **Normalize:** turn a number into a common range, here 0 to 1, so that every input gets a fair say.
+- **Overfitting:** learning what you trained on so well that you handle new things worse. Our generation 80 champion is the fastest on its home track and fails where the generation 10 and 20 champions get through.
 - **Output:** one of the 4 numbers the brain produces, one per key. Above 0.5 means that key is pressed.
+- **Parameter:** a number a network may change while it learns. Ours has 70: 60 weights and 10 biases.
 - **Parent:** one of the top 10 cars of a generation, whose numbers are copied into the next one.
 - **Pre-register:** write down the exact test before running it, so the results can't change the question.
 - **Population:** all the cars of one generation, here 100.
 - **px (pixel):** one dot on the screen. The screen is 1280 × 720 px.
-- **Race:** my ghost lap and a champion's best lap, driven at the same time on the same track. They can't collide.
+- **Race:** a way to compare laps in the game: my ghost lap and a champion's best lap, driven at the same time on the same track. They can't collide.
 - **Replay check:** a fixed set of runs whose results must never change unless we mean them to (`tools/replay-check.js`).
+- **Reinforcement learning:** learning from rewards and penalties during the task, adjusting the numbers a little after each experience. We don't use it.
 - **Ray:** one of the car's 5 eyes: a line that goes out until it hits a wall, up to 200 px.
 - **Seed:** the starting number for the random number generator. The same seed always gives the same "random" numbers.
-- **Scoreboard:** my best lap against the champion of each of the six fixed generations (1, 5, 10, 20, 40, 80), and the running score.
+- **Scoreboard:** in the game, my best lap next to the champion of each of the six fixed generations (1, 5, 10, 20, 40, 80).
 - **Selection:** ranking the cars by fitness and keeping the best as parents.
 - **Share link:** a web address that carries a whole track as letters, 4 per point, so it opens exactly that track.
 - **Sigmoid:** a squash function whose result is always between 0 and 1. Used for the 4 keys.
@@ -1166,7 +1272,9 @@ export function decodeTrack(text) {
 - **Stall:** a car that goes 3 seconds without reaching a new checkpoint is out.
 - **Standing start:** a lap that starts from rest, 30 px behind the line. A champion's first lap is one.
 - **Step:** one tick of the simulation, one sixtieth of a second.
+- **Supervised learning:** learning from examples with the correct answers given. We don't use it: we have no correct answers for driving.
 - **Track check:** the automatic test of a drawn track: enough points, on the screen, no turn too tight, and the road doesn't cross or touch itself.
 - **Track editor:** the screen where you click points to draw your own track.
+- **Transformer:** the kind of neural network ChatGPT and Claude run on, built for text: it looks at all the words at once and works out which matter to which.
 - **tanh:** a squash function whose result is always between −1 and 1. Used for the hidden neurons.
 - **Weight:** the number a neuron multiplies one input by. A big weight means "this input matters a lot". A negative weight means "this input pushes the other way".
