@@ -3,8 +3,8 @@
 ## What it is
 A small bug-shaped car that learns to drive by itself in the browser: a
 neural network drives it, a genetic algorithm evolves the networks. It is
-built on camera for the CodeMask video "How to Build a Self-Driving Car AI
-Without Knowing AI". The git history, PROMPTS.md and DEVLOG.md are the raw
+built on camera for the CodeMask video "How to Build a Neural Network with
+AI (Beginner Friendly)". The git history, PROMPTS.md and DEVLOG.md are the raw
 material for the video and the guides.
 
 ## Tech
