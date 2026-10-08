@@ -108,7 +108,7 @@ material for the video and the guides.
 - HOW-IT-WORKS.md is the main guide, for someone who just watched the video (rewritten for the video,
   prompt 20): the video's chapters in the video's order, the video's story, numbers and wording on every
   claim; ~2,500–3,000 words. An "In 30 seconds" box at the top. Each chapter starts with a
-  "▶ watch this part" link (`VIDEO_URL&t=<seconds>`, the literal placeholder until the video is up) and
+  "▶ watch this part" link (`https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=<seconds>`, the video's chapter times) and
   ends with "For the curious: [Deep dive →](DEEP-DIVE.md#...)". Short sentences and everyday words; the
   water-pipe analogy of the video, with its honest caveat that numbers in the middle tanks can be
   negative. My lap is one benchmark, never "me vs the AI". Pictures are the video's own rendered stills
@@ -123,8 +123,8 @@ material for the video and the guides.
   and writes guide-facts.md. A number it can't confirm gets fixed or removed, never kept. Every fact names
   the step or run it comes from, and a number next to a picture (in its caption or in the paragraph right
   above it) must come from the picture's own step or run, or be a rule of the game; the build fails otherwise.
-- Before release, every `VIDEO_URL` in HOW-IT-WORKS.md becomes the full
-  `https://www.youtube.com/watch?v=<ID>` (so `&t=` works), never a youtu.be link; then rebuild the pages.
+- Video links are the full `https://www.youtube.com/watch?v=xQIbVdU7Gn8` form (so `&t=` works), never a youtu.be
+  link; tools/guide-page.js fails on a youtu.be link or a left-over `VIDEO_URL` placeholder.
 - DEEP-DIVE.md keeps every detail: tables, precise numbers, "reproduce it"
   notes, function names with file paths, and the full template (The one
   idea · Analogy · Key figure · Real numbers · What actually happened ·

@@ -13,7 +13,7 @@ This guide follows the video chapter by chapter, with the same numbers. Each cha
 
 ## 1. Three words
 
-[▶ watch this part](VIDEO_URL&t=51)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=51)
 
 **Artificial intelligence.** A regular program does exactly what it's told: "if there's a wall ahead, slow down". Here we don't write any driving rules at all. We give the car sensors, four buttons and a score: who got the furthest. How to actually drive gets found on its own, by trial and error.
 
@@ -31,7 +31,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#0-what-were-building)
 
 ## 2. The World
 
-[▶ watch this part](VIDEO_URL&t=171)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=171)
 
 To learn anything you need a place to learn: a track, some walls, and a little bug of a car you can also drive yourself.
 
@@ -49,7 +49,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#1-the-world)
 
 ## 3. Eyes
 
-[▶ watch this part](VIDEO_URL&t=242)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=242)
 
 What does the car actually see? Nothing. It has no camera and no map. All it has are five invisible whiskers, like a cat. Each one reaches forward until it hits a wall, up to 200 pixels, and reports how far away that wall is. It's like the parking sensors on a real car: they don't show you a picture, they just beep, close or far.
 
@@ -73,7 +73,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#2-eyes)
 
 ## 4. Generation 1
 
-[▶ watch this part](VIDEO_URL&t=325)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=325)
 
 What does the brain do when every tap is set at random? A hundred cars, a hundred random brains. They pass through each other; only the walls matter. Hit a wall and you're out. Sit for three seconds without progress, and you're out too, so cars spinning in place don't drive forever.
 
@@ -91,7 +91,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#generation-1-random-brains-gloriou
 
 ## 5. The Brain
 
-[▶ watch this part](VIDEO_URL&t=378)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=378)
 
 One tank with its pipes is a **neuron**, the smallest part of the brain. A neuron does just four things, always the same four:
 
@@ -172,7 +172,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#3-brain)
 
 ## 6. Evolution
 
-[▶ watch this part](VIDEO_URL&t=597)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=597)
 
 You could train a network by showing it thousands of correct answers: "in this situation, press left". But where would those come from? Recorded from me, it would learn my mistakes too. Evolution needs no correct answers, only a score, and it's just three steps, repeated many times.
 
@@ -234,7 +234,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#4-evolution)
 
 ## 7. Stuck
 
-[▶ watch this part](VIDEO_URL&t=686)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=686)
 
 Evolution doesn't always work. We ran it five times, each with a different random start. Four learned to drive. One got stuck: 95 generations in a row with exactly the same result.
 
@@ -305,7 +305,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#seed-1-stuck-at-518-for-95-generat
 
 ## 8. Reading the Brain
 
-[▶ watch this part](VIDEO_URL&t=742)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=742)
 
 Back to that hairpin, with the left whisker 23 pixels from the wall. We froze time and traced how this one decision was calculated.
 
@@ -370,7 +370,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#5-reading-a-brain)
 
 ## 9. How well did it learn?
 
-[▶ watch this part](VIDEO_URL&t=823)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=823)
 
 How well does it drive? "Fast" isn't enough; we need something to compare it to. So we set up four benchmarks:
 
@@ -394,7 +394,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#6-how-well-did-it-learn)
 
 ## 10. Learned or memorized?
 
-[▶ watch this part](VIDEO_URL&t=894)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=894)
 
 A student who memorized last year's exam gets an A on that exam. On a new one? With AI too, you have to test on something it has never seen, or you can't tell learning from memorizing.
 
@@ -418,7 +418,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#7-did-it-learn-or-memorize)
 
 ## 11. The exam
 
-[▶ watch this part](VIDEO_URL&t=975)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=975)
 
 To make the test fair, we built one more track: the exam. And before any testing, we wrote down a rule: nobody trains on this track, ever. It's only for testing.
 
@@ -442,7 +442,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#the-exam-step-7b)
 
 ## 12. The fix
 
-[▶ watch this part](VIDEO_URL&t=1022)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=1022)
 
 The obvious fix: train on several tracks. We wrote this plan down before the exam: add two new tracks, retrain from scratch, and score each car by the sum of its scores on all three.
 
@@ -478,7 +478,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md#step-7c-one-more-try-decided-after
 
 ## 13. Retro
 
-[▶ watch this part](VIDEO_URL&t=1114)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=1114)
 
 ![The sprint retro: what got done, what broke, what we learned](docs/img/guide-13-retro.webp)
 
@@ -496,7 +496,7 @@ For the curious: [Deep dive →](DEEP-DIVE.md)
 
 ## 14. Your turn: the track editor
 
-[▶ watch this part](VIDEO_URL&t=1146)
+[▶ watch this part](https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=1146)
 
 The game has a track editor: press T, choose "Edit / new track", and click to add points. It checks the track as you draw and says, in plain words, when a turn is too tight or the road runs into itself. A ready track can be driven, given to a champion, or shared as a link.
 

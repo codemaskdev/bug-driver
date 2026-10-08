@@ -10,7 +10,8 @@
 // load any other file at all. So every figure is embedded in the page itself
 // (a data: URL made from the SVG, WebP or PNG file). The build fails if an image path
 // in the Markdown doesn't exist on disk, or if a page still points an <img> at a file.
-// "VIDEO_URL&t=…" links stay exactly as written: VIDEO_URL is replaced once the video is up.
+// Video links are the full https://www.youtube.com/watch?v=<ID>&t=<seconds> form; the build fails on a left-over
+// VIDEO_URL placeholder or a youtu.be link (its &t= doesn't work).
 
 import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import { syncCode, boxPlaceholders, boxHtml } from './code-boxes.js';
@@ -30,7 +31,9 @@ export function slug(text) {
 
 // Where a link in the Markdown should point from docs/guide/
 function href(url) {
-  if (url.startsWith('#') || /^[a-z]+:/.test(url) || url.startsWith('VIDEO_URL')) return url;
+  if (url.startsWith('VIDEO_URL')) throw new Error(`a video link is still the placeholder: ${url}`);
+  if (/youtu\.be\//.test(url)) throw new Error(`a video link uses youtu.be (its &t= doesn't work): ${url}`);
+  if (url.startsWith('#') || /^[a-z]+:/.test(url)) return url;
   const [path, hash = ''] = url.split('#');
   const tail = hash ? `#${hash}` : '';
   if (path === 'HOW-IT-WORKS.md') return `index.html${tail}`;
