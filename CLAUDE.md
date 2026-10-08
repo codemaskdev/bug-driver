@@ -120,7 +120,11 @@ material for the video and the guides.
   short walkthrough. The build fails if a function is missing or a box no longer matches the code.
 - `node tools/guide-facts.js` works every number of HOW-IT-WORKS.md (and every number the video corrected
   in DEEP-DIVE.md) out again from the code, the saved runs and the simulation, checks the guides say it,
-  and writes guide-facts.md. A number it can't confirm gets fixed or removed, never kept.
+  and writes guide-facts.md. A number it can't confirm gets fixed or removed, never kept. Every fact names
+  the step or run it comes from, and a number next to a picture (in its caption or in the paragraph right
+  above it) must come from the picture's own step or run, or be a rule of the game; the build fails otherwise.
+- Before release, every `VIDEO_URL` in HOW-IT-WORKS.md becomes the full
+  `https://www.youtube.com/watch?v=<ID>` (so `&t=` works), never a youtu.be link; then rebuild the pages.
 - DEEP-DIVE.md keeps every detail: tables, precise numbers, "reproduce it"
   notes, function names with file paths, and the full template (The one
   idea · Analogy · Key figure · Real numbers · What actually happened ·

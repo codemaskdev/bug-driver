@@ -216,7 +216,7 @@ export function fitness(car) { => How good was this car?
 
 **Step two: select.** The top ten become parents. The other ninety, that's it for them. The very best car is copied into the next generation exactly as it is. That's why the best result on the training track can never get worse.
 
-**Step three: children with typos.** The other 99 cars are copies of the parents, with a few taps nudged at random. The better the parent, the better its chances to have children. Chances, not a fixed share: in one real generation the best parent got 20 of the 99 children and the tenth got 1.
+**Step three: children with typos.** The other 99 cars are copies of the parents, with a few taps nudged at random. The better the parent, the better its chances to have children. Chances, not a fixed share: in the step in the picture below, from generation 1 to 2, the best parent got 15 of the 99 children, the second got 16, and the tenth got 1.
 
 ![All 100 cars ranked by score, the top ten kept, and their children](docs/img/guide-06-ranking.webp)
 
