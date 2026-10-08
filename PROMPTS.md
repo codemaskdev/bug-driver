@@ -315,3 +315,23 @@ Then run it, report the table (all 4 training tracks + Exam), race my Exam ghost
 
 Built: the Step 7c pre-registration, committed before any training (2dccd8b). Then the four-track training, the one Exam test, the race, and chapter 7 in both guides.
 What broke: nothing in the training. Two small things: the race HUD's lap times ran off the screen with a long name like "GEN 100 ×4 TRACKS" (fixed). And a check of the new exam tool, run on the Step 7b champions, also put their gens 1, 5 and 40 on Exam, which the 7b exam hadn't included.
+
+## 15. The same numbers on every Node version
+
+Only the part of this prompt about the tests and the simulation is logged here; the rest of it (the README's title and GIF, a plan for a third guide) went to the CodeMask repo's production prompts.
+
+````text
+b) npm test must work for a viewer on current Node (20, 22, 24):
+   - Fix the test script so node --test finds the tests on Node 22+ (e.g. explicit glob/file list).
+   - Investigate why the replay/determinism test fails on Node 20. Find the exact cause
+     (Math.* differences between V8 versions? sort stability? something else?).
+     If the official numbers (seed 3: gen 19 = 12.67, gen 80 = 12.47, etc.) are NOT
+     reproducible on other Node versions, don't hide it: pin the version (.nvmrc + "engines")
+     and say clearly in README which Node version reproduces the video's numbers.
+     If it can be made identical across versions without changing the official run's results, do that.
+   - Report results per Node version (18/20/22/24 — use npx node@X or nvm if available).
+````
+
+Built: `npm test` lists its test files itself (tools/run-tests.js), so it runs on Node 22+ too (8c719eb). The cause of the Node 20 failure: Math.log, cos, sin, exp, tanh and atan2 give a different last bit on V8 11.3+ than on V8 10.2 (Node 18). The official numbers survived even so (same laps in every generation), but not every bit did. src/sim/fmath.js ports fdlibm, the code V8 used up to 10.x, and the simulation uses it (cafe258). Now Node 18, 20, 22 and 24 all give the official seed 3 run bit for bit, the browser too, and the replay golden results are unchanged. 71/71 tests on all four.
+What broke: nothing; npm test on Node 24 had been running no tests at all.
+
