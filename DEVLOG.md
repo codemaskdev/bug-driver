@@ -638,3 +638,11 @@ Prompt 20. Docs and guide tools only; no simulation code, track, physics or trai
 - **The fact check (21beabb):** `node tools/guide-facts.js` works out 50 facts again (the 980 rule settings take about 8 s) and checks both guides say them: 50 of 50 confirmed. It writes guide-facts.md, with every other deep-dive number listed by section with that section's sources.
 
 Nothing broke in the game. One draft claim was wrong and never committed: "weights from about −3 to +3" (the champions' are −1.96 to +2.28).
+
+## 2026-10-08 — The numbers next to a picture (14c53cf)
+
+Prompt 21. Docs and the fact-check tool only (69 tests pass).
+
+- HOW-IT-WORKS.md, chapter 6: the paragraph above the ranking picture said "the best parent got 20 of the 99 children and the tenth got 1": that's generation 4 to 5, while the picture shows generation 1 to 2. Now it quotes the picture's step: the best parent got 15, the second 16, the tenth 1 (worked out again by breeding seed 3's generation 1 with `nextGeneration()`). The deep dive keeps generation 4 to 5, next to its own figure of that generation.
+- tools/guide-facts.js: every fact names its step or run, every picture of HOW-IT-WORKS.md says which it shows, and a number in a picture's caption or in the paragraph right above it must come from that step or run, or be a rule of the game. Tested by putting the old sentence back: it fails with "20 comes from seed 3, gen 4→5". 52 of 52 facts confirmed.
+- Release note (CLAUDE.md): `VIDEO_URL` becomes the full `https://www.youtube.com/watch?v=<ID>`, not youtu.be, so the `&t=` links work.

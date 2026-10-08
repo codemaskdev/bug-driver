@@ -540,3 +540,18 @@ Report: word counts, list of chapters with their watch-links, pictures used, the
 
 Built: HOW-IT-WORKS.md rewritten for the video (its 14 chapters, a watch-this-part link each, the video's numbers and wording, 25 of its rendered stills as WebP, four code boxes); DEEP-DIVE.md updated (chapter 6 reframed as How well did it learn?, every script correction, three new sections, glossary); tools/guide-facts.js and guide-facts.md, which work out every number again from the code, the runs and the simulation (50 of 50 confirmed); README links; the pages regenerated, still self-contained.
 What broke: the first draft said the champions' weights run "from about −3 to +3"; the data says −1.96 to +2.28, so it was corrected before committing. One sentence of the beginner guide had drifted from the video's wording, and the fact check caught it. The pages embed the images (data: URLs) rather than loading them from docs/guide/img, because that was the fix for the Safari file:// problem; the "calibration-free note" wasn't added, as nothing in the project calibrates.
+
+## 21. Guide review: the numbers next to a picture
+
+````text
+Guide review — one fix:
+HOW-IT-WORKS.md chapter 6: the text says "the best parent got 20 of the 99 children and the tenth got 1" (generation 4→5), but the picture
+right below and its caption are the generation 1→2 step. Make the text match the picture: in that step the best parent got 15 children,
+the second got 16, the tenth got 1 — which shows "chances, not a fixed share" even better. Add a fact-check rule: a number in a caption's
+paragraph must come from the same step/run as the picture. Rebuild the pages, re-run guide-facts.js. Commit as CodeMask, don't push yet.
+
+Also note for release: VIDEO_URL must be replaced with the full form https://www.youtube.com/watch?v=<ID> (so &t= works), not youtu.be.
+````
+
+Built: chapter 6 of HOW-IT-WORKS.md now quotes the step its picture shows (generation 1 to 2: 15, 16, …, 1 children); every fact in tools/guide-facts.js names its step or run, and a number in a picture's caption or the paragraph above it must come from the picture's own step or run; CLAUDE.md notes the full youtube.com/watch?v= form for VIDEO_URL.
+What broke: nothing. Put back on purpose, the old sentence fails the new rule ("20" comes from seed 3, gen 4→5).
