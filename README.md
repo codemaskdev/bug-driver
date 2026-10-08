@@ -1,6 +1,8 @@
 # Bug Driver
 
-A small bug-shaped car that teaches itself to drive in your browser, using a tiny neural network and a genetic algorithm written from scratch in plain JavaScript, no ML libraries. Built on camera for the CodeMask video "How to Build a Self-Driving Car AI Without Knowing AI".
+![Generation 1: a hundred random brains crash or stall; generation 80: one clean, fast lap](docs/img/readme-learning.gif)
+
+A small bug-shaped car that teaches itself to drive in your browser, using a tiny neural network and a genetic algorithm written from scratch in plain JavaScript, no ML libraries. Built on camera for the CodeMask video "How to Build a Neural Network with AI (Beginner Friendly)".
 
 ## Links
 - ▶ Play in your browser: https://codemaskdev.github.io/bug-driver/
@@ -27,4 +29,4 @@ Comparing laps: in AI mode press S for the scoreboard (my ghost lap next to seed
 
 `node tools/evolution-report.js <seed>` runs 100 generations headless and writes runs/seed-N.json (stats per generation) and champions/seed-N.json (the best brain at generations 1, 5, 10, 20, 40, 80).
 
-Tests run the simulation headless in Node, no install needed: `npm test`.
+Tests run the simulation headless in Node, no install needed: `npm test` (Node 18 or newer). Every Node version reproduces the video's numbers exactly, down to the last bit: the simulation uses its own sin, cos, exp, log, tanh and atan2 (src/sim/fmath.js), because `Math.*` is allowed to differ in the last bit between JavaScript engines (Node 18 and Node 20+ do). The game in your browser runs the same simulation, so it gives the same results there too.
