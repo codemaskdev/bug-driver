@@ -3,6 +3,7 @@
 
 import { STEP } from './constants.js';
 import { segmentHit } from './geometry.js';
+import * as fm from './fmath.js'; // sin, cos, … the same on every engine (Math.* differs in the last bit)
 
 // Tuning numbers (px and seconds)
 export const CAR = {
@@ -89,8 +90,8 @@ export function stepCar(car, input, walls) {
 
   // Steering: how fast the car turns depends on its speed (reversing turns the other way, like a real car)
   car.angle += car.steer * CAR.turnRate * steeringGrip(v) * Math.sign(v) * dt;
-  car.x += Math.cos(car.angle) * v * dt;
-  car.y += Math.sin(car.angle) * v * dt;
+  car.x += fm.cos(car.angle) * v * dt;
+  car.y += fm.sin(car.angle) * v * dt;
 
   // Hitting a wall is a crash: the car stops right there, no sliding along the wall
   const hit = hitWall(car, walls);
@@ -107,7 +108,7 @@ const REACH = Math.max(...CAR.hitbox.map(([x, y]) => Math.hypot(x, y)));
 
 // The car's hitbox outline in world coordinates, rotated with the car.
 export function carOutline(car) {
-  const c = Math.cos(car.angle), s = Math.sin(car.angle);
+  const c = fm.cos(car.angle), s = fm.sin(car.angle);
   return CAR.hitbox.map(([fx, fy]) => ({ x: car.x + c * fx - s * fy, y: car.y + s * fx + c * fy }));
 }
 

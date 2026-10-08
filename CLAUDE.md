@@ -28,6 +28,14 @@ material for the video and the guides.
 - One seeded RNG for everything: initial brains, mutations, spawns.
   Same seed = same evolution.
 - Never use Math.random().
+- Simulation code (src/sim) never calls Math.sin, cos, exp, log, tanh, atan2
+  (or any other Math function that rounds): they may differ in the last bit
+  between JavaScript engines (Node 18 and Node 20+ do). It uses
+  src/sim/fmath.js, which gives the same bits everywhere (the results Node 18
+  gave, which the official runs were made with); tests/fmath.test.js checks
+  both. Math.sqrt, hypot, abs, min, max, floor, imul are exact and fine.
+- `npm test` must pass on every Node version from 18 up (CI-free: check 18,
+  20, 22 and the current one before a release).
 - Fixed timestep: the simulation advances in fixed steps of 1/60 s,
   independent of the frame rate and rendering. Determinism must hold on
   any monitor.

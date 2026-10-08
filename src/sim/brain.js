@@ -3,6 +3,7 @@
 // The whole brain is one flat array of 70 numbers: every weight and every bias.
 
 import { UP, DOWN, LEFT, RIGHT } from './car.js';
+import * as fm from './fmath.js'; // sin, cos, … the same on every engine (Math.* differs in the last bit)
 
 export const INPUTS = 6;   // 5 eyes + speed, from getInputs()
 export const HIDDEN = 6;
@@ -22,12 +23,12 @@ export function randomBrain(rand) {
 
 // Activation for the hidden layer: squashes any number into -1..1.
 export function tanh(x) {
-  return Math.tanh(x);
+  return fm.tanh(x);
 }
 
 // Activation for the outputs: squashes any number into 0..1, read as "how hard to press this key".
 export function sigmoid(x) {
-  return 1 / (1 + Math.exp(-x));
+  return 1 / (1 + fm.exp(-x));
 }
 
 // One neuron: multiply each input by its weight, add them up, add the bias, squash.

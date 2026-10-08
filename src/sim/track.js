@@ -4,6 +4,7 @@
 // share link just by encoding its points and width.
 
 import { signedArea } from './geometry.js';
+import * as fm from './fmath.js'; // sin, cos, … the same on every engine (Math.* differs in the last bit)
 
 export const TRACKS = [
   {
@@ -130,7 +131,7 @@ export function buildTrack(def) {
   const spawn = {
     x: center[0].x - t0.x * SPAWN_BEHIND_LINE,
     y: center[0].y - t0.y * SPAWN_BEHIND_LINE,
-    angle: Math.atan2(t0.y, t0.x),
+    angle: fm.atan2(t0.y, t0.x),
   };
 
   return {

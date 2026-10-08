@@ -3,6 +3,7 @@
 
 import { CAR } from './car.js';
 import { segmentHit } from './geometry.js';
+import * as fm from './fmath.js'; // sin, cos, … the same on every engine (Math.* differs in the last bit)
 
 const DEG = Math.PI / 180;
 // Where each eye looks, relative to the heading. Negative = left, positive = right.
@@ -11,11 +12,11 @@ export const SENSOR_LABELS = ['left 60°', 'left 30°', 'ahead', 'right 30°', '
 export const SENSOR_RANGE = 200; // px: farther than this, an eye sees nothing
 
 // Each eye sits on the car's outline (the hitbox), so a distance of 0 means the wall touches the car.
-const EYE_OFFSETS = SENSOR_ANGLES.map((a) => edgeDistance(Math.cos(a), Math.sin(a)));
+const EYE_OFFSETS = SENSOR_ANGLES.map((a) => edgeDistance(fm.cos(a), fm.sin(a)));
 
 // How far can the car see in one direction: distance from (x, y) to the nearest wall along `angle`, up to `range`.
 export function castRay(x, y, angle, walls, range = SENSOR_RANGE) {
-  const ex = x + Math.cos(angle) * range, ey = y + Math.sin(angle) * range;
+  const ex = x + fm.cos(angle) * range, ey = y + fm.sin(angle) * range;
   const minX = Math.min(x, ex), maxX = Math.max(x, ex), minY = Math.min(y, ey), maxY = Math.max(y, ey);
   let nearest = 1; // as a share of the ray's length
   for (const w of walls) {
@@ -39,7 +40,7 @@ export function readSensors(car, walls) {
 // Where eye number i sits on the car's outline, in world coordinates.
 export function eyePosition(car, i) {
   const angle = car.angle + SENSOR_ANGLES[i];
-  return { x: car.x + Math.cos(angle) * EYE_OFFSETS[i], y: car.y + Math.sin(angle) * EYE_OFFSETS[i] };
+  return { x: car.x + fm.cos(angle) * EYE_OFFSETS[i], y: car.y + fm.sin(angle) * EYE_OFFSETS[i] };
 }
 
 // The brain's input: the only 6 numbers the car will ever know.

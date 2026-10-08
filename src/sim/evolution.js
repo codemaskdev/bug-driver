@@ -6,6 +6,7 @@
 import { makeRng } from './rng.js';
 import { refuseTraining } from './held-out.js';
 import { POPULATION, createGeneration, randomBrains, stepGeneration, fitness, trackProgress } from './generation.js';
+import * as fm from './fmath.js'; // sin, cos, … the same on every engine (Math.* differs in the last bit)
 
 export const PARENTS = 10;          // the top 10 cars become parents
 export const MUTATION_RATE = 0.1;   // each of the 70 numbers has a 10% chance to change...
@@ -39,7 +40,7 @@ export function selection(cars, score = fitness) {
 // A random number from a bell curve around 0 (most nudges small, a few bigger), from the seeded generator.
 export function gaussian(rand) {
   const u = 1 - rand(), v = rand(); // u in (0, 1] so the log is safe
-  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  return Math.sqrt(-2 * fm.log(u)) * fm.cos(2 * Math.PI * v);
 }
 
 // Mutation: copy a parent's 70 numbers, and give each one a 10% chance to be nudged a little.
