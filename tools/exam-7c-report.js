@@ -59,7 +59,7 @@ console.log(`watch it: index.html?race=exam&champion=${best.name}`);
 
 if (NAME === 'multi4') {
   writeFileSync(new URL('runs/exam-7c.json', root), JSON.stringify({
-    preRegistered: 'DEVLOG.md, Step 7c pre-registration (commit 41039bd)',
+    preRegistered: 'DEVLOG.md, Step 7c pre-registration (commit 2dccd8b)',
     note: 'The second time Exam is used for testing; Step 7c was decided after seeing the first exam.',
     me: { steps: ghost.steps, seconds: +(ghost.steps / STEPS_PER_SECOND).toFixed(2) },
     training: TRAINING, rows,

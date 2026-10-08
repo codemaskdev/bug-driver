@@ -345,14 +345,14 @@ I opened docs/guide/index.html (double-click, file://) and I don't see any image
 Commit as a fix, update DEVLOG. Then tell me to reopen the page.
 ````
 
-Built: the paths were already ../img/ and correct. Safari blocks a local page from reading ../ folders (reproduced with WebKit), so the figures were copied next to the page, and the build now fails on a missing image (972e5f8).
+Built: the paths were already ../img/ and correct. Safari blocks a local page from reading ../ folders (reproduced with WebKit), so the figures were copied next to the page, and the build now fails on a missing image (b5c1a67).
 What broke: that fix wasn't the one the user needed; the next prompt shows the scoreboard still broken.
 
 ## 12. (a screenshot)
 
 The message was only a screenshot, no text: chapter 6 of the web guide, with the scoreboard picture shown as a broken image.
 
-Built: every figure is now built into the page itself as a data: URL, so it no longer depends on what the viewer allows (0407de0). Checked with the HTML files alone in an empty folder: 7/7 and 22/22 images.
+Built: every figure is now built into the page itself as a data: URL, so it no longer depends on what the viewer allows (ec4bd68). Checked with the HTML files alone in an empty folder: 7/7 and 22/22 images.
 What broke: I never found out for sure which app showed the page. My best explanation is a viewer that lets local pages load no other files.
 
 ## 13. Images show now
@@ -390,7 +390,7 @@ Guide chapter 7 "Did it learn, or memorize?" in both levels (simple HOW-IT-WORKS
 Update PROMPTS.md and DEVLOG.md. Report the results table and tell me when Exam is ready for me to drive.
 ````
 
-Built: four new frozen tracks, pre-registered with their SHA-256 (fa2a3a1) before any car drove them. Then the pre-registered tests, a track picker (T), Exam with a first-3-laps record and a ghost download (G), and guide chapter 7 in both levels.
+Built: four new frozen tracks, pre-registered with their SHA-256 (f543436) before any car drove them. Then the pre-registered tests, a track picker (T), Exam with a first-3-laps record and a ghost download (G), and guide chapter 7 in both levels.
 What broke: nothing in the code. The result: the champions drive Zigzag and Wide Sweepers fine, but every gen 80 champion fails the mirrored hairpin. The "first corner" crash we expected never happened. No AI has driven Exam.
 
 ## 15. My Exam lap, Step 7b, and the exam
@@ -489,7 +489,7 @@ Pre-register in DEVLOG first (commit before training):
 Then run it, report the table (all 4 training tracks + Exam), race my Exam ghost against the best on Exam, and add it to chapter 7 in both guides. Update PROMPTS.md and DEVLOG.md, 🎬-mark the outcome.
 ````
 
-Built: the Step 7c pre-registration, committed before any training (41039bd). Then the four-track training, the one Exam test, the race, and chapter 7 in both guides.
+Built: the Step 7c pre-registration, committed before any training (2dccd8b). Then the four-track training, the one Exam test, the race, and chapter 7 in both guides.
 What broke: nothing in the training. Two small things: the race HUD's lap times ran off the screen with a long name like "GEN 100 ×4 TRACKS" (fixed). And a check of the new exam tool, run on the Step 7b champions, also put their gens 1, 5 and 40 on Exam, which the 7b exam hadn't included.
 
 ## 20. The guides for the video
@@ -565,6 +565,6 @@ Also apply the pending guide fix (chapter 6: 15 / 16 / 1 children for the genera
 Commit as CodeMask. Then push bug-driver to GitHub (the repo stays private for now). Report the commit hashes and the push result.
 ````
 
-Built: the 14 "▶ watch this part" links of HOW-IT-WORKS.md are https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=<seconds> (36e3e90); DEEP-DIVE.md had no placeholder (it has no watch links). The chapter 6 fix (15 / 16 / 1) was already in (14c53cf). tools/guide-page.js now refuses a left-over VIDEO_URL or a youtu.be link.
+Built: the 14 "▶ watch this part" links of HOW-IT-WORKS.md are https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=<seconds> (34a6d46); DEEP-DIVE.md had no placeholder (it has no watch links). The chapter 6 fix (15 / 16 / 1) was already in (f2bdda1). tools/guide-page.js now refuses a left-over VIDEO_URL or a youtu.be link.
 What broke: nothing. Put back on purpose, one placeholder fails the page build ("a video link is still the placeholder").
 

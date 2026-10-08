@@ -14,7 +14,7 @@ Each fact also names the step or run it comes from. A number next to a picture o
 | 1. Three words | 100 cars a generation | "hundred" (simple) | hundred | rules | `POPULATION` in src/sim/generation.js | ✓ |
 | 2. The World | sixty ticks a second | "sixty times a second" (simple) | sixty times a second | rules | `STEPS_PER_SECOND` in src/sim/constants.js | ✓ |
 | 2. The World | the same key presses give exactly the same run | "exactly the same run" (simple) | exactly the same run | my Neon Loop lap | ghosts/me-v3.json replayed twice through `stepWorld()` (the simulation, run headless by this tool); also tests/ghost.test.js and tools/replay-check.js | ✓ |
-| 2. The World | the road went from 64 to 90 px | "64", "90" (simple + deep) | 64 | rules | width in src/sim/track.js now (90) and at a6c88e0~1 (64), git history | ✓ |
+| 2. The World | the road went from 64 to 90 px | "64", "90" (simple + deep) | 64 | rules | width in src/sim/track.js now (90) and at aac3bfa~1 (64), git history | ✓ |
 | 2. The World | my best lap is 26.40 s | "26.40" (simple + deep) | 26.40 | my Neon Loop lap | ghosts/me-v3.json (1584 steps) | ✓ |
 | 3. Eyes | five whiskers, up to 200 px | "200" (simple + deep) | 200 | rules | `SENSOR_ANGLES`, `SENSOR_RANGE` in src/sim/sensors.js | ✓ |
 | 3. Eyes | every input is squeezed between 0 and 1 | "0", "1" (simple) | 0 | rules | `inputsFromView()` in src/sim/sensors.js | ✓ |
@@ -55,7 +55,7 @@ Each fact also names the step or run it comes from. A number next to a picture o
 | 12. The fix | zero out of four | "Zero out of four" (simple) | Zero out of four | exam, three tracks | runs/exam.json (exam, multi) | ✓ |
 | 12. The fix | no right-hand turn this tight in training: Neon Loop r 62 px, Zigzag and Wide Sweepers none; Exam r 49 and 45 px | "r 62 px", "r 49 px and r 45 px" (deep) | r 62 px | track shapes | the track data in src/sim/track.js through `buildTrack()`, every right-hand turn of 150°+ measured here | ✓ |
 | 12. The fix | trained on four tracks: four of four, best Exam lap 13.25 s, the fastest of any car so far | "13.25" (simple + deep) | 13.25 | exam, four tracks | runs/exam-7c.json, against runs/exam.json | ✓ |
-| 12. The fix | the four-track plan was decided after the exam, and pre-registered before training | "after the exam" (simple + deep) | after the exam | rules | DEVLOG.md, "Step 7c pre-registration" (commit 41039bd) | ✓ |
+| 12. The fix | the four-track plan was decided after the exam, and pre-registered before training | "after the exam" (simple + deep) | after the exam | rules | DEVLOG.md, "Step 7c pre-registration" (commit 2dccd8b) | ✓ |
 | deep: generation 1 | seed 3: 58 of the 61 cars that barely moved were then out by the 3-second rule | "58 of the 61" (deep) | 58 of the 61 | seed 3, gen 1 | generation 1 of seed 3 (the simulation, run headless by this tool) | ✓ |
 | deep: generation 1 | seed 1: 67 stalled, 33 crashed | "\| 1 \| 67 \| 33 \|" (deep) | \| 1 \| 67 \| 33 \| | generation 1, seeds 1–5 | generation 1 of seed 1 (the simulation, run headless by this tool) | ✓ |
 | deep: generation 1 | seed 2: 60 stalled, 40 crashed | "\| 2 \| 60 \| 40 \|" (deep) | \| 2 \| 60 \| 40 \| | generation 1, seeds 1–5 | generation 1 of seed 2 (the simulation, run headless by this tool) | ✓ |
@@ -111,7 +111,7 @@ Sources named in this section: `node tools/reference-lap.js` for the three progr
 
 ### 7. Did it learn, or memorize?
 
-Numbers (85): 7 · 2 · 3 · 1 · 90 px · 256 · 4 · 6 · 9 · 3 s · 60 s · 5 · 10 · 9.25 · 9.88 s · 8.08 · 8.47 s · 60% · 20 · 13.33 s · 13.20 s · 13.17 s · 12.65 s · 40 · 13.92 s · 80 · 30.02 s · 12.47 s · 330 px · 7.10 s · 7.63 s · 0 · 0.000 · 70 · 54.03 s · 44.30 s · 32.02 s · 1921 · 100 · 10% · 0.3 · 8.15 s · 8.17 s · 13.87 s · 13.83 s · 5.60 s · 6.17 s · 38.4% · 5.80 · 5.95 s · 38.9 · 40.2% · 173 · 195 px · 11.60 s · 75.8% · 7.52 · 7.62 s · 2.27 s · 12.3% · 18.18 s · 150 · 8 px · 62 px · 49 px · 45 px · 8 · 1073 s · 22.95 · 16.42 · 14.72 · 13.72 · 13.33 · 13.25 s · 13.3% · 35.65 s · 19.87 s · 22.35 s · 12.63 s · 12.68 s · 18.77 s · 14 · 15 · 18 · 19
+Numbers (86): 7 · 543436 · 90 px · 256 · 4 · 6 · 2 · 9 · 3 s · 60 s · 5 · 10 · 9.25 · 9.88 s · 8.08 · 8.47 s · 1 · 60% · 20 · 13.33 s · 13.20 s · 13.17 s · 12.65 s · 40 · 13.92 s · 80 · 3 · 30.02 s · 12.47 s · 330 px · 7.10 s · 7.63 s · 0 · 0.000 · 70 · 54.03 s · 44.30 s · 32.02 s · 1921 · 100 · 10% · 0.3 · 8.15 s · 8.17 s · 13.87 s · 13.83 s · 5.60 s · 6.17 s · 38.4% · 5.80 · 5.95 s · 38.9 · 40.2% · 173 · 195 px · 11.60 s · 75.8% · 7.52 · 7.62 s · 2.27 s · 12.3% · 18.18 s · 150 · 8 px · 62 px · 49 px · 45 px · 8 · 1073 s · 22.95 · 16.42 · 14.72 · 13.72 · 13.33 · 13.25 s · 13.3% · 35.65 s · 19.87 s · 22.35 s · 12.63 s · 12.68 s · 18.77 s · 14 · 15 · 18 · 19
 
 Sources named in this section: `node tools/generalization-report.js` (writes `runs/step7a.json`; `tests/step7.test.js` checks it), or in the game `index.html?champion=3-80&track=neon-loop-mirrored`.; `node tools/exam-report.js` (writes `runs/exam.json`; `tests/exam.test.js` checks every result and the race).; `node tools/multi-train.js multi4` (champions/seed-3-multi4.json, runs/seed-3-multi4.json), then `node tools/exam-7c-report.js` (runs/exam-7c.json). `tests/step7c.test.js` checks the training rules, every recorded lap, every Exam result and the race.
 

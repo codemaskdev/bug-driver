@@ -122,7 +122,7 @@ const bm = benchmarks(), g1 = generationOne(3), g1all = [1, 2, 3, 4, 5].map((s) 
 const turns = Object.fromEntries(['neon-loop', 'zigzag', 'wide-sweepers', 'exam'].map((t) => [t, rightTurns(t)]));
 const multiExam = [10, 20, 80, 100].map((g) => examRow('exam', true, g));
 const four = exam7c.rows.filter((r) => [10, 20, 80, 100].includes(r.generation));
-const oldWidth = Number(/width: (\d+)/.exec(execFileSync('git', ['show', 'a6c88e0~1:src/sim/track.js'], { cwd: new URL('.', root), encoding: 'utf8' }))[1]);
+const oldWidth = Number(/width: (\d+)/.exec(execFileSync('git', ['show', 'aac3bfa~1:src/sim/track.js'], { cwd: new URL('.', root), encoding: 'utf8' }))[1]);
 
 // ---- the facts ---------------------------------------------------------------------------------------------
 // { claim, says: [strings the guide must contain], value (worked out here, must equal `says[0]` unless `check`), in, source }
@@ -135,7 +135,7 @@ fact({ chapter: '1. Three words', run: 'rules', claim: 'the brain is 70 numbers'
 fact({ chapter: '1. Three words', run: 'rules', claim: '100 cars a generation', says: ['hundred'], value: String(POPULATION) === '100' ? 'hundred' : POPULATION, in: ['simple'], source: '`POPULATION` in src/sim/generation.js' });
 fact({ chapter: '2. The World', run: 'rules', claim: 'sixty ticks a second', says: ['sixty times a second'], value: STEPS_PER_SECOND === 60 ? 'sixty times a second' : STEPS_PER_SECOND, in: ['simple'], source: '`STEPS_PER_SECOND` in src/sim/constants.js' });
 fact({ chapter: '2. The World', run: 'my Neon Loop lap', claim: 'the same key presses give exactly the same run', says: ['exactly the same run'], value: replayTwice() ? 'exactly the same run' : 'differs', in: ['simple'], source: `ghosts/me-v3.json replayed twice through \`stepWorld()\` (${SIM}); also tests/ghost.test.js and tools/replay-check.js` });
-fact({ chapter: '2. The World', run: 'rules', claim: 'the road went from 64 to 90 px', says: ['64', '90'], value: `${oldWidth}`, check: () => oldWidth === 64 && trackDef('neon-loop').width === 90, source: 'width in src/sim/track.js now (90) and at a6c88e0~1 (64), git history' });
+fact({ chapter: '2. The World', run: 'rules', claim: 'the road went from 64 to 90 px', says: ['64', '90'], value: `${oldWidth}`, check: () => oldWidth === 64 && trackDef('neon-loop').width === 90, source: 'width in src/sim/track.js now (90) and at aac3bfa~1 (64), git history' });
 fact({ chapter: '2. The World', run: 'my Neon Loop lap', claim: 'my best lap is 26.40 s', says: ['26.40'], value: sec(me.steps), source: 'ghosts/me-v3.json (1584 steps)' });
 fact({ chapter: '3. Eyes', run: 'rules', claim: 'five whiskers, up to 200 px', says: ['200'], value: String(SENSOR_RANGE), check: () => SENSOR_ANGLES.length === 5, source: '`SENSOR_ANGLES`, `SENSOR_RANGE` in src/sim/sensors.js' });
 fact({ chapter: '3. Eyes', run: 'rules', claim: 'every input is squeezed between 0 and 1', says: ['0', '1'], in: ['simple'], value: '0', check: () => { const v = inputsFromView([0, 200, 100, 0, 0], 400); return v.every((x) => x >= 0 && x <= 1) && v[0] === 1 && v[1] === 0; }, source: '`inputsFromView()` in src/sim/sensors.js' });
@@ -184,7 +184,7 @@ fact({ chapter: '12. The fix', run: 'track shapes', claim: 'no right-hand turn t
   check: () => !turns.zigzag.length && !turns['wide-sweepers'].length && turns.exam.join() === '49,45', source: 'the track data in src/sim/track.js through `buildTrack()`, every right-hand turn of 150°+ measured here' });
 fact({ chapter: '12. The fix', run: 'exam, four tracks', claim: 'trained on four tracks: four of four, best Exam lap 13.25 s, the fastest of any car so far', says: ['13.25'], value: s2(Math.min(...four.map((r) => r.exam.lapSeconds ?? Infinity))),
   check: () => four.every((r) => r.exam.lapSeconds != null) && Math.min(...four.map((r) => r.exam.lapSeconds)) < Math.min(...exam.results.filter((r) => r.track === 'exam' && r.lapSeconds).map((r) => r.lapSeconds)), source: 'runs/exam-7c.json, against runs/exam.json' });
-fact({ chapter: '12. The fix', run: 'rules', claim: 'the four-track plan was decided after the exam, and pre-registered before training', says: ['after the exam'], value: 'after the exam', check: () => /Step 7c pre-registration/.test(read('DEVLOG.md')), source: 'DEVLOG.md, "Step 7c pre-registration" (commit 41039bd)' });
+fact({ chapter: '12. The fix', run: 'rules', claim: 'the four-track plan was decided after the exam, and pre-registered before training', says: ['after the exam'], value: 'after the exam', check: () => /Step 7c pre-registration/.test(read('DEVLOG.md')), source: 'DEVLOG.md, "Step 7c pre-registration" (commit 2dccd8b)' });
 
 // deep-dive-only corrections the video made
 fact({ chapter: 'deep: generation 1', run: 'seed 3, gen 1', claim: 'seed 3: 58 of the 61 cars that barely moved were then out by the 3-second rule', says: ['58 of the 61'], in: ['deep'], value: `${g1.barelyStalled} of the ${g1.barely}`, source: `generation 1 of seed 3 (${SIM})` });

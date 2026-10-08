@@ -1,11 +1,11 @@
 # Bug Driver — DEVLOG
 
 ## 2026-10-06 — Rules: fixed timestep, sim apart from rendering, English PROMPTS.md
-Commit f51d0b9. Three rules added to CLAUDE.md: the simulation moves in fixed 1/60 s steps, it is kept apart from rendering (x1 / x10 / max and headless in Node), and PROMPTS.md stays English-only.
+Commit 2f37fac. Three rules added to CLAUDE.md: the simulation moves in fixed 1/60 s steps, it is kept apart from rendering (x1 / x10 / max and headless in Node), and PROMPTS.md stays English-only.
 No game yet, no numbers. Nothing broke.
 
 ## 2026-10-06 — Step 1: a track and a bug car you can drive
-Commit 8267f57. The Neon Loop track is stored as data: 33 centerline points plus a 64 px width, smoothed into 495 samples (3961 px of road). 83 invisible checkpoints sit 48 px apart. The tightest bend is the hairpin, 47.9 px centerline radius.
+Commit 6416984. The Neon Loop track is stored as data: 33 centerline points plus a 64 px width, smoothed into 495 samples (3961 px of road). 83 invisible checkpoints sit 48 px apart. The tightest bend is the hairpin, 47.9 px centerline radius.
 The car is a cyan pixel ladybug with a 24×16 px hitbox and simple arcade physics: 330 px/s top speed, wheels that turn gradually, less steering at low and at high speed. A wall stops it dead with sparks and CRASHED; R restarts. Each lap saves the car's exact starting state plus one input per step (4 key bits), so the best lap can be replayed later as a ghost.
 
 Real numbers, from a scripted driver (it follows the centerline and slows for curves, pressing the same 4 keys a player has; no AI):
@@ -25,13 +25,13 @@ What broke:
 🎬 Maybe: 718 of 980 settings for a hand-coded "perfect" driver crashed, on a track a human can drive.
 
 ## 2026-10-06 — Stop tracking .DS_Store
-Commit 1be3b4b. Step 1's commit accidentally included src/.DS_Store, because I staged everything with `git add -A`. This commit removes it and adds a .gitignore. No game change, nothing else broke.
+Commit f4ae36e. Step 1's commit accidentally included src/.DS_Store, because I staged everything with `git add -A`. This commit removes it and adds a .gitignore. No game change, nothing else broke.
 
 ## 2026-10-06 — Rule: devlog commits are separate
-Commit 322ddb5. CLAUDE.md now says DEVLOG/PROMPTS updates go in their own `docs: devlog for <hash>` commit. No game change. Nothing broke.
+Commit 39d4d2d. CLAUDE.md now says DEVLOG/PROMPTS updates go in their own `docs: devlog for <hash>` commit. No game change. Nothing broke.
 
 ## 2026-10-06 — A bigger ladybug you can actually see
-Commit e5b6bc3. After the first human test drive the car was hard to see. It is now a ladybug drawn from above: a round cyan shell with a dark center line and 5 dots on each wing case, a small dark head with two eyes, antennae, and a glowing cyan outline.
+Commit de44bf3. After the first human test drive the car was hard to see. It is now a ladybug drawn from above: a round cyan shell with a dark center line and 5 dots on each wing case, a small dark head with two eyes, antennae, and a glowing cyan outline.
 - On screen: 40×30 px with antennae and wheels, up from 30×18. The shell plus head is 36×26 px, up from 26×18. About 2.2× the area.
 - Hitbox: it was a 24×16 px rectangle. Now it is a 9-point outline that follows the round shell and the head, 36×26 px, sitting just inside the drawn shell. A rectangle that size would stick out past the round shell's corners, so you would crash before visibly touching the wall.
 - The car's center spawns 30 px behind the line (was 20), so its longer nose stays behind the start line.
@@ -47,10 +47,10 @@ All 8 tests pass. In headless Chrome: 2 laps counted, best lap saved under the n
 Nothing broke.
 
 ## 2026-10-06 — Direction chevrons at the start
-Commit e14a0cb. Three faint cyan chevrons sit on the road 60, 92 and 124 px past the start line, pointing the way to drive. They are drawn once into the track image and have no effect on the simulation. Nothing broke.
+Commit 0f6aff5. Three faint cyan chevrons sit on the road 60, 92 and 124 px past the start line, pointing the way to drive. They are drawn once into the track image and have no effect on the simulation. Nothing broke.
 
 ## 2026-10-06 — A 90 px road
-Commit a6c88e0. The human test drive said the steering and physics feel good but the 64 px road was too tight. The road is now 90 px wide. Car physics and the 36×26 hitbox are unchanged.
+Commit aac3bfa. The human test drive said the steering and physics feel good but the 64 px road was too tight. The road is now 90 px wide. Car physics and the 36×26 hitbox are unchanged.
 
 Just setting width to 90 broke two things, so the layout was adjusted:
 - Hairpin: its tightest centerline radius was 47.9 px, barely more than the new half-width of 45, so the inner wall shrank to an almost-sharp point about 3 px across. It is now a proper half-circle of radius 70. Its two legs are 140 px apart (were 128), its apex moved from x 238 to x 260, and its tightest radius is now 57.4 px, so the inner wall bends at about 12 px (it was 16 px at 64 px). It is still the tightest turn on the track.
@@ -71,10 +71,10 @@ All 9 tests pass. In headless Chrome: 2 laps counted, best lap saved under the p
 🎬 Maybe: the same hand-coded driver, 64 px vs 90 px road: 806 → 543 crashes out of 980.
 
 ## 2026-10-06 — Physics freeze
-Commit 29a3ff9. CLAUDE.md now says physics and track are frozen at PHYSICS_VERSION 3, and changing them needs the user's OK first, because it would invalidate the ghost lap and all training. No game change. Nothing broke.
+Commit 286273f. CLAUDE.md now says physics and track are frozen at PHYSICS_VERSION 3, and changing them needs the user's OK first, because it would invalidate the ghost lap and all training. No game change. Nothing broke.
 
 ## 2026-10-06 — Step 2: the car gets eyes
-Commit 6903182. 5 distance rays at −60°, −30°, 0°, +30°, +60° from the heading, each up to 200 px. They live in src/sim/sensors.js:
+Commit 188daf9. 5 distance rays at −60°, −30°, 0°, +30°, +60° from the heading, each up to 200 px. They live in src/sim/sensors.js:
 - castRay(): how far the car can see in one direction.
 - readSensors(): the car's whole view, 5 distances in px.
 - getInputs(): the brain's future input, and the only 6 numbers the car will ever know. Each eye becomes 1 − distance/200 (1 = touching, 0 = nothing in range), and speed becomes speed/330, with reversing counted as 0.
@@ -94,7 +94,7 @@ What broke: one new test failed on its first run because its test wall was ±50 
 🎬 The E overlay: the ladybug in the hairpin with five rays, the 43–153 px labels, and the BRAIN INPUTS panel next to it. "These 6 numbers are all it will ever know" is a ready-made Short.
 
 ## 2026-10-06 — Step 3: a brain, and generation 1
-Commit e1f268d. The brain is a tiny neural network written from scratch in src/sim/brain.js. 6 inputs (getInputs) go to 6 hidden neurons (tanh), then to 4 outputs (sigmoid): gas, brake, left, right. An output above 0.5 holds that key for the step, so the AI uses exactly the player's 4 keys. The whole brain is one flat array of 70 numbers (6×(6+1) + 4×(6+1)), seeded random in −1..1. The functions are neuron(), layer(), outputs() and think().
+Commit 8cbbd64. The brain is a tiny neural network written from scratch in src/sim/brain.js. 6 inputs (getInputs) go to 6 hidden neurons (tanh), then to 4 outputs (sigmoid): gas, brake, left, right. An output above 0.5 holds that key for the step, so the AI uses exactly the player's 4 keys. The whole brain is one flat array of 70 numbers (6×(6+1) + 4×(6+1)), seeded random in −1..1. The functions are neuron(), layer(), outputs() and think().
 100 cars start together and don't collide with each other. A car is out on a crash, or after 3 s without a new checkpoint (stall); a generation ends when all are out or at 60 s. fitness() = checkpoints passed in order plus the fraction of the way to the next one. Progress % = fitness / 83 (82 checkpoints plus the start line again), so 100% is one lap.
 Tab switches to AI mode. 1/2/3 set x1/x10/max: max draws nothing while the generation runs, only a "MAX SPEED" line. `?autoplay=1&seed=N` starts in AI mode and reruns generation 1 every 4 s after it ends. E shows the leader's rays, its 6 inputs, and its 4 outputs with the pressed keys lit. The leader is drawn bigger and bright, live cars at 45%, wrecks at 22%. Manual mode, the lap timer and the ghost recording are untouched.
 
@@ -120,14 +120,14 @@ What broke:
 🎬 Seed 2: the best-looking chaos. At 1.5 s there are wrecks scattered all over the start straight, spark bursts on both walls, and cars sitting backwards, and 28 cars are dead in the first 2 seconds. Runner-up for a different Short is seed 3: a random brain, with no learning at all, still gets 65.1% of the way round before crashing in the U-turn. A "beginner's luck" moment.
 
 ## 2026-10-06 — My ghost lap, saved to the repo
-Commit c5f6489. My best manual lap was exported from my own Chrome's localStorage (origin localhost:3000, key `bug-driver:best:neon-loop-6ujqcw:physics-3`) into ghosts/me-v3.json. The file holds the exact start state, all 1584 inputs (one per step) and the lap time: 1584 steps = 26.40 s.
+Commit cf1acc5. My best manual lap was exported from my own Chrome's localStorage (origin localhost:3000, key `bug-driver:best:neon-loop-6ujqcw:physics-3`) into ghosts/me-v3.json. The file holds the exact start state, all 1584 inputs (one per step) and the lap time: 1584 steps = 26.40 s.
 The page sent the stored text to a local file byte for byte: 1731 bytes, and the SHA-256 in the browser matches the file (8ff671bd9b064d07…). I didn't copy it by hand.
 Headless replay (`src/sim/ghost.js`, `tests/ghost.test.js`): the ghost finishes the lap in exactly 1584 steps, on its very last recorded input. CLAUDE.md now says the scoreboard uses this file, never localStorage.
 For scale: my 26.40 s is 9.15 s slower than the careful scripted driver (17.25 s) and 13.72 s slower than the fastest one (12.68 s). The same localStorage also still held an old 42.92 s lap from physics 1 (64 px road, old hitbox); it is invalid under the frozen rules and was not exported.
 Nothing broke.
 
 ## 2026-10-06 — Step 4: evolution
-Commit 5ce52d5. How a new generation is made (src/sim/evolution.js, every step its own function):
+Commit f68c814. How a new generation is made (src/sim/evolution.js, every step its own function):
 - fitness(): how far along the track (checkpoints in order + fraction to the next), plus, for a finished lap, 6000 ÷ lap time in seconds. "Go as far as you can; if you finish, finish fast." A finisher always outranks a non-finisher.
 - selection(): rank all 100, keep the top 10.
 - Elitism: the best brain goes through unchanged. The simulation is deterministic, so it drives the exact same run again, and the best fitness can never go down (tested).
@@ -172,7 +172,7 @@ Addendum to the Step 4 entry (precision; the numbers above are unchanged):
 - "First lap" in the table is the first lap ever completed, not the fastest lap of that generation. For seed 5 at gen 22, the first car over the line did 15.50 s, while the fastest lap of that generation was 15.07 s.
 
 ## 2026-10-06 — Step 5: see the brain think
-Commit 4106a20 (game). Plan update in the CodeMask repo: c29dd37.
+Commit ac48008 (game). Plan update in the CodeMask repo: c29dd37.
 - **B, live brain panel:** the real network from brain.js, drawn from explainThink(), for the leader or any clicked car. 6 inputs, 6 hidden neurons, 4 outputs, and all 60 connections: thickness = |weight|, cyan +, pink −. Nodes glow by value, and an output turns solid yellow when its key is pressed.
 - **F, explain one decision:** freezes the simulation and shows one hidden neuron (the one with the biggest say in the chosen key) and that key's output neuron. Every input × weight, the sum, + bias, the total, tanh or sigmoid, then pressed or not. ← → pick the key.
 - **N, the 70 numbers:** a grid of every weight and bias, optionally next to a second brain.
@@ -196,7 +196,7 @@ What broke: nothing in the simulation. The on-screen problems were all found in 
 🎬 "Explain one decision", the seed 3 gen 40 champion at the hairpin, step 368 of its solo run (the champion viewer, not the live evolution leader). Its left-60° eye sees the inside wall only 23 px away (input 0.883), and ahead is 94 px. Hidden neuron h6: 0.883 × −1.117 = −0.987 is the biggest term; sum −0.380, + bias −1.173 = −1.554, tanh → −0.914. Output LEFT: h6's −0.914 × −0.615 = +0.562 is the biggest push; sum 1.758, + bias −1.086 = 0.672, sigmoid → 0.662 > 0.5 → LEFT PRESSED. It is braking at the same time (BRAKE 0.549). "The wall on my left is 23 px away, so... turn left", because it is hugging the inside of the hairpin.
 
 ## 2026-10-06 — The beginner guide, chapters 0–5
-Commits 7c64ea0 (rules in CLAUDE.md), 84e10d9 (figures), 6713931 (guide), fbf6b21 (a correction). No game code changed.
+Commits 1f52cc0 (rules in CLAUDE.md), e29df9d (figures), 706eb5c (guide), da99826 (a correction). No game code changed.
 - HOW-IT-WORKS.md: chapters 0–5 plus a glossary, each chapter in the fixed template, every number with a "reproduce it" note.
 - tools/figures.js draws all 19 figures from the real simulation in 14 s and writes every number it uses to docs/img/figure-data.json. Running it twice gives byte-identical files.
 
@@ -215,12 +215,12 @@ What broke:
 - **Two wrong claims in my first draft:**
   - "Skipping 63 checkpoints": that was the old 83-checkpoint track; it is 62 of 82 now.
   - "Rerunning writes exactly the same runs/seed-3.json": the file also stores the run time. The history is identical.
-  - The first was fixed before its commit, the second in fbf6b21.
+  - The first was fixed before its commit, the second in da99826.
 
 🎬 The inside-line table: generation 1 drives down the middle of the hairpin, and generation 80 passes the apex 5 px from the inner wall. Nobody told it to.
 
 ## 2026-10-06 — The guide in two levels
-Commits 73e3221 (rules), 0539f2f (DEEP-DIVE.md), fe0332c (simple HOW-IT-WORKS.md), f773644 (web page). No game code changed.
+Commits a657b57 (rules), 52e5231 (DEEP-DIVE.md), eb9e84c (simple HOW-IT-WORKS.md), b36db04 (web page). No game code changed.
 - **DEEP-DIVE.md** is the full guide from before, with two edits. Chapter 0 has a new analogy: blindfolded drivers whose children inherit their habits with small copying mistakes. The dog-learning-a-trick analogy implied learning during a run, which never happens here. The seed 1 "why" is now labelled "Our best explanation:".
 - **HOW-IT-WORKS.md** is new and simple. It starts with an "In 30 seconds" box, and each chapter has one idea, one picture and one real moment. Six new big-text figures (simple-*.svg) are drawn from the same real data.
 - **docs/guide/** is built by `node tools/guide-page.js` from the two Markdown files: index.html (simple) and deep-dive.html. It is checked at phone width (390 px): no sideways scrolling, no broken images, and all 6 deep-dive links land on real headings.
@@ -235,7 +235,7 @@ What broke:
 - **Labels on top of things.** Several simple figures had labels sitting on walls or on each other; they were moved into free space.
 
 ## 2026-10-06 — Step 6: me vs the AI
-Commits dcc99b3 (race mode and scoreboard) and 3ff5439 (guide chapter 6, both levels).
+Commits 95330cd (race mode and scoreboard) and c4a3cee (guide chapter 6, both levels).
 - **The race.** My ghost (ghosts/me-v3.json, 26.40 s, cyan) and a champion (yellow) drive at the same time without colliding. Each starts its best lap exactly where that lap really began: championBestLap() drives the champion alone for 60 s and keeps its fastest lap and its start state.
 - **No lap, no contest.** A champion with no lap starts from the normal spot and drives until it crashes or stalls; I win by default, and the screen marks where it got out.
 - **Live gap:** when did the leader pass the spot where the other car is now.
@@ -266,7 +266,7 @@ What broke:
 🎬 Generation 10, the first time the AI beats me. It leads from the first quarter of a second. When it crosses the line at 13.17 s I'm only 53% of the way round, and it's 6.4 s ahead of me at that moment. Final: AI WINS by 13.23 s (`?race=3-10&autoplay=1`).
 
 ## 2026-10-06 — Fix: no pictures in the web guide when double-clicked
-Commit 972e5f8. Opening docs/guide/index.html by double-click showed text but no images.
+Commit b5c1a67. Opening docs/guide/index.html by double-click showed text but no images.
 - **Cause: Safari, not the paths.** The paths in the page were already correct (`../img/...` from docs/guide/), and all SVGs are valid XML. In headless Chrome via file:// (no flags) all 7 + 22 images loaded. But on this Mac a double-clicked .html opens in Safari, the system default (Chrome is only set for http links). Safari lets a local page read files in its own folder and below, and `../img/` is outside that.
 - **Reproduced with Safari's engine.** WKWebView with read access limited to the page's folder (docs/guide/): 0 of 7 images loaded. With access one folder up (docs/): 7 of 7.
 - **Fix:** tools/guide-page.js now copies every figure the pages use into docs/guide/img/ (29 SVGs + figure-data.json) and links them as `img/...`. The HTML is still never edited by hand.
@@ -278,19 +278,19 @@ Commit 972e5f8. Opening docs/guide/index.html by double-click showed text but no
 - **What broke, honestly:** my earlier page check passed because it ran in Chrome only, never in the browser that actually opens the file here.
 
 ## 2026-10-06 — Fix, second try: pictures built into the web guide
-Commit 0407de0. After 972e5f8 the user reopened the page and the chapter 6 scoreboard was still a broken image. The broken-image icon in the screenshot was Chromium's, not Safari's.
+Commit ec4bd68. After b5c1a67 the user reopened the page and the chapter 6 scoreboard was still a broken image. The broken-image icon in the screenshot was Chromium's, not Safari's.
 - **What I could and couldn't check.**
   - Could: in headless Chrome via file:// and in WebKit (even with access to the HTML file only), all 7 + 22 images loaded.
   - Couldn't: the Chrome extension can't open file:// pages, so I couldn't look at the user's own window.
   - My best explanation: the page was shown by a viewer that lets a local page load no other files at all (some apps' built-in HTML previews work like that). Not confirmed.
-- **Fix, independent of the viewer.** tools/guide-page.js now builds every figure into the page itself, as a data: URL made from the SVG file. The docs/guide/img/ copies from 972e5f8 are gone.
+- **Fix, independent of the viewer.** tools/guide-page.js now builds every figure into the page itself, as a data: URL made from the SVG file. The docs/guide/img/ copies from b5c1a67 are gone.
   - Page sizes: index.html 208 KB, deep-dive.html 748 KB.
   - The build fails if a Markdown image path doesn't exist (tested: exit code 1 with simple-6-scoreboard.svg hidden, 0 normally), or if any <img> still points at a file.
 - **Checked:**
   - Chrome file://, at 390 px and 1280 px: index.html 7/7 images, deep-dive.html 22/22.
   - The strictest case: both HTML files copied alone into an empty folder, with no figures next to them. Chrome loads 7/7 and 22/22, and so does WebKit with read access to the HTML file only.
   - GitHub is unaffected: the Markdown still points at docs/img/, and all of those files are tracked.
-- **What broke, honestly:** the first fix (972e5f8) solved a real Safari problem but not the one the user saw. I declared it done after testing in two engines, without knowing which app actually showed the page.
+- **What broke, honestly:** the first fix (b5c1a67) solved a real Safari problem but not the one the user saw. I declared it done after testing in two engines, without knowing which app actually showed the page.
 
 ## 2026-10-06 — Step 7a pre-registration (written before any test is run)
 This entry is in the same commit as the tracks themselves, on purpose: it has to be fixed before any car drives them. (Normally devlog entries get their own commit; this one is the exception the prompt asked for.)
@@ -325,7 +325,7 @@ SHA-256 of the four tracks' data (`node tools/track-hash.js`): **f4fccfefb8b4897
 **Me on Exam.** Exam becomes drivable in manual mode (track picker). My first 3 completed laps on it count, and the best of the three is my Exam time. Crashed attempts are not laps. The laps are saved and exported to ghosts/me-exam.json. No AI result on Exam is shown to me before I drive.
 
 ## 2026-10-06 — Step 7a: did it learn, or memorize?
-Commits fa2a3a1 (pre-registration, track SHA-256 f4fccfef…6a2d9c), b4def4f (track picker, Exam record, tests), 130c825 (guide chapter 7, both levels). The pre-registered tests were run exactly as written, and nothing was changed after seeing the results. Exam was not run.
+Commits f543436 (pre-registration, track SHA-256 f4fccfef…6a2d9c), 8441449 (track picker, Exam record, tests), f8defeb (guide chapter 7, both levels). The pre-registered tests were run exactly as written, and nothing was changed after seeing the results. Exam was not run.
 
 Results (`node tools/generalization-report.js`, saved in runs/step7a.json, re-checked by tests/step7.test.js). Each cell is the best lap, or how the car got out and how far it got.
 | car | Neon Loop (home) | Mirrored | Zigzag | Wide Sweepers |
@@ -360,7 +360,7 @@ What broke: nothing in the code. While designing, before registration, Wide Swee
 🎬 The champion that beat me by 14 s stops dead in its own hairpin driven backwards, keeps the brake down, and reverses into the wall (`?champion=3-80&track=neon-loop-mirrored`, crash at 7.63 s).
 
 ## 2026-10-06 — Step 7b: training on three tracks (the exam waits for my Exam lap)
-Commits 4b4662f (training, champions) and 9250e2a (races on other tracks).
+Commits 61337b8 (training, champions) and 2a8bd34 (races on other tracks).
 
 **My Exam lap isn't there yet.**
 - The prompt reported "I drove Exam: 3 counted laps, best 21.37 s".
@@ -396,7 +396,7 @@ Multi-track champions (`node tools/multi-train.js`, champions/seed-3-multi.json)
 - 55 tests pass.
 
 ## 2026-10-06 — Real code in the guide
-Commits b16d35e (readability pass) and 87083da (intro chapter, code boxes, deep-dive code).
+Commits c30be9e (readability pass) and 76b7790 (intro chapter, code boxes, deep-dive code).
 
 **The goal:** a complete beginner should be able to follow everything, including the code.
 
@@ -421,21 +421,21 @@ Commits b16d35e (readability pass) and 87083da (intro chapter, code boxes, deep-
 Checked in Chrome at 390 px and 1100 px: 13 boxes, 8 of 8 images, no sideways scroll.
 
 ## 2026-10-06 — Step 8: things for viewers
-Commits 693bff8 (guide fixes), 66c3a8b (Exam rule), 4dba24e (track check, share links), 82fd0c4 (track menu, editor, any track), f34f7c7 (replay check), 846ceed (guide chapter 8), a3c3eb2 (CLAUDE.md).
+Commits b76f9e9 (guide fixes), b76b836 (Exam rule), 6f45e0a (track check, share links), d53a4cf (track menu, editor, any track), 7e61d93 (replay check), a6fcb6b (guide chapter 8), a399571 (CLAUDE.md).
 
-**Guide fixes first** (693bff8):
+**Guide fixes first** (b76f9e9):
 - `export` is now in the symbols list.
 - The neuron box says what squash means.
 - The mutate box gives the usual nudge (about 0.3 or less).
 - "Roll a die".
 
-**The Exam rule, in one place** (66c3a8b).
+**The Exam rule, in one place** (b76b836).
 - Every AI car in the game, the tools and the tests is created by `createGeneration()`. It now refuses Exam, and any track with exactly Exam's points in another order, before a single car exists.
 - So the races, the champion viewer and live training can't put an AI car on Exam, even by mistake.
 - Exam never opens in the editor and never goes in a share link, in either direction (tested). The one test that touches it passes no brains at all.
 - ghosts/me-exam.json still doesn't exist. When it does, Step 7b's exam has to lift this guard on purpose.
 
-**The track check** (4dba24e), with a plain message and a spot to circle for each problem:
+**The track check** (6f45e0a), with a plain message and a spot to circle for each problem:
 - at least 4 points and at most 60;
 - the walls stay 10 px inside the screen;
 - the tightest bend of the road's middle line is at least 45 px in radius (half the road), or the inside wall folds over itself;
@@ -443,12 +443,12 @@ Commits 693bff8 (guide fixes), 66c3a8b (Exam rule), 4dba24e (track check, share 
 
 The car itself could turn tighter (a radius of about 19.5 px at walking pace), so the road's shape is the real limit. All four drivable built-in tracks pass; their tightest bends are Zigzag 46.2 px, Neon Loop 53.4 px and Wide Sweepers 55.2 px.
 
-**Share links** (4dba24e): `?t=` + "1" + 4 URL-safe letters per point (2 letters = 0..4095).
+**Share links** (6f45e0a): `?t=` + "1" + 4 URL-safe letters per point (2 letters = 0..4095).
 - Paperclip, 18 points: 73 letters.
 - Decoding checks the version, the length, the letters and the whole track check, and gives a plain message otherwise. 2000 random strings and 12 broken links: no crash.
 - Every drivable built-in track round-trips to identical walls, checkpoints and start.
 
-**In the game** (82fd0c4):
+**In the game** (d53a4cf):
 - T opens a track menu: the built-in tracks (Exam marked drive-only), "My track", the track from a link, "Edit / new track", "Copy link", and with a champion running "Copy link: this track + champion".
 - The editor: click to add points, drag to move, right-click to delete, Backspace to undo; the check runs live, and "Drive it" / "Let the AI train on it" stay off until the track is valid.
 - Drive, test any of the 37 saved champions (30 one-track, 7 multi-track), or train from scratch with a seed box, on any track except Exam.
@@ -462,7 +462,7 @@ The car itself could turn tighter (a radius of about 19.5 px at walking pace), s
   - training seed 3 on Paperclip gives the same generations 1 and 2 in the browser and in Node, to the last digit.
 - Not checked by hand: a full lap of my own on a custom track. Driving uses the same code as on the built-in tracks.
 
-**The replay check** (f34f7c7): six scenarios, compared with tools/replay-golden.json, in about 2 s, also inside `npm test` (61 tests pass).
+**The replay check** (7e61d93): six scenarios, compared with tools/replay-golden.json, in about 2 s, also inside `npm test` (61 tests pass).
 - The scenarios: my Neon Loop ghost (1584 steps), champion seed 3 gen 20 (best 759 steps), gen 80 (748), multi-track gen 100 (790), seed 3 generations 1–3 (identical to the first 3 rows of runs/seed-3.json), and Paperclip from its link.
 - **What broke:** the first version compared only my ghost's lap time. In a throwaway copy we changed the car's turn rate by 0.0000001. Five scenarios flagged it, but my ghost still finished in exactly 1584 steps, so it passed. Its path fingerprint was added; now all 6 of 6 flag that change.
 
@@ -491,14 +491,14 @@ Every saved seed 3 champion on Paperclip:
 Not pre-registered: it's a track drawn for fun, chosen because it broke the champion. Our best explanation is the same as for Mirrored: neither Neon Loop nor the three Step 7b training tracks has a right-hand hairpin. This is not the exam; no AI has driven Exam.
 
 **Other things that broke, all fixed before committing:**
-- R on a multi-track champion restarted the one-track champion of the same generation. This bug has been there since 9250e2a.
+- R on a multi-track champion restarted the one-track champion of the same generation. This bug has been there since 2a8bd34.
 - On a crowded track the fitness chart landed on the start line. It now goes where it covers the least road, and stays in Neon Loop's infield there.
 - The editor's buttons covered the start point; they moved to the top right.
 
 ## 2026-10-06 — Step 7b, the exam
-Commits 2dff84d (my Exam ghost), 0be70eb (Exam unlocked for testing), 5973520 (the exam), 0420dc5 (replay check), 8dc8606 (guide chapter 7), cc891eb (CLAUDE.md).
+Commits 34c41c3 (my Exam ghost), acf1ef4 (Exam unlocked for testing), cd6c5f5 (the exam), ff47d26 (replay check), 6cfab78 (guide chapter 7), 13b8ecc (CLAUDE.md).
 
-**My Exam lap** (2dff84d).
+**My Exam lap** (34c41c3).
 - ghosts/me-exam.json, copied unchanged from Downloads.
 - My first 3 counted laps took 3242, 2658 and 1921 steps (54.03 s, 44.30 s, 32.02 s). The file is the third and best of them: **32.02 s is my official Exam time**.
 - Checked three ways:
@@ -507,14 +507,14 @@ Commits 2dff84d (my Exam ghost), 0be70eb (Exam unlocked for testing), 5973520 (t
   - it replays headless to exactly 1921 steps (tests/exam-ghost.test.js).
 - Prompt 15 said 21.37 s. As found then, that lap was on Zigzag. The real Exam lap is 32.02 s, and every race and number here uses it.
 
-**Exam opened for testing, never for training** (0be70eb).
+**Exam opened for testing, never for training** (acf1ef4).
 - `unlockExam()` checks the ghost: the exact track and physics, 3 counted laps, the best of them, and that it replays to its own time. Only then may `createGeneration()` put a saved champion on Exam.
 - `createEvolution()` and `createMultiEvolution()` refuse Exam, always.
 - In the game, Exam allows champions (`?track=exam&champion=3-80`) and the race; "train from scratch" and the seed box say "Nobody trains on Exam, ever".
 - Exam still never opens in the editor or goes in a share link.
 - Tests: a fake ghost doesn't unlock it; after a real unlock, training is still refused.
 
-**The exam** (5973520, `node tools/exam-report.js` → runs/exam.json, every result checked again in tests/exam.test.js). Seed 3, each champion alone, under the evolution rules:
+**The exam** (cd6c5f5, `node tools/exam-report.js` → runs/exam.json, every result checked again in tests/exam.test.js). Seed 3, each champion alone, under the evolution rules:
 | champion | Exam | Neon Loop Mirrored |
 | --- | --- | --- |
 | gen 10, one track | 13.87 s (4 laps) | 13.33 s |
@@ -542,7 +542,7 @@ How they got out:
 - We saw this risk after Step 7a and wrote it down in the Step 7b entry before the exam ran, and kept the pre-registered plan. Nothing was changed after seeing these results.
 - One seed only, so it's a pattern, not a proof.
 
-**Replay check** (0420dc5): now 7 scenarios. My Exam ghost was added. The golden results were updated on purpose with `--update`, and the diff is only the 6 new lines; the old 6 scenarios are unchanged.
+**Replay check** (ff47d26): now 7 scenarios. My Exam ghost was added. The golden results were updated on purpose with `--update`, and the diff is only the 6 new lines; the old 6 scenarios are unchanged.
 
 🎬 **The exam race:** `index.html?race=exam&champion=3-20&autoplay=1`. My 32.02 s against 13.83 s, and the AI wins by 18.18 s.
 
@@ -582,7 +582,7 @@ How they got out:
 **Whatever happens is the result.** No retries, no other seeds, no changes to the method, the tracks or the fitness after seeing anything.
 
 ## 2026-10-06 — Step 7c: four training tracks, and the second Exam test
-Commits 41039bd (pre-registration, before any training), 9f3ea61 (training), b726c2d (the game loads the four-track champions), 935829d (the one Exam test and the race), 2a8e52d (race HUD fix), 9f15254 (guide chapter 7). Everything was run exactly as pre-registered. Nothing was changed after seeing a result, and nothing was retried.
+Commits 2dccd8b (pre-registration, before any training), c08b49e (training), d9ca9a3 (the game loads the four-track champions), 4b3b579 (the one Exam test and the race), c131656 (race HUD fix), bc20484 (guide chapter 7). Everything was run exactly as pre-registered. Nothing was changed after seeing a result, and nothing was retried.
 
 **Training** (`node tools/multi-train.js multi4`, 1073 s in Node). Seed 3, 100 generations, Neon Loop + Mirrored + Zigzag + Wide Sweepers, fitness = the sum of the four.
 - The first lap on all four tracks came in generation 5.
@@ -620,7 +620,7 @@ Commits 41039bd (pre-registration, before any training), 9f3ea61 (training), b72
 - That check also ran their gens 1, 5 and 40 on Exam for the first time: they crashed at 2.53 s, 8.05 s and 5.90 s.
 - The four-track champions never drove Exam before the one real test.
 
-**Also fixed** (2a8e52d): the race HUD wrote both lap times left-aligned 170 px from the right edge. "GEN 100 ×4 TRACKS 13.25" ran off the screen; "×3 TRACKS" would have too. They're right-aligned now.
+**Also fixed** (c131656): the race HUD wrote both lap times left-aligned 170 px from the right edge. "GEN 100 ×4 TRACKS 13.25" ran off the screen; "×3 TRACKS" would have too. They're right-aligned now.
 
 🎬 **The outcome:** `index.html?race=exam&champion=3-multi4-100&autoplay=1`. The car that trained on a right-hand hairpin drives clean through Exam's and beats me by 18.77 s. For the before/after, the same hairpin with the one-track gen 80 first: `index.html?track=exam&champion=3-80` (it reverses into the wall), then `index.html?track=exam&champion=3-multi4-100` (clean laps).
 
@@ -628,18 +628,18 @@ Commits 41039bd (pre-registration, before any training), 9f3ea61 (training), b72
 
 **Correction to the Step 7c entry above:** "the first lap on all four tracks came in generation 5" was wrong. The first laps came earlier and track by track: Wide Sweepers in gen 2 (3 cars), Mirrored and Zigzag in gen 3, Neon Loop in gen 4 (runs/seed-3-multi4.json). Gen 5 is the first generation whose champion finished a lap on all four.
 
-## 2026-10-08 — The guides, matched to the video (b8de5ad, 593ecf5, 498ae81, 21beabb)
+## 2026-10-08 — The guides, matched to the video (2826564, 2726111, e3ae0e8, 49ce8ad)
 
 Prompt 20. Docs and guide tools only; no simulation code, track, physics or training changed (69 tests pass, the replay check is unchanged).
 
-- **tools/guide-page.js (b8de5ad):** builds WebP and PNG figures into the pages as data: URLs, like the SVGs, and keeps `VIDEO_URL&t=` links as written. Both pages still open with no other file next to them: checked by copying each page alone into an empty folder (25 and 32 images, none broken).
-- **HOW-IT-WORKS.md rewritten (593ecf5):** the video's 14 chapters in its order, each with its watch link (t = 51, 171, 242, 325, 378, 597, 686, 742, 823, 894, 975, 1022, 1114, 1146 s). About 2,700 words of text, plus 355 in captions and 819 in the four code boxes (neuron, fitness, mutate, think). 25 stills from the video (docs/img/guide-*.webp, 1.1 MB in all), cropped to their content.
-- **DEEP-DIVE.md updated (498ae81):** chapter 6 reframed: my lap is one of four benchmarks, and the first generation under each is 6 (19.25 s), 8 (15.43 s), 19 (12.67 s) and never (centre-line floor 11.93 s; best of the run 12.43 s). Generation 1 now says how every car went out: seed 3, 76 stalled and 24 crashed (seeds 1, 2, 4, 5: 67/33, 60/40, 70/30, 60/40). The other script corrections, three new sections, and glossary entries.
-- **The fact check (21beabb):** `node tools/guide-facts.js` works out 50 facts again (the 980 rule settings take about 8 s) and checks both guides say them: 50 of 50 confirmed. It writes guide-facts.md, with every other deep-dive number listed by section with that section's sources.
+- **tools/guide-page.js (2826564):** builds WebP and PNG figures into the pages as data: URLs, like the SVGs, and keeps `VIDEO_URL&t=` links as written. Both pages still open with no other file next to them: checked by copying each page alone into an empty folder (25 and 32 images, none broken).
+- **HOW-IT-WORKS.md rewritten (2726111):** the video's 14 chapters in its order, each with its watch link (t = 51, 171, 242, 325, 378, 597, 686, 742, 823, 894, 975, 1022, 1114, 1146 s). About 2,700 words of text, plus 355 in captions and 819 in the four code boxes (neuron, fitness, mutate, think). 25 stills from the video (docs/img/guide-*.webp, 1.1 MB in all), cropped to their content.
+- **DEEP-DIVE.md updated (e3ae0e8):** chapter 6 reframed: my lap is one of four benchmarks, and the first generation under each is 6 (19.25 s), 8 (15.43 s), 19 (12.67 s) and never (centre-line floor 11.93 s; best of the run 12.43 s). Generation 1 now says how every car went out: seed 3, 76 stalled and 24 crashed (seeds 1, 2, 4, 5: 67/33, 60/40, 70/30, 60/40). The other script corrections, three new sections, and glossary entries.
+- **The fact check (49ce8ad):** `node tools/guide-facts.js` works out 50 facts again (the 980 rule settings take about 8 s) and checks both guides say them: 50 of 50 confirmed. It writes guide-facts.md, with every other deep-dive number listed by section with that section's sources.
 
 Nothing broke in the game. One draft claim was wrong and never committed: "weights from about −3 to +3" (the champions' are −1.96 to +2.28).
 
-## 2026-10-08 — The numbers next to a picture (14c53cf)
+## 2026-10-08 — The numbers next to a picture (f2bdda1)
 
 Prompt 21. Docs and the fact-check tool only (69 tests pass).
 
@@ -647,11 +647,11 @@ Prompt 21. Docs and the fact-check tool only (69 tests pass).
 - tools/guide-facts.js: every fact names its step or run, every picture of HOW-IT-WORKS.md says which it shows, and a number in a picture's caption or in the paragraph right above it must come from that step or run, or be a rule of the game. Tested by putting the old sentence back: it fails with "20 comes from seed 3, gen 4→5". 52 of 52 facts confirmed.
 - Release note (CLAUDE.md): `VIDEO_URL` becomes the full `https://www.youtube.com/watch?v=<ID>`, not youtu.be, so the `&t=` links work.
 
-## 2026-10-08 — The video is up: watch links (36e3e90)
+## 2026-10-08 — The video is up: watch links (34a6d46)
 
 Prompt 22. Docs and the page build only (69 tests pass, guide-facts.js: 52 of 52 facts confirmed).
 
 - HOW-IT-WORKS.md: the 14 `VIDEO_URL&t=` links are now `https://www.youtube.com/watch?v=xQIbVdU7Gn8&t=` (t = 51 … 1146 s, the video's chapter times), the full watch form so the times work. DEEP-DIVE.md had no placeholder. docs/guide/index.html rebuilt (56 figures, still self-contained).
 - tools/guide-page.js fails the build on a left-over `VIDEO_URL` or a youtu.be link; checked by putting one placeholder back.
-- The chapter 6 numbers (generation 1 to 2: 15, 16, …, 1 children) were already fixed in 14c53cf.
+- The chapter 6 numbers (generation 1 to 2: 15, 16, …, 1 children) were already fixed in f2bdda1.
 

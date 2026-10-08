@@ -925,7 +925,7 @@ export function raceResult(race) {
 *Every tested champion, alone on three tracks it has never driven. Cyan: its best lap. Pink: it never finished a lap; the cell says how it got out and how far it got. Left column: its lap on Neon Loop, its home track, for comparison.*
 
 ### Pre-registered: the tests were fixed before any car drove
-Before running anything, we added four new tracks and wrote down the exact tests in [DEVLOG.md](DEVLOG.md) ("Step 7a pre-registration", commit fa2a3a1). That way the results couldn't change the questions. All four tracks use the same 90 px road and the same frozen physics. Their data has a fingerprint (SHA-256 `f4fccfef…6a2d9c`), and a test fails if they ever change.
+Before running anything, we added four new tracks and wrote down the exact tests in [DEVLOG.md](DEVLOG.md) ("Step 7a pre-registration", commit f543436). That way the results couldn't change the questions. All four tracks use the same 90 px road and the same frozen physics. Their data has a fingerprint (SHA-256 `f4fccfef…6a2d9c`), and a test fails if they ever change.
 
 ![The four new tracks](docs/img/07-new-tracks.svg)
 
@@ -992,7 +992,7 @@ The exam: the one-track champions of generations 10, 20 and 80, and the three-tr
 *Reproduce it: `node tools/exam-report.js` (writes `runs/exam.json`; `tests/exam.test.js` checks every result and the race).*
 
 ### Step 7c: one more try, decided after the exam
-**Said openly: this step was not in the plan.** It exists because of the exam result above, and it was pre-registered before any training (DEVLOG.md, "Step 7c pre-registration", commit 41039bd).
+**Said openly: this step was not in the plan.** It exists because of the exam result above, and it was pre-registered before any training (DEVLOG.md, "Step 7c pre-registration", commit 2dccd8b).
 - **The change:** train on 4 tracks: Neon Loop, Neon Loop Mirrored, Zigzag, Wide Sweepers. Mirrored is added because it has a hairpin that turns right.
 - **Everything else unchanged:** seed 3 from scratch, 100 generations, fitness = the sum of the 4 single-track scores, 100 cars, top 10, 1 elite, mutation 10% with sigma 0.3. It took 1073 s in Node.
 - **The test:** the 7 saved champions on Exam, once, after training. No retries, no tuning. Exam is still never trained on.

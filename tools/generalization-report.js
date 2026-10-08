@@ -46,5 +46,5 @@ if (process.argv[1]?.endsWith('generalization-report.js')) {
       console.log(`${id.padEnd(19)} seed ${c.seed} gen ${String(c.generation).padEnd(3)} ${what}`);
     }
   }
-  writeFileSync(new URL('runs/step7a.json', root), JSON.stringify({ preRegistered: 'DEVLOG.md, Step 7a pre-registration (commit fa2a3a1)', results }, null, 1) + '\n');
+  writeFileSync(new URL('runs/step7a.json', root), JSON.stringify({ preRegistered: 'DEVLOG.md, Step 7a pre-registration (commit f543436)', results }, null, 1) + '\n');
 }
